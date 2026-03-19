@@ -41,7 +41,7 @@ be changed directly in Excel and downstream cells will update automatically.
 | **Ops Costs** | Annual CapEx for compute and storage, broken out by line item |
 | **Purchase Plan** | Actionable per-year purchase requirements (batch nodes, K8s, storage by tier), with LOY1 (FY2026) detail for the current purchase cycle |
 | **International Compute** | DRP compute split: USDF (35%), France / CC-IN2P3 (40%), UK / UKDF (25%) |
-| **Yearly Readiness** | Per-LOY readiness (LOY1–LOY10) with milestone markers (DP2, DR1–DR4) and on-track / gap status |
+| **Yearly Readiness** | Per-LOY readiness (LOY1–LOY10) with milestone markers (DP2, DR1–DR9) and on-track / gap status |
 | **Charts** | Forecast charts for storage and compute growth |
 
 ---
@@ -90,9 +90,9 @@ repository. Their key numbers have been captured in `sizing_params.yaml`.
 - **storage_retention** — sliding window lengths for Qserv, output images, coadds, Parquet
 - **qserv_data_per_node** — per-LOY drive density ramp
 - **row_sizes** — per-LOY catalog row size growth
-- **dr_schedule** — DR1/DR2/DR3 target LOYs
+- **dr_schedule** — DR1–DR9 target LOYs (annual; 11 total DRs per PSTN-019, DR10–DR11 beyond model window)
 - **international_compute** — France (40%) and UK (25%) DRP shares
-- **milestones_by_loy** — DP2, DR1–DR4 milestone labels per LOY
+- **milestones_by_loy** — DP2, DR1–DR9 milestone labels per LOY (annual data releases)
 - **dp2** — Data Preview 2 parameters (10% of DR1)
 - **k8s** — K8s infrastructure growth rate
 - **efd** — Engineering Facility Database storage estimate

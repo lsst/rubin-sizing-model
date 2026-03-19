@@ -56,7 +56,7 @@ prompt:
   tier1_tb_per_night: 5.6        # long-term retention (preliminary_visit_image + difference_image etc.)
   tier2_tb_per_night: 6.0        # short-term retention (30-day rolling)
   tier2_retention_days: 30
-  dr1_target_year: 2028          # Feb 2028 -- Tier 1 accumulates until this year
+  dr1_target_year: 2027          # DR1 at LOY2 (~12-14 months after survey start) -- Tier 1 accumulates until this year
 
 # ---------------------------------------------------------------------------
 # Qserv (from conversation with Igor)
@@ -257,17 +257,38 @@ row_sizes:
 
 # ---------------------------------------------------------------------------
 # DR Schedule (LOY -> DR mapping for readiness summary)
+# Per PSTN-019: 11 annual data releases over 10-year survey.
+# DR1 at LOY2 (~12-14 months after survey start, per RTN-011).
+# DR10-DR11 fall beyond this model's 10-LOY window.
 # ---------------------------------------------------------------------------
 dr_schedule:
   DR1:
-    loy: 3          # LOY3 = FY2028
-    description: "First full data release"
+    loy: 2          # LOY2 = FY2027
+    description: "First full data release (year 1 observations)"
   DR2:
-    loy: 5          # LOY5 = FY2030
-    description: "Second data release (~2x DR1)"
+    loy: 3          # LOY3 = FY2028
+    description: "Second data release (years 1-2)"
   DR3:
+    loy: 4          # LOY4 = FY2029
+    description: "Third data release (years 1-3)"
+  DR4:
+    loy: 5          # LOY5 = FY2030
+    description: "Fourth data release (years 1-4)"
+  DR5:
+    loy: 6          # LOY6 = FY2031
+    description: "Fifth data release (years 1-5)"
+  DR6:
     loy: 7          # LOY7 = FY2032
-    description: "Third data release"
+    description: "Sixth data release (years 1-6)"
+  DR7:
+    loy: 8          # LOY8 = FY2033
+    description: "Seventh data release (years 1-7)"
+  DR8:
+    loy: 9          # LOY9 = FY2034
+    description: "Eighth data release (years 1-8)"
+  DR9:
+    loy: 10         # LOY10 = FY2035
+    description: "Ninth data release (years 1-9)"
 
 # ---------------------------------------------------------------------------
 # International Compute Sharing (DRP only — storage stays at USDF)
@@ -281,18 +302,20 @@ international_compute:
 
 # ---------------------------------------------------------------------------
 # Milestones by LOY (for purchase planning / readiness)
+# 11 annual DRs per PSTN-019; DR1 at LOY2, DR9 at LOY10.
+# DR10-DR11 extend beyond the 10-LOY model window.
 # ---------------------------------------------------------------------------
 milestones_by_loy:
   1: "DP2"
-  2: ""
-  3: "DR1"
-  4: ""
-  5: "DR2"
-  6: ""
-  7: "DR3"
-  8: ""
-  9: "DR4"
-  10: ""
+  2: "DR1"
+  3: "DR2"
+  4: "DR3"
+  5: "DR4"
+  6: "DR5"
+  7: "DR6"
+  8: "DR7"
+  9: "DR8"
+  10: "DR9"
 
 # ---------------------------------------------------------------------------
 # Data Preview 2 (currently running — 10% of DR1 processing)

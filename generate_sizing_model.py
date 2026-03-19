@@ -671,7 +671,7 @@ def build_ops_storage_tab(ws, P, N, FY0):
         ws.cell(row=31, column=i + 3).value = f"={apdb_ref_tb}/{apdb_ref_vis}*{c}16*{c}15"
         ws.cell(row=31, column=i + 3).number_format = num_fmt_tb()
 
-    # Row 32: Prompt Tier 1 (accumulates nights * tier1_tb_per_night per year until DR1)
+    # Row 32: Prompt Tier 1 (accumulates until DR1, then constant)
     ws.cell(row=32, column=1, value="Prompt Tier 1 (cumulative)")
     ws.cell(row=32, column=2, value="TB")
     dr1_year = prompt["dr1_target_year"]
