@@ -87,6 +87,7 @@ observing:
 imaging:
   lsstcam_image_size_tb: 0.00819222      # 8.19 GB logical per exposure (Key Numbers row 24)
   raw_compression: 0.464                  # 3.8 GB on disk / 8.19 GB logical (Key Numbers rows 24,31)
+  calibration_compression: 1.0            # no measured compression for cals — use full logical size
   lossy_compression: 0.27                 # from DRP doc: compressed/uncompressed visit_image ratio
   # Per-visit DRP output constants from DRP Resource Usage Estimates (DR1 actual, uncompressed):
   output_image_tb_per_visit: 0.01906      # DR1 visit_image: 4,003 TB / 210k visits
@@ -208,9 +209,9 @@ costs:
 # Price Decrease Factors (annual, compounding)
 # ---------------------------------------------------------------------------
 price_factors:
-  cpu_annual_decrease: 0.10              # 10% per year
-  storage_annual_decrease: 0.05          # 5% per year
-  qserv_annual_decrease: 0.075           # 7.5% per year
+  cpu_annual_decrease: 0.0               # flat — no annual decrease (was 10%)
+  storage_annual_decrease: 0.0           # flat — no annual decrease (was 5%)
+  qserv_annual_decrease: 0.0             # flat — no annual decrease (was 7.5%)
 
 # ---------------------------------------------------------------------------
 # Lifecycle / Depreciation

@@ -34,8 +34,7 @@ that would benefit from refinement to increase the model's robustness.
 | # | Gap | Impact | Suggested Fix |
 |---|-----|--------|---------------|
 | 3.1 | **Unit costs are point-in-time** — the model uses a power-law deflation curve. Actual vendor pricing fluctuates and depends on procurement volume. | Costs diverge further out. | Refresh unit costs annually from procurement quotes. |
-| 3.2 | **No operating costs (power, cooling, rack space, staffing)** — only capital expenditure is modelled. | Total Cost of Ownership (TCO) is underestimated. | Add an OpEx layer ($/kW, FTE costs). |
-| 3.3 | **No network / bandwidth costs** — data transfer between USDF, France, and UK is not costed. | Relevant if large datasets ship internationally. | Add WAN transfer cost estimate. |
+| 3.2 | **No network / bandwidth costs** — data transfer between USDF, France, and UK is not costed. | Relevant if large datasets ship internationally. | Add WAN transfer cost estimate. |
 | 3.4 | **Torino pricing is provisional** — the Torino node cost ($16,000) may change at procurement. | Budget uncertainty for future LOYs. | Update `sizing_params.yaml` when RFQ is received. |
 
 ## 4. Data Products
@@ -63,5 +62,4 @@ that would benefit from refinement to increase the model's robustness.
 1. **Storage refresh accounting** (2.1) — highest risk of silently inflating available storage.
 2. **GPU growth model** (1.2) — increasingly important as ML pipelines mature.
 3. **Per-pipeline compute breakdown** (1.3) — essential for capacity planning conversations with pipeline teams.
-4. **Operating costs** (3.2) — needed for full budget submissions.
-5. **Sensitivity analysis** (5.1) — critical for confidence when presenting to stakeholders.
+4. **Sensitivity analysis** (5.1) — critical for confidence when presenting to stakeholders.

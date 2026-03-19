@@ -151,8 +151,10 @@ def generate_png_charts(P, N, FY0):
 
         eng_imgs = obs["engineering_fraction"] * sci_imgs_year
         cal_imgs = obs["nights_per_year"] * obs["calibration_images_per_day"]
+        cal_comp = img["calibration_compression"]
         ri = (img["lsstcam_image_size_tb"] * img["raw_compression"]
-              * (sci_imgs_year + eng_imgs + cal_imgs))
+              * (sci_imgs_year + eng_imgs)
+              + img["lsstcam_image_size_tb"] * cal_comp * cal_imgs)
 
         prec = P["precursor"]
         coadd_per_dr = (prec["hsc_rc2_output_coadd_tb"] / prec["hsc_rc2_area_deg2"]
@@ -600,12 +602,13 @@ def build_ops_storage_tab(ws, P, N, FY0):
     # Row 10: blank
     # Row 11: LSSTCam image size
     param_row(11, "LSSTCam image size", "TB", [img["lsstcam_image_size_tb"]] * N)
-    # Row 12: Raw compression
-    param_row(12, "Raw image compression", "factor", [img["raw_compression"]] * N)
+    # Row 12: Raw compression (science + engineering)
+    param_row(12, "Raw image compression (science)", "factor", [img["raw_compression"]] * N)
     # Row 13: Lossy compression
     param_row(13, "Lossy image compression", "factor", [img["lossy_compression"]] * N)
+    # Row 14: Calibration compression (typically 1.0 = uncompressed — no measured data)
+    param_row(14, "Calibration image compression", "factor", [img["calibration_compression"]] * N)
 
-    # Row 14: blank
     # Row 15: Nights per year
     param_row(15, "Observing nights per year", "nights", [obs["nights_per_year"]] * N, num_fmt_int())
     # Row 16: Visits per night
@@ -692,11 +695,15 @@ def build_ops_storage_tab(ws, P, N, FY0):
 
     # Row 34: blank
     # Row 35: Raw Images per year (annual production, not cumulative)
+    # Science + engineering images use measured raw_compression (Row 12);
+    # calibration images use calibration_compression (Row 14) — no measured data.
     ws.cell(row=35, column=1, value="LSSTCam Raw Images (per year)")
     ws.cell(row=35, column=2, value="TB")
     for i in range(N):
         c = col(i)
-        ws.cell(row=35, column=i + 3).value = f"=SUM({c}19:{c}21)*{c}11*{c}12"
+        ws.cell(row=35, column=i + 3).value = (
+            f"=({c}19+{c}20)*{c}11*{c}12+{c}21*{c}11*{c}14"
+        )
         ws.cell(row=35, column=i + 3).number_format = num_fmt_tb()
 
     # Row 36: LSSTCam Output Coadd Images (per-DR, constant — area-based)
