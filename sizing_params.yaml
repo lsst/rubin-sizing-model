@@ -1,0 +1,322 @@
+# =============================================================================
+# Rubin Observatory USDF Sizing Model -- Tunable Parameters
+# =============================================================================
+# Edit numbers here; re-run generate_sizing_model.py to regenerate the xlsx.
+# The Python script itself should never need editing.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# General
+# ---------------------------------------------------------------------------
+general:
+  start_fiscal_year: 2026        # FY corresponding to LOY1
+  num_loy: 10                    # LOY1 through LOY10
+  scale_year: 2026               # year used as baseline for price factor scaling
+
+# ---------------------------------------------------------------------------
+# DRP Estimates (from DRP Resource Usage Estimates, Jim Bosch)
+# Numbers calibrated against actual DP2 measurements and DR1 projections.
+# ---------------------------------------------------------------------------
+drp:
+  # DRP core-hours = input_TB_per_year × cumulative_years × core_hours_per_input_TB
+  # Calibrated so that 1 year of input (798 TB) × 20571 = 16.4M core-hours = DR1 actual.
+  core_hours_per_input_tb: 20571   # DR1 actual: 16,416,000 ch / 798 TB input
+  commissioning_carryover_ch: 0    # no carry-over assumed
+  dr1_node_days: 5700              # DR1 estimate: 5700 node-days @ 120 cores/node
+  dp2_node_days: 650               # DP2 actual: 650 node-days @ 120 cores/node
+  safety_margin: 1.5
+  cores_per_node: 120
+  wall_to_cpu_ratio: 1.14
+  processing_window_days: 200
+  # Storage totals from DRP Resource Usage Estimates (with lossy compression):
+  dp2_storage_total_pb: 7.43      # DP2 total DRP output (compressed, ~30k visits)
+  dp2_storage_release_pb: 0.32    # DP2 release products (compressed)
+  dr1_storage_total_pb: 47        # DR1 total DRP output (compressed, ~210k visits)
+  dr1_storage_release_pb: 1.6     # DR1 release products (compressed)
+  dr1_storage_nocomp_pb: 52       # DR1 total without compression (for reference)
+  dr2_multiplier: 2.0
+
+# ---------------------------------------------------------------------------
+# Alert Production (from existing sizing spreadsheet Compute tab)
+# ---------------------------------------------------------------------------
+alert_production:
+  ap_cores: 1188                 # alert production cores (Compute!$F$27)
+
+# ---------------------------------------------------------------------------
+# Compute Scaling Fractions
+# ---------------------------------------------------------------------------
+compute_fractions:
+  dac_drp_fraction: 0.10         # DAC/LSP cores = 10% of DRP cores
+  staff_dac_fraction: 0.10       # Staff LSP cores = 10% of DAC cores
+
+# ---------------------------------------------------------------------------
+# Prompt Products (RFC-1134)
+# ---------------------------------------------------------------------------
+prompt:
+  tier1_tb_per_night: 5.6        # long-term retention (preliminary_visit_image + difference_image etc.)
+  tier2_tb_per_night: 6.0        # short-term retention (30-day rolling)
+  tier2_retention_days: 30
+  dr1_target_year: 2028          # Feb 2028 -- Tier 1 accumulates until this year
+
+# ---------------------------------------------------------------------------
+# Qserv (from conversation with Igor)
+# ---------------------------------------------------------------------------
+qserv:
+  current_nodes: 92              # Docker bare-metal nodes (15 Docker + 77 K8s v-cluster)
+  cores_per_node: 32
+  ram_gb_per_node: 256
+  nvme_slots_populated: 12       # out of 24 total slots
+  nvme_slots_total: 24
+  storage_tb_per_node: 32        # with 12 slots (uncompressed)
+  max_storage_tb_per_node: 64    # if all 24 slots populated
+  replication_factor: 3
+
+# ---------------------------------------------------------------------------
+# Observing Parameters (from Rubin Key Numbers spreadsheet)
+# ---------------------------------------------------------------------------
+observing:
+  nights_per_year: 300             # assumed observing nights (2 wk planned + 2 wk unplanned outage)
+  visits_per_night: 700            # sim-based: 2.1M visits / 10yr / 300 nights (was 1000 pre-ops)
+  images_per_visit: 1              # snaps=1 per Rubin Key Numbers (was 2 during construction)
+  calibration_images_per_day: 450  # from Rubin Key Numbers (was 500 pre-ops)
+  engineering_fraction: 0.01       # engineering images = 1% of science images
+
+# ---------------------------------------------------------------------------
+# Image & Compression Parameters (from Rubin Key Numbers + DRP Resource Usage Estimates)
+# ---------------------------------------------------------------------------
+imaging:
+  lsstcam_image_size_tb: 0.00819222      # 8.19 GB logical per exposure (Key Numbers row 24)
+  raw_compression: 0.464                  # 3.8 GB on disk / 8.19 GB logical (Key Numbers rows 24,31)
+  lossy_compression: 0.27                 # from DRP doc: compressed/uncompressed visit_image ratio
+  # Per-visit DRP output constants from DRP Resource Usage Estimates (DR1 actual, uncompressed):
+  output_image_tb_per_visit: 0.01906      # DR1 visit_image: 4,003 TB / 210k visits
+  parquet_tb_per_visit: 0.00618           # DR1 non-image release: 1,297 TB / 210k visits
+  # Legacy HSC ratio (kept for reference; no longer used in output formulas):
+  lsstcam_to_hsc_ratio: 0.00936473464
+
+# ---------------------------------------------------------------------------
+# Storage Scaling Fractions and Constants
+# ---------------------------------------------------------------------------
+storage_fractions:
+  apdb_reference_tb: 4.5           # APDB reference total TB (OSS-REQ-0190 baseline)
+  apdb_reference_visits: 57000     # visits corresponding to the APDB reference TB
+  scratch_fraction: 0.10           # scratch = 10% of output images
+  misc_overhead_fraction: 0.20     # other/misc = 20% of per-year subtotal
+  sims_output_tb: 5.0              # simulation output (constant per year)
+
+# ---------------------------------------------------------------------------
+# Catalog Row Sizes (from LDM-141)
+# ---------------------------------------------------------------------------
+catalogs:
+  object_row_bytes: 1896
+  object_extra_row_bytes: 21005
+  source_row_bytes: 467
+  forced_source_row_bytes: 41
+  loy1_objects: 27500000000        # 27.5 billion
+  loy1_sources: 901000000000       # 901 billion
+  loy1_forced_sources: 2910000000000  # 2.91 trillion
+  objects_per_year: [27500000000, 32500000000, 35700000000, 38200000000, 40300000000, 42200000000, 43800000000, 45300000000, 46400000000, 47400000000]
+  sources_per_year: [901000000000, 1800000000000, 2700000000000, 3600000000000, 4510000000000, 5410000000000, 6310000000000, 7210000000000, 8110000000000, 9010000000000]
+  forced_sources_multiplier: 1.0   # Model!G8 in old sheet (multiplied by base values)
+  forced_sources_base_per_year: [2910000000000, 6870000000000, 11300000000000, 16100000000000, 21300000000000, 26700000000000, 32400000000000, 38300000000000, 44100000000000, 50100000000000]
+
+# ---------------------------------------------------------------------------
+# Science Users
+# ---------------------------------------------------------------------------
+users:
+  count_per_year: [5000, 6000, 7000, 7500, 7500, 7500, 7500, 7500, 7500, 7500]
+  tb_per_user_per_year: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]
+
+# ---------------------------------------------------------------------------
+# Precursor / Reference Data (from Storage tab -- HSC RC2/PDR2, DC2)
+# ---------------------------------------------------------------------------
+precursor:
+  hsc_rc2_area_deg2: 8.5
+  hsc_rc2_input_images_tb: 0.8098272
+  hsc_rc2_output_images_tb: 2.4         # lossless compressed
+  hsc_rc2_output_coadd_tb: 0.675        # lossless compressed
+  hsc_rc2_output_catalogs_tb: 1.419
+  hsc_pdr2_input_images_tb: 93.3426312  # 2564358 CCDs * 18.2 MB
+  lsstcam_area_deg2: 17000
+  coadd_products: 2                      # deep and good-seeing
+
+# ---------------------------------------------------------------------------
+# Current Hardware on the Ground (2026 -- Rubin USDF specific)
+# Source: 2026_HW_Initial_Capacity_Capture.xlsx (FY24 planners + initial
+#         capture tabs, Rubin USDF rows only).
+# Milano count: 50 from FY24 CPU Planner. Usage confirms ~60% utilization
+#   (2.76M core-hours/month avg ÷ 92,160 core-hours/node/month ≈ 30 nodes
+#    active; 50 purchased for Rubin matches capacity).
+# Torino count: 10 confirmed by user as specifically available to Rubin.
+# ---------------------------------------------------------------------------
+current_fleet:
+  batch:
+    milano_nodes: 50             # FY24 CPU Planner, Rubin USDF row
+    milano_cores_per_node: 128   # FY24 CPU Planner B22
+    milano_ram_gb: 512           # FY24 CPU Planner B23
+    torino_nodes: 10             # user confirmed, available to Rubin
+    torino_cores_per_node: 120   # Initial CPU Capture, "Torino node usable cores"
+    torino_ram_gb: 720
+  k8s:
+    nodes: 75                    # Initial k8s Capture, Rubin USDF row
+    cores_per_node: 48           # FY24 k8s Planner B22
+    ram_gb_per_node: 256         # K8s node RAM
+  interactive:
+    nodes: 11                    # Initial InteractiveWorkflow Cap, Rubin USDF
+    cores_per_node: 64           # FY24 Interactive Planner B22
+  gpu:
+    h200_nodes: 2                # Initial GPU Capture, Rubin USDF (includes H200 from 2025)
+    h200_cores: 128              # GPU H200 cores
+    h200_ram_gb: 512             # GPU H200 RAM
+    h200_eff_cores: 128          # GPU H200 effective cores
+  qserv:
+    nodes: 92                    # from conversation with Igor
+  storage:
+    total_installed_pb: 30       # Initial Storage Capture, Rubin USDF = 30,000 TB
+
+# ---------------------------------------------------------------------------
+# Node Costs (2025-2026 actuals / estimates)
+# ---------------------------------------------------------------------------
+costs:
+  nodes:
+    milano_usd: 11800            # FY24 CPU Planner, $11.8K per node
+    milano_cores: 128
+    milano_ram_gb: 512
+    torino_usd: 16000            # estimated for future purchases
+    torino_cores: 120            # usable cores from HW Capture
+    torino_ram_gb: 720
+    k8s_usd: 8000
+    k8s_cores: 48
+    qserv_usd: 20000
+    gpu_h200_usd: 250000
+    eff_cores_milano: 128        # physical cores per Milano
+    eff_cores_torino: 120        # usable cores per Torino (from HW Capture)
+    eff_cores_xeon: 27           # for K8s reference (from DMTN-135 Table 29)
+  storage:
+    flash_per_tb: 320            # NVMe / Weka
+    normal_per_tb: 56            # SATA HDD / Ceph POSIX
+    latent_per_tb: 36            # object store / slow disk
+    tape_per_tb: 12.5            # LTO tape
+  hosting:
+    per_node_per_year: 566       # floor space + power + cooling + maintenance
+    rack_install_cost: 24000
+    nodes_per_rack: 36
+    overhead_pct: 0.14           # 14% of hardware cost as overhead
+    overhead_fixed_m: 0.15       # $150K fixed annual overhead (in $M)
+
+# ---------------------------------------------------------------------------
+# Price Decrease Factors (annual, compounding)
+# ---------------------------------------------------------------------------
+price_factors:
+  cpu_annual_decrease: 0.10              # 10% per year
+  storage_annual_decrease: 0.05          # 5% per year
+  qserv_annual_decrease: 0.075           # 7.5% per year
+
+# ---------------------------------------------------------------------------
+# Lifecycle / Depreciation
+# ---------------------------------------------------------------------------
+lifecycle:
+  compute_lifetime_years: 3
+  storage_lifetime_years: 5
+
+# ---------------------------------------------------------------------------
+# Storage Retention Windows (years)
+# ---------------------------------------------------------------------------
+storage_retention:
+  qserv_window_years: 3           # Qserv DB kept for 3 years (sliding)
+  output_images_window_years: 2   # Output images kept 2 years
+  coadd_window_years: 3           # Coadd images kept 3 years
+  parquet_window_years: 3         # Parquet catalogs kept 3 years
+
+# ---------------------------------------------------------------------------
+# Qserv Data-per-Node Ramp (TB per node over LOY1-10)
+# Drives get denser: 43.2 -> 86.4 -> 172.8
+# ---------------------------------------------------------------------------
+qserv_data_per_node:
+  - 43.2    # LOY1
+  - 43.2    # LOY2
+  - 86.4    # LOY3
+  - 86.4    # LOY4
+  - 86.4    # LOY5
+  - 86.4    # LOY6
+  - 172.8   # LOY7
+  - 172.8   # LOY8
+  - 172.8   # LOY9
+  - 172.8   # LOY10
+
+# ---------------------------------------------------------------------------
+# Object / Source Row Size Growth (bytes, per LOY -- from existing spreadsheet)
+# Row sizes grow ~3% per year as schema evolves
+# ---------------------------------------------------------------------------
+row_sizes:
+  object_per_year: [1896, 1953, 2012, 2073, 2136, 2201, 2268, 2337, 2408, 2481]
+  object_extra_per_year: [21005, 21636, 22286, 22955, 23644, 24354, 25085, 25838, 26614, 27413]
+  source_per_year: [467, 482, 497, 512, 528, 544, 561, 578, 596, 614]
+  forced_source_per_year: [41, 41, 41, 41, 41, 41, 41, 41, 41, 41]
+
+# ---------------------------------------------------------------------------
+# DR Schedule (LOY -> DR mapping for readiness summary)
+# ---------------------------------------------------------------------------
+dr_schedule:
+  DR1:
+    loy: 3          # LOY3 = FY2028
+    description: "First full data release"
+  DR2:
+    loy: 5          # LOY5 = FY2030
+    description: "Second data release (~2x DR1)"
+  DR3:
+    loy: 7          # LOY7 = FY2032
+    description: "Third data release"
+
+# ---------------------------------------------------------------------------
+# International Compute Sharing (DRP only — storage stays at USDF)
+# France (CC-IN2P3) and UK (UKDF) contribute DRP compute.
+# DMTN-135 uses 50%/25%; user specifies 40%/25%.
+# USDF handles remaining fraction plus ALL AP, DAC, Qserv, K8s.
+# ---------------------------------------------------------------------------
+international_compute:
+  france_drp_share: 0.40       # CC-IN2P3 handles 40% of DRP compute
+  uk_drp_share: 0.25           # UKDF handles 25% of DRP compute
+
+# ---------------------------------------------------------------------------
+# Milestones by LOY (for purchase planning / readiness)
+# ---------------------------------------------------------------------------
+milestones_by_loy:
+  1: "DP2"
+  2: ""
+  3: "DR1"
+  4: ""
+  5: "DR2"
+  6: ""
+  7: "DR3"
+  8: ""
+  9: "DR4"
+  10: ""
+
+# ---------------------------------------------------------------------------
+# Data Preview 2 (currently running — 10% of DR1 processing)
+# ---------------------------------------------------------------------------
+dp2:
+  drp_fraction: 0.10           # DP2 is ~10% of DR1 workload
+
+# ---------------------------------------------------------------------------
+# K8s Infrastructure Growth
+# ---------------------------------------------------------------------------
+k8s:
+  growth_rate_per_year: 0.05   # 5% annual growth for K8s services
+
+# ---------------------------------------------------------------------------
+# EFD (Engineering and Facility Database)
+# EFD telemetry is stored on K8s node-local storage, not on the shared
+# Ceph/Weka pool. It is bundled with K8s node cost, not tracked as
+# separate storage purchases. Included here for documentation.
+# ---------------------------------------------------------------------------
+efd:
+  storage_tb_per_year: 1.0     # approximate telemetry growth
+
+# ---------------------------------------------------------------------------
+# Current Year Status (for purchase cycle planning)
+# ---------------------------------------------------------------------------
+current_year:
+  months_elapsed: 3            # as of March 2026
+  months_remaining: 9          # rest of FY2026

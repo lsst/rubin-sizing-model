@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>[#RFC-1134] Prompt data products dataset types for data.lsst.cloud users</title>
+    <meta http-equiv="Content-Type" Content="application/vnd.ms-word; charset=UTF-8">
+        <style type="text/css">
+
+.tableBorder, .grid
+{
+    background-color: #fff;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableBorder td, .grid td
+{
+    vertical-align: top;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+
+.noPadding
+{
+    padding: 0 !important;
+}
+
+h3 .subText
+{
+    font-size: 60%;
+    font-weight: normal;
+}
+
+.tabLabel
+{
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-bottom:none;
+    padding: 2px;
+    display: inline;
+}
+
+td.blank
+{
+    padding: 0;
+    margin: 0;
+}
+
+.blank td
+{
+    border: none;
+}
+
+#descriptionArea
+{
+    margin: 0;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+
+hr
+{
+    border-top:1px solid #aaa;
+}
+
+hr.fullcontent
+{
+  height: 15px;
+  padding: 10px 0;
+  background: #fff url('https://rubinobs.atlassian.net/images/icons/hr.gif') no-repeat scroll center;
+}
+
+</style>
+
+</head>
+<body>
+
+<table class="tableBorder" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td bgcolor="#f0f0f0" width="100%" colspan="2" valign="top">
+                            <h3 class="formtitle">
+                        [RFC-1134]&nbsp;<a href="https://rubinobs.atlassian.net/browse/RFC-1134">Prompt data products dataset types for data.lsst.cloud users</a>
+            <span class="subText">
+               Created: 22/Oct/25                   &nbsp;Updated: 16/Mar/26
+
+                                            </span>
+            </h3>
+        </td>
+    </tr>
+    <tr>
+        <td width="20%"><b>Status:</b></td>
+        <td width="80%">Board Recommended</td>
+    </tr>
+    <tr>
+        <td width="20%"><b>Project:</b></td>
+        <td width="80%"><a href="https://rubinobs.atlassian.net/secure/BrowseProject.jspa?id=10055">Request For Comments</a></td>
+    </tr>
+
+        <tr>
+            <td><b>Components:</b></td>
+            <td>
+                                        <a title="DM - Data Management"
+                href="https://rubinobs.atlassian.net/issues/?jql=project%3D10055%20AND%20%22component%22%3D11107%20ORDER%20BY%20priority%20ASC"
+            >DM</a>                        </td>
+    </tr>
+    
+
+    
+
+    
+    
+    </table>
+
+<br />
+<table class="grid" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td bgcolor="#f0f0f0" valign="top" width="20%">
+            <b>Type:</b>
+        </td>
+        <td bgcolor="#ffffff" valign="top"  colspan="3" >
+            RFC
+        </td>
+
+            </tr>
+    <tr>
+                        <td bgcolor="#f0f0f0" valign="top" width="20%">
+                <b>Reporter:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top"  width="30%" >
+                                        
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_reporter_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                            </td>
+        
+                    <td bgcolor="#f0f0f0" width="20%">
+                <b>Assignee:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" nowrap  width="30%" >
+                                        
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_assignee_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                            </td>
+            </tr>
+    	<tr>
+		<td bgcolor="#f0f0f0" width="20%">
+			<b>Resolution:</b>
+		</td>
+		<td bgcolor="#ffffff" valign="top" width="30%" nowrap>
+            				Unresolved
+                    </td>
+                    <td bgcolor="#f0f0f0" width="20%">
+                <b>Votes:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" width="30%" nowrap>
+                0
+            </td>
+        
+    </tr>
+    
+        <tr>
+        <td bgcolor="#f0f0f0" width="20%">
+            <b>Labels:</b>
+        </td>
+        <td id="labels-336217-value" class="value" bgcolor="#ffffff" valign="top" colspan="3" nowrap>
+                            None
+                    </td>
+    </tr>
+    
+    
+    </table>
+
+
+
+    <br />
+
+    	<table class="grid" cellpadding="0" cellspacing="0" border="0" width="100%">
+            
+
+        
+            <tr>
+            <td bgcolor="#f0f0f0" width="20%" valign="top">
+                <b>Issue links:</b>
+            </td>
+            <td bgcolor="#ffffff" valign="top" class="noPadding">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="blank">
+                                            <tr>
+                            <td colspan="4" bgcolor="#f0f0f0">
+                                <b>Gantt: start-finish</b><br/>
+                            </td>
+                        </tr>
+                                    <tr>
+            <td>
+                is triggering
+            </td>
+            <td>
+                <a href="https://rubinobs.atlassian.net/browse/DM-53937">
+                     DM-53937                 </a>
+            </td>
+            <td>
+                Create task to standardize AP single ...
+            </td>
+            <td>
+                To Do
+            </td>
+        </tr>
+                                                                            <tr>
+                            <td colspan="4" bgcolor="#f0f0f0">
+                                <b>Relates</b><br/>
+                            </td>
+                        </tr>
+                                    <tr>
+            <td>
+                relates to
+            </td>
+            <td>
+                <a href="https://rubinobs.atlassian.net/browse/RFC-1140">
+                     RFC-1140                 </a>
+            </td>
+            <td>
+                Proposed plan for temporary retention...
+            </td>
+            <td>
+                Adopted
+            </td>
+        </tr>
+                                                                    </table>
+            </td>
+        </tr>
+    
+
+
+    
+                        <tr>
+                <td bgcolor="#f0f0f0" width="20%" valign="top"><b>Planned End:</b></td>
+                <td id="customfield_10074-336217-value" class="value" bgcolor="#ffffff" width="80%">            <span title="04/Nov/25 9:00 AM"><time class="livestamp allow-future" datetime="2025-11-04T09:00:00-0700">04/Nov/25 9:00 AM</time></span>
+    </td>
+            </tr>
+            </table>
+
+    <br/>
+
+    <table cellpadding="2" cellspacing="0" border="0" width="100%" align="center">
+    <tr>
+        <td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+            &nbsp;<font color="#ffffff"><b>Description</b></font>&nbsp;
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+    </table>
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td id="descriptionArea">
+            <p>We plan to make prompt data products available to data right holders at data.lsst.cloud some time in 2026.  </p>
+
+<p>In this RFC, I would like to decide what <b>butler dataset types</b> from the alert production pipelines we will publish.  Notes: </p>
+
+<ol>
+	<li>This RFC is only about the prompt image products and other types we wish to provide via a butler repo at RSP.  I don't intend to discuss catalogs provided via databases in this RFC. </li>
+	<li>These datasets are produced by <tt>ap_pipe</tt> pipeline (or a fallback when full ApPipe can't run) by realtime prompt processing and catchup processing with LSSTCam data. </li>
+	<li>That implies that this RFC is only about survey-style FBS-driven science observations.</li>
+	<li>The data we provide to data.lsst.cloud users is a subset of what project people can access at USDF.  Project people access more types at repo <tt>embargo</tt> and  <tt>main</tt>. <b>Please think non-project users at data.lsst.cloud  in this RFC</b>! </li>
+	<li>Nothing is permanent and we can change later. It might be easy to add types but difficult to remove, because users form expectations. </li>
+	<li>Project requirement is to have the data products for 30 days (DMS-REQ-0310) and later on-demand re-generation (DMS-REQ-0311 , DMS-REQ-0399). We currently do not foresee a re-generation service in early 2026. </li>
+	<li><del>If possible we will turn on lossy compression to save space.  But we aren’t ready to do it today. So here I start with a baseline estimate.</del>   Since 2025-12-09 prompt processing production has started to use lossy16 compression for image outputs. The size estimate here is updated with the compressed sizes.</li>
+	<li>Ultimately we might consolidate some butler catalog datasets from per-
+{visit, detector}
+<p> into per-visit datasets in the non-realtime, post-alert, pre-publication pipelines. It might not reduce storage space but save inodes and database rows. This RFC is a baseline without such consolidation.</p></li>
+	<li>Non-realtime pipelines might add dataset types for publication and they may replace some dataset types here in the future. We now have an initial Daytime AP catchup batch and its outputs are included here. Outputs from further pipelines are out of scope for this RFC but we will revisit when we know more about other non-realtime pipelines. Please consider this RFC a baseline with basic Daytime AP catchup but not other non-realtime pipelines.</li>
+	<li>Some solar system dataset types (<tt>ss_*</tt> ) may be dropped if they confirm the PPDB contents are sufficient. Proposal is to provide them until PPDB is available for community. They are listed in a separate tier.</li>
+</ol>
+
+
+
+
+<p>This RFC may matter to you. Some examples but not limited to </p>
+
+<ul>
+	<li>Any dataset type we provide the users is a dataset type we need to provide support about.</li>
+	<li>What we decide has storage implications 💰  . The data will be stored at <tt>/sdf/data/rubin/</tt>. </li>
+	<li>You know how scientists may use these data</li>
+	<li>… I don’t know, so here is an RFC 🙂</li>
+</ul>
+
+
+
+
+<p>I’m listing the dataset types in two tiers. The 3 in <font color="#0747a6">bold face</font> are images and dominate the space usage; others are much smaller by comparison.  </p>
+
+<h2><a name="Tier1.KeepuntilDR1"></a>Tier 1.  Keep until DR1</h2>
+
+<p>To mitigate the lack of regeneration service, we propose these 3 types to be kept as long as possible until DR1.</p>
+
+<ul>
+	<li><font color="#0747a6"><b>preliminary_visit_image</b></font> <b>(~5.3TB per night)</b></li>
+	<li><tt>preliminary_visit_image_background</tt> (~0.02TB per night)</li>
+	<li><tt>difference_kernel</tt> (~0.06TB per night) (Moved to Tier 2 once the regeneration service is available)</li>
+	<li><tt>preliminary_visit_summary</tt>  (Produced by Daytime AP Catchup) (Typically &lt;0.01 TB per night)</li>
+	<li><del>single_visit_star_reprocessed_footprints  (Produced by Daytime AP Catchup) (the 5 sigma direct source catalog) Sizes vary. Worst case can be ~5TB per night.</del>   (Replaced by <tt>ap_source</tt> )</li>
+	<li><tt>ap_source</tt> (a new dataset type to be produced by Daytime AP Catchup)(the 5 sigma direct source catalog) Sizes vary and to be known.  Preliminary size estimate is  about 0.2TB per night but would be more for denser fields.</li>
+</ul>
+
+
+
+
+<p>If DR1 is 1 year later, it can be about 5.6TB*365 = about <b>2PB.</b> </p>
+
+<p>If DR1 is 2 year later, it can be about 4*PB.* </p>
+
+<p>RTN-011 v7.3 has “Start of LSST” at Feb 2026 and  DR1 at Feb 2028. </p>
+
+<p>This assumes 1000 visits per night, but we might not have observations in full speed in early operations. Some sizes depend on the fields. </p>
+
+
+
+<h2><a name="Tier2%3AStoredfor30days.Deleteafterwards.%C2%A0"></a>Tier 2: Stored for 30 days. Delete afterwards. </h2>
+
+<ul>
+	<li><font color="#0747a6"><b>difference_image</b></font> <b>(~5.3TB per night)</b></li>
+	<li><tt>single_visit_star_footprints</tt> (typically &lt;1TB per night. Worst case can be ~5TB per night though)</li>
+	<li><tt>dia_source_apdb</tt></li>
+	<li><tt>dia_forced_source_apdb</tt></li>
+	<li><tt>dia_object_apdb</tt></li>
+	<li><tt>marginal_new_dia_source</tt></li>
+	<li><tt>regionTimeInfo</tt></li>
+</ul>
+
+
+<p>~6TB*30= about <b>0.2PB</b> for 30 days</p>
+
+
+
+<h2><a name="Tier3%3AKeepalluntilPPDBavailabletocommunity.Donotprovideafterwards.%C2%A0"></a>Tier 3: Keep all until PPDB available to community. Do not provide afterwards. </h2>
+
+<ul>
+	<li><tt>ss_source_direct_detector</tt></li>
+	<li><tt>ss_object_direct_unassociated</tt></li>
+	<li><tt>ss_object_unassociated_detector</tt></li>
+	<li><tt>ss_source_detector</tt></li>
+</ul>
+
+
+
+
+<h2><a name="Others%C2%A0"></a>Others  </h2>
+
+<p>Other relevant types we will also provide to data.lsst.cloud users. My understanding is they are needed per requirements (DMS-REQ-0346), so probably no disputes here. </p>
+
+<ul>
+	<li><tt>raw</tt></li>
+	<li>All <tt><b>_metadata</tt>, <tt></b>_log</tt>, <tt>*_config</tt>, and packages datasets from the processing</li>
+	<li><tt>refcat</tt>:  <tt>the_monster_20250219</tt></li>
+	<li><tt>pretrainedModelPackage</tt>: <tt>pretrained_models/tac_cnn_dc2_2024-11-14</tt></li>
+	<li><tt>skyMap</tt>: <tt>lsst_cells_v1</tt></li>
+	<li><tt>template_coadd</tt>: follows what <tt>embargo</tt> has in the <tt>LSSTCam/templates</tt> collection</li>
+	<li><tt>calib</tt>: follows what <tt>embargo</tt> has in the <tt>LSSTCam/calib</tt> collection</li>
+</ul>
+
+
+<h2><a name=""></a></h2>
+<p>Types that we <b>DO NOT</b> provide to data.lsst.cloud users</p>
+
+
+<ul>
+	<li><font color="#0747a6"><b>template_detector</b></font> <b>(~9.4TB per night)</b>  (see comments)</li>
+	<li>Any other butler dataset types from real-time/night-time prompt processing not listed in this RFC</li>
+</ul>
+
+
+
+
+<h2><a name="FileCounts"></a>File Counts</h2>
+
+<p>5 Tier 1 types + 7 Tier 2 types + 4 Tier 3 types= 16 output types.</p>
+
+<p>Plus 1 raw  + 17 tasks <b>2 ( <tt></b>_metadata</tt>, <tt>*_log</tt>)<br/>
+--&gt; that is 51 types in total.  </p>
+
+<p><tt>_config</tt> is 1 per task per day.  <tt>packages</tt> is 1 per day → not counting them</p>
+
+<p>Types like <tt>refcat</tt> <tt>pretrainedModelPackage</tt> <tt>skyMap template_coadd</tt> and other calib should be updated less frequently than daily. → not counting them</p>
+
+
+
+<p>51 types * 1000 visits per night * 188 detectors = about  <b>9,600,000</b> files.</p>
+
+<p>Future work may consolidate metadata and log files so we have fewer files, but Butler database rows may still be there. </p>
+            <br/>
+        </td>
+    </tr>
+    </table>
+
+    <br/>
+
+    <table cellpadding="2" cellspacing="0" border="0" width="100%" align="center">
+    <tr>
+        <td bgcolor="#bbbbbb" width="1%" nowrap align="center">
+            &nbsp;<font color="#ffffff"><b>Comments</b></font>&nbsp;
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+    </table>
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="grid" style="margin: 0;">
+                <tr id="comment-header-606818"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">22/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-606818"><td bgcolor="#ffffff">
+            <p>Tagging <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A75b6608f-df26-4775-a93d-f50ab790c78d" class="user-hover" rel="712020:75b6608f-df26-4775-a93d-f50ab790c78d" data-account-id="712020:75b6608f-df26-4775-a93d-f50ab790c78d" accountid="712020:75b6608f-df26-4775-a93d-f50ab790c78d" rel="noreferrer">Adam Bolton</a> <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=61f1af42aeaacb00720a62fb" class="user-hover" rel="61f1af42aeaacb00720a62fb" data-account-id="61f1af42aeaacb00720a62fb" accountid="61f1af42aeaacb00720a62fb" rel="noreferrer">Wei Yang</a>  as this affects storage need</p>
+        </td></tr>
+                <tr id="comment-header-606819"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:befe5a11-4020-4c5e-a75b-747d71151eae"
+                id="word_commented_712020:befe5a11-4020-4c5e-a75b-747d71151eae"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Abefe5a11-4020-4c5e-a75b-747d71151eae">
+                    Krzysztof Findeisen
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">22/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-606819"><td bgcolor="#ffffff">
+            <p>My understanding (based mostly on worst-case crowded field work) is that <tt>single_visit_star_footprints</tt> can be up to 28 MiB each. That’s a scale comparable to the image datasets.</p>
+        </td></tr>
+                <tr id="comment-header-606822"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">22/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-606822"><td bgcolor="#ffffff">
+            <p>Thanks! I rounded up the 30days estimate a bit. </p>
+
+<p>But indeed if we observe crowded field every night and all are 28MiB each,  we would need  ~25% more storage… </p>
+        </td></tr>
+                <tr id="comment-header-606872"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="5c2f5797a217aa69bce53f54"
+                id="word_commented_5c2f5797a217aa69bce53f54"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=5c2f5797a217aa69bce53f54">
+                    Jim Bosch
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">23/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-606872"><td bgcolor="#ffffff">
+            <p>I think we would ultimately benefit a lot from consolidating any public butler catalog datasets from per-</p>
+{visit, detector}
+<p> into per-visit datasets in  our post-alert, pre-publication pipelines.  I don’t think that will save regular storage space, but it may save inodes and database rows, especially if we decide to retain any butler database rows for 30-day datasets after we delete them (I think this is a big open question).</p>
+
+<p>I think the expectation is that we will be adding a <tt>source<span class="error">&#91;_detector&#93;</span></tt> to Tier 1 in Y1 only, to be created entirely in post-alert, pre-publication pipelines.  But I think that might replace <tt>single_visit_star_detector</tt>, and it could be a lot smaller if we don’t keep the footprints and store in Parquet instead of afw.table FITS.</p>
+        </td></tr>
+                <tr id="comment-header-606896"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:90208234-7b6a-4246-94bd-1dca1b533c09"
+                id="word_commented_557058:90208234-7b6a-4246-94bd-1dca1b533c09"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A90208234-7b6a-4246-94bd-1dca1b533c09">
+                    Mario Juric
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">23/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-606896"><td bgcolor="#ffffff">
+            <p>I want to discuss this with the SolSys subgroup, as we’re working on understanding how to increase completeness of SSO detection while we’re still bootstrapping the templates. So I don’t misrepresent them, where can I find the up-to-date definitions for <tt>single_visit_star_detector</tt> and <tt>source</tt>, and how/when they’re generated (i.e., sigma-thresholds, deblending settings, etc)?</p>
+        </td></tr>
+                <tr id="comment-header-606920"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                id="word_commented_557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab">
+                    Kian-Tat Lim
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">23/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-606920"><td bgcolor="#ffffff">
+            <p>We (<a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A5afef4b4-f1bc-4238-977f-9f8d3183e55c" class="user-hover" rel="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" data-account-id="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" accountid="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" rel="noreferrer">Gregory Dubois-Felsmann</a> <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960" class="user-hover" rel="63e809f7db4f715c97259960" data-account-id="63e809f7db4f715c97259960" accountid="63e809f7db4f715c97259960" rel="noreferrer">Tim Jenness</a> and I) believe that <tt>template_detector</tt> is trivial to reproduce using the warp task, the <tt>template_coadd</tt> that already has to be kept and published, and the WCS from the <tt>preliminary_visit_image</tt>.  So a few lines of code can replace 26 TB/night of images.</p>
+        </td></tr>
+                <tr id="comment-header-606924"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                id="word_commented_557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab">
+                    Kian-Tat Lim
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">23/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-606924"><td bgcolor="#ffffff">
+            <p>I believe the <tt>single_visit_star_footprints</tt> contain so-called HeavyFootprints with per-pixel information (I see <tt>HeavyFootprintF</tt> in the persistables section of the FITS file).  Is this required or can it be stripped, possibly saving a lot of space?  I don’t think we’re expecting to publish HeavyFootprints as part of the standardized <tt>source</tt> Parquet catalog.</p>
+
+<p>(Grr, Jira didn’t show me Jim’s comment when I posted this; sorry for the redundancy.)</p>
+        </td></tr>
+                <tr id="comment-header-607110"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                id="word_commented_557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438">
+                    Ian Sullivan
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">24/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607110"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab" class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" data-account-id="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" accountid="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" rel="noreferrer">Kian-Tat Lim</a> <tt>template_detector</tt> is not necessarily easy to reproduce exactly. During the first ~year when we are building up incremental templates it can be very helpful to know exactly what template was used for a given science image.</p>
+        </td></tr>
+                <tr id="comment-header-607115"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">24/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607115"><td bgcolor="#ffffff">
+            <p>I had been told that templates are not changing through the first year and once we have a template for a patch that is then fixed until the templates from DR1 turn up. <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438" class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" data-account-id="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" accountid="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" rel="noreferrer">Ian Sullivan</a> are you saying that templates will be recalculated during the year? What is the actual reason why it’s not possible to reproduce. If you had the exact template from that date what is the problem?</p>
+        </td></tr>
+                <tr id="comment-header-607116"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                id="word_commented_557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438">
+                    Ian Sullivan
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">24/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607116"><td bgcolor="#ffffff">
+            <p>If you have the exact <tt>template_coadd</tt> from the date it should be possible to reproduce the <tt>template_detector</tt>. There is high pressure from the community to produce alerts as early as possible over as much sky as possible, so we are preparing for the possibility that we will need to update templates several times before DR1 templates are available. Note that we only expect to have DR1 templates a year after we stop taking DR1 observations, so this period spans about two years.</p>
+        </td></tr>
+                <tr id="comment-header-607117"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">24/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607117"><td bgcolor="#ffffff">
+            <p>My naive guess is that it's still much cheaper in storage to keep every template and use butler provenance to work out which template to use to regenerate a given detector template.</p>
+
+<p><em>This comment was left via Slack.</em></p>
+        </td></tr>
+                <tr id="comment-header-607727"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">31/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607727"><td bgcolor="#ffffff">
+            <p>Can you add file count per day per dataset type in addition to total size? Butler is affected more by number of datasets and I see <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aa49cc341-56b7-4dbb-8396-545e067e5c6c" class="user-hover" rel="712020:a49cc341-56b7-4dbb-8396-545e067e5c6c" data-account-id="712020:a49cc341-56b7-4dbb-8396-545e067e5c6c" accountid="712020:a49cc341-56b7-4dbb-8396-545e067e5c6c" rel="noreferrer">David Irving</a> is currently estimating 3 million files to be published per day (more than DP1) where I think we had originally been assuming the number would be about 600k.</p>
+        </td></tr>
+                <tr id="comment-header-607729"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">31/Oct/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607729"><td bgcolor="#ffffff">
+            <p>Also, if we are going to want to run a re-creation service on any of these dataset types then we will also need to be archiving the provenance graphs from prompt products. In theory we could not publish those to Google but leave them at USDF for the service to read. (we might not ever be able to promise exactly the same results unless the prompt software is very stable).</p>
+        </td></tr>
+                <tr id="comment-header-607903"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="5c2f5797a217aa69bce53f54"
+                id="word_commented_5c2f5797a217aa69bce53f54"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=5c2f5797a217aa69bce53f54">
+                    Jim Bosch
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">03/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607903"><td bgcolor="#ffffff">
+            <p>I hadn’t noticed my my first quick pass through this RFC that we were proposing to store <tt>template_detector</tt>.  I think we can provide code to make them from <tt>template_coadd</tt> that will work well enough (even if it’s not quite as packaged up as a recreation service), and storing the warped templates is a huge upscope in storage.</p>
+        </td></tr>
+                <tr id="comment-header-607911"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:49aa4cb9-303e-4a6b-9428-6c8646cbc11d"
+                id="word_commented_557058:49aa4cb9-303e-4a6b-9428-6c8646cbc11d"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A49aa4cb9-303e-4a6b-9428-6c8646cbc11d">
+                    Eric Bellm
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">03/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607911"><td bgcolor="#ffffff">
+            <p>I don’t remember why <tt>template_detector</tt> ended up in Tier 1; I think Tier 2 (30 day retention) would be fine for it.  We should keep it that long for forced photometry and make it available for users.</p>
+        </td></tr>
+                <tr id="comment-header-607942"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">03/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-607942"><td bgcolor="#ffffff">
+            <p>Are all of the Tier 2 dataset types needed by the community or are some of them solely being used to make life easier for solar system processing at USDF? Keeping things for 30 days in USDF prompt butler can be done without being required to sync to cloud RSP.</p>
+        </td></tr>
+                <tr id="comment-header-608032"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608032"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960" class="user-hover" rel="63e809f7db4f715c97259960" data-account-id="63e809f7db4f715c97259960" accountid="63e809f7db4f715c97259960" rel="noreferrer">Tim Jenness</a> <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aa49cc341-56b7-4dbb-8396-545e067e5c6c" class="user-hover" rel="712020:a49cc341-56b7-4dbb-8396-545e067e5c6c" data-account-id="712020:a49cc341-56b7-4dbb-8396-545e067e5c6c" accountid="712020:a49cc341-56b7-4dbb-8396-545e067e5c6c" rel="noreferrer">David Irving</a>  It’s worse if we include all <tt><b>_metadata</tt> and <tt></b>_log</tt>.  Here is my math: </p>
+
+<p>From the 2 tiers of pp products: 4+ 11 =15 output types. <br/>
+Plus 1 raw  + 17 tasks <b>2 ( <tt></b>_metadata</tt>, <tt>*_log</tt>)<br/>
+--&gt; that is 50 types in total.  </p>
+
+<p><tt>_config</tt> is 1 per task per day.  <tt>packages</tt> is 1 per day → not counting them</p>
+
+<p>Types like <tt>refcat</tt> <tt>pretrainedModelPackage</tt> <tt>skyMap template_coadd</tt> and other calib should be updated less frequently than daily. → not counting them</p>
+
+
+<p>50 types * 1000 visits per night * 188 detectors =  <b>9,400,000</b> files. </p>
+        </td></tr>
+                <tr id="comment-header-608033"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608033"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960" class="user-hover" rel="63e809f7db4f715c97259960" data-account-id="63e809f7db4f715c97259960" accountid="63e809f7db4f715c97259960" rel="noreferrer">Tim Jenness</a>  PP currently doesn’t store any graphs.  Some work is needed to make that happen.  Can’t provenance graphs be re-created if we know the pipelines? </p>
+        </td></tr>
+                <tr id="comment-header-608034"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:a49cc341-56b7-4dbb-8396-545e067e5c6c"
+                id="word_commented_712020:a49cc341-56b7-4dbb-8396-545e067e5c6c"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aa49cc341-56b7-4dbb-8396-545e067e5c6c">
+                    David Irving
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608034"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6" class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" data-account-id="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" accountid="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" rel="noreferrer">Hsin-Fang Chiang</a> Jim’s new provenance system consolidates all the metadata and log files into a single file.  There is still additional work needed to integrate the provenance system into PP.  Once that is done it should get things down to worst case of 1 extra dataset per exposure+detector combination – and possibly as little as one extra dataset per day_obs.</p>
+        </td></tr>
+                <tr id="comment-header-608035"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608035"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A49aa4cb9-303e-4a6b-9428-6c8646cbc11d" class="user-hover" rel="557058:49aa4cb9-303e-4a6b-9428-6c8646cbc11d" data-account-id="557058:49aa4cb9-303e-4a6b-9428-6c8646cbc11d" accountid="557058:49aa4cb9-303e-4a6b-9428-6c8646cbc11d" rel="noreferrer">Eric Bellm</a> : At least <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438" class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" data-account-id="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" accountid="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" rel="noreferrer">Ian Sullivan</a>  has expressed wishes to keep <tt>template_detector</tt> longer than 30 days if possible.  It indeed drives the storage need significantly.   <br/>
+We might also pick a middle point, say 6 months or whatever, if Pipelines wish to keep <tt>template_detector</tt> longer than 30 days.  </p>
+        </td></tr>
+                <tr id="comment-header-608036"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608036"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960" class="user-hover" rel="63e809f7db4f715c97259960" data-account-id="63e809f7db4f715c97259960" accountid="63e809f7db4f715c97259960" rel="noreferrer">Tim Jenness</a> My understanding is that those solar system related products are indeed meant for the community, but <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A90208234-7b6a-4246-94bd-1dca1b533c09" class="user-hover" rel="557058:90208234-7b6a-4246-94bd-1dca1b533c09" data-account-id="557058:90208234-7b6a-4246-94bd-1dca1b533c09" accountid="557058:90208234-7b6a-4246-94bd-1dca1b533c09" rel="noreferrer">Mario Juric</a>  should confirm. </p>
+        </td></tr>
+                <tr id="comment-header-608038"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608038"><td bgcolor="#ffffff">
+            <p>I don't understand. I thought above we agreed that we would not keep template_detector because it can easily be recreated so long as we track provenance for which specific template was used.</p>
+
+<p><em>This comment was left via Slack.</em></p>
+        </td></tr>
+                <tr id="comment-header-608040"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:90208234-7b6a-4246-94bd-1dca1b533c09"
+                id="word_commented_557058:90208234-7b6a-4246-94bd-1dca1b533c09"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A90208234-7b6a-4246-94bd-1dca1b533c09">
+                    Mario Juric
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608040"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6" class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" data-account-id="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" accountid="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" rel="noreferrer">Hsin-Fang Chiang</a> <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960" class="user-hover" rel="63e809f7db4f715c97259960" data-account-id="63e809f7db4f715c97259960" accountid="63e809f7db4f715c97259960" rel="noreferrer">Tim Jenness</a> Reading the Tier 2 list, these look like APDB contents (not just SolSys specific tables) + source catalogs. <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A49aa4cb9-303e-4a6b-9428-6c8646cbc11d" class="user-hover" rel="557058:49aa4cb9-303e-4a6b-9428-6c8646cbc11d" data-account-id="557058:49aa4cb9-303e-4a6b-9428-6c8646cbc11d" accountid="557058:49aa4cb9-303e-4a6b-9428-6c8646cbc11d" rel="noreferrer">Eric Bellm</a> should confirm, but I think these are effectively a substitute for PPDB which would mean we want the community to be able to access them.</p>
+        </td></tr>
+                <tr id="comment-header-608041"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608041"><td bgcolor="#ffffff">
+            <p>You mean we need them until PPDB is available? Or we need them even if PPDB exists.</p>
+
+<p><em>This comment was left via Slack.</em></p>
+        </td></tr>
+                <tr id="comment-header-608059"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                id="word_commented_557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438">
+                    Ian Sullivan
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608059"><td bgcolor="#ffffff">
+            <p>I think there is value in keeping <tt>template_detector</tt> available, since with it and the other Tier 1 data products you can reproduce the image differencing results exactly. However, if we have provenance that will tell us the correct coadds to use as inputs and those are preserved I would support dropping the time we keep <tt>template_detector</tt> down to 30 days.</p>
+        </td></tr>
+                <tr id="comment-header-608068"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                id="word_commented_557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab">
+                    Kian-Tat Lim
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608068"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438" class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" data-account-id="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" accountid="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438" rel="noreferrer">Ian Sullivan</a> But you’re already keeping the exact difference images for 30 days.  So why do we also need <tt>template_detector</tt>?  Can’t that be reproduced exactly by subtracting the difference from the PVI?</p>
+
+<p>(To be clear, going from 9PB to 800TB is very good.)</p>
+        </td></tr>
+                <tr id="comment-header-608071"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                id="word_commented_557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438">
+                    Ian Sullivan
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608071"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab" class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" data-account-id="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" accountid="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" rel="noreferrer">Kian-Tat Lim</a> No, the image difference is the science image minus the <b>convolved</b> template, and we can’t reliably deconvolve to get the input <tt>template_detector</tt>.</p>
+        </td></tr>
+                <tr id="comment-header-608073"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                id="word_commented_557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab">
+                    Kian-Tat Lim
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608073"><td bgcolor="#ffffff">
+            <p>Well, the obvious question then is can we dump <tt>difference_image</tt> if we have <tt>template_detector</tt>?  You seem to be saying that we have D = P - K * T and somehow we need to keep all four.  (Where T itself is a sum of warps of some T_c, that we’re also keeping, as I understand it.)</p>
+        </td></tr>
+                <tr id="comment-header-608074"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:a49cc341-56b7-4dbb-8396-545e067e5c6c"
+                id="word_commented_712020:a49cc341-56b7-4dbb-8396-545e067e5c6c"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3Aa49cc341-56b7-4dbb-8396-545e067e5c6c">
+                    David Irving
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">04/Nov/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-608074"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6" class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" data-account-id="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" accountid="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" rel="noreferrer">Hsin-Fang Chiang</a> Actually it turns out that I <a href="https://rubin-obs.slack.com/archives/C07QFRSJE6R/p1762287989412839" class="external-link" rel="nofollow noreferrer">misunderstood the plan for provenance</a>.  We’ll have fewer files but the Butler database rows will still be there.  (At least for <tt>_metadata</tt>, possibly not for <tt>_logs</tt>.  And we might only have to have these internally at USDF.)  So yeah, potentially up to 9 million.</p>
+        </td></tr>
+                <tr id="comment-header-613263"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63764f019960988ef6bcba0e"
+                id="word_commented_63764f019960988ef6bcba0e"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63764f019960988ef6bcba0e">
+                    Leanne Guy
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">01/Dec/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-613263"><td bgcolor="#ffffff">
+            <p>We need to keep  <font color="#0747a6">preliminary_visit_image </font>and <tt>preliminary_visit_image_background</tt> through DR1 – see: <a href="https://project.lsst.org/groups/ccb/node/5575" class="external-link" rel="nofollow noreferrer"><ins>https://project.lsst.org/groups/ccb/node/5575</ins></a></p>
+
+<p>For the other Tier 1 datasets do we really need to keep them until DR1 or can we keep them until the regeneration service becomes available? Once the regeneration service becomes available, they could be moved to a Tier 2. “We currently do not foresee a re-generation service in early 2026.” → what is the ETA for the regeneration service?</p>
+
+<p>I also understood that we were not updating templates, once produced, in year 1. <a href="http://ls.st/dmsr" class="external-link" rel="nofollow noreferrer"><ins>DMS-REQ-0280</ins></a>: “ …..but once a template is produced for a sky position and filter it will not be replaced until the next Data Release to avoid repeated baseline changes.”. This seems like a big upscope.  I understand there is pressure from the community, but year 1 alerts are best effort. </p>
+
+<p>In general, I’d advocate for starting with the smallest possible set of data products, and add more, only if there is demand from the community during year 1. As <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6" class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" data-account-id="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" accountid="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" rel="noreferrer">Hsin-Fang Chiang</a> says: “ It might be easy to add types but difficult to remove, because users form expectations”</p>
+        </td></tr>
+                <tr id="comment-header-613279"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">02/Dec/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-613279"><td bgcolor="#ffffff">
+            <p>Thank you<a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63764f019960988ef6bcba0e" class="user-hover" rel="63764f019960988ef6bcba0e" data-account-id="63764f019960988ef6bcba0e" accountid="63764f019960988ef6bcba0e" rel="noreferrer">Leanne Guy</a> . I edited the RFC for moving <tt>difference_kernel</tt>  and <tt>template_detector</tt>  to Tier 2 once the regeneration service is available. </p>
+
+
+<p>I don’t know the ETA of the regeneration service. It’s not clear to me who owns that scope; but likely some watchers of this ticket know and may know the ETA? </p>
+        </td></tr>
+                <tr id="comment-header-613281"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">02/Dec/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-613281"><td bgcolor="#ffffff">
+            <p>This RFC intentionally did not estimate the size of  <tt>template_coadd</tt> which is an input but not output of Prompt Processing. (Same for <tt>calib</tt>) . We need to make available  production <tt>template_coadd</tt>  , and mirroring what the <tt>emabrgo</tt> repo has should be good enough. (any objections?) It’s indeed an open question how long production templates need to be kept but that probably can be another RFC or a DMLT discussion. </p>
+        </td></tr>
+                <tr id="comment-header-613286"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="5c2f5797a217aa69bce53f54"
+                id="word_commented_5c2f5797a217aa69bce53f54"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=5c2f5797a217aa69bce53f54">
+                    Jim Bosch
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">02/Dec/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-613286"><td bgcolor="#ffffff">
+            <p>I’m not even sold on retaining <tt>template_detector</tt> in particular (because it’s big) “until we have a regeneration service”:</p>
+
+<ul>
+	<li>We’ve already shipped DP1 without a lot of intermediates that people would similarly <em>like</em> to have, and we’re going to be doing the same for DP2.</li>
+	<li>Any regeneration service that can handle the kind of heavy pixel-processing needed to regenerate these seems like it’d need to run on top of user batch, which probably means going through a TAC, and getting a SLAC account, etc.  It’s not something that would really be accessible to all science users on demand.</li>
+</ul>
+
+
+<p>That’s probably not consistent with requirements, which generally leaned very heavily (and with the benefit of hindsight, I think unrealistically) into regeneration to solve a lot of problems.</p>
+
+<p>This may sound like an argument to retain those datasets longer, but I think you could make the same argument about a ton of similar DRP datasets (<tt>post_isr_image</tt>, <tt>preliminary_visit_image</tt>, <tt>direct_warp</tt>) that are also very expensive to retain, not directly expected to be useful for science, and really convenient for regenerating the direct-science data products efficiently.</p>
+        </td></tr>
+                <tr id="comment-header-613287"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">02/Dec/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-613287"><td bgcolor="#ffffff">
+            <p>We agreed above that template detector was not needed even without a regeneration service since we can easily provide the few lines of code needed to reproduce it</p>
+
+<p><em>This comment was left via Slack.</em></p>
+        </td></tr>
+                <tr id="comment-header-613404"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63764f019960988ef6bcba0e"
+                id="word_commented_63764f019960988ef6bcba0e"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63764f019960988ef6bcba0e">
+                    Leanne Guy
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">02/Dec/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-613404"><td bgcolor="#ffffff">
+            <blockquote><p>We’ve already shipped DP1 without a lot of intermediates that people would similarly <em>like</em> to have, and we’re going to be doing the same for DP2.</p></blockquote>
+
+<p>Correct, and that is OK, because DP2, like DP1 is a shared-risk <em>preview.</em> Through these previews we learn which intermediates are of actually useful. </p>
+        </td></tr>
+                <tr id="comment-header-616316"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae"
+                id="word_commented_557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A20ad3b56-9b88-4b76-bb4e-576e831f79ae">
+                    William O&#39;Mullane
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">15/Dec/25</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-616316"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6" class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" data-account-id="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" accountid="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" rel="noreferrer">Hsin-Fang Chiang</a>  can you update the original text of the RFC to state where we are now ?  We will return to this after the break in January.</p>
+        </td></tr>
+                <tr id="comment-header-620555"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">06/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-620555"><td bgcolor="#ffffff">
+            <p>I updated the RFC description. </p>
+
+<ul>
+	<li>Prompt Processing has turned on lossy compression at prompt output generation for all 3 image types since about 1 month ago. The size in this RFC is updated for the compressed size. </li>
+</ul>
+
+
+<ul>
+	<li>The heaviest type  <tt>template_detector</tt> is moved from Tier 1 to Tier 2 per popular demand. </li>
+</ul>
+
+
+<ul>
+	<li>Notes are added about future consideration re: dataset consolidation and non-realtime pipelines. I mean this RFC to provide a baseline before work on consolidation and non-realtime pipeline is ready for production.  </li>
+</ul>
+
+
+<p>The total size has dropped significantly. </p>
+        </td></tr>
+                <tr id="comment-header-620757"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">07/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-620757"><td bgcolor="#ffffff">
+            <p>I missed two dataset types that are pipeline init outputs: <tt>single_visit_star_schema</tt>  and <tt>dia_source_schema</tt> .  There is only one of each per day per pipeline per deployment and they are small (&lt;100KB each). </p>
+
+<p>Questions to the Pipelines folks: should we include them in the publication?  </p>
+        </td></tr>
+                <tr id="comment-header-620774"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="5c2f5797a217aa69bce53f54"
+                id="word_commented_5c2f5797a217aa69bce53f54"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=5c2f5797a217aa69bce53f54">
+                    Jim Bosch
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">08/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-620774"><td bgcolor="#ffffff">
+            <p>I'd say no: for science users those are superseded by the SDM schemas.</p>
+        </td></tr>
+                <tr id="comment-header-621819"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae"
+                id="word_commented_557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A20ad3b56-9b88-4b76-bb4e-576e831f79ae">
+                    William O&#39;Mullane
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-621819"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6" class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" data-account-id="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" accountid="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6" rel="noreferrer">Hsin-Fang Chiang</a> CCB agrees to all but <b>template_detector</b> - this can be reproduced with a library/service call (admittedly the short routine like many others does not exist yet) but it will . If  <b>template_detector</b>  is removed we can board recommend</p>
+        </td></tr>
+                <tr id="comment-header-621821"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">12/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-621821"><td bgcolor="#ffffff">
+            <p>Thanks for the updates. </p>
+
+<p>I’ve updated the description and removed <tt>template_detector</tt> from the types we serve to data.lsst.cloud users. </p>
+
+        </td></tr>
+                <tr id="comment-header-622842"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:ea68b8c5-7ca9-4389-9f49-d51fd0f9db1a"
+                id="word_commented_557058:ea68b8c5-7ca9-4389-9f49-d51fd0f9db1a"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Aea68b8c5-7ca9-4389-9f49-d51fd0f9db1a">
+                    frossie
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">15/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-622842"><td bgcolor="#ffffff">
+            <p>Raising the prospect that we should not enforce 30-day delete until a recreation service is available and/or DR1 is out</p>
+
+<p>cc: <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A5afef4b4-f1bc-4238-977f-9f8d3183e55c" class="user-hover" rel="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" data-account-id="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" accountid="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" rel="noreferrer">Gregory Dubois-Felsmann</a> </p>
+        </td></tr>
+                <tr id="comment-header-622844"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                id="word_commented_557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab">
+                    Kian-Tat Lim
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">15/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-622844"><td bgcolor="#ffffff">
+            <p>Given the numbers above, this doubles to triples the storage requirements from 2.2 to 4-6 PB if DR1 is one year later.</p>
+        </td></tr>
+                <tr id="comment-header-624816"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">23/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-624816"><td bgcolor="#ffffff">
+            <p>Apologies for reopening this. </p>
+
+<p>As Daytime AP catchup campaign is ramping up, it might be easier to consider the additional types together.  The Daytime AP catchup runs additional pipelines besides what realtime prompt processing runs; notably `consolidateVisitSummary` and `singleFrameDetectAndMeasure` (after 
+    <span class="jira-issue-macro resolved" data-jira-key="DM-53893" >
+                <a href="https://rubinobs.atlassian.net/browse/DM-53893" class="jira-issue-macro-key issue-link"  title="Move SingleFrameDetectAndMeasure into Daytime AP pipeline" >
+            <img class="icon" src="https://rubinobs.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10318?size=medium" />
+            DM-53893
+        </a>
+                                                    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-success jira-macro-single-issue-export-pdf">Done</span>
+            </span>
+). They add two additional types `preliminary_visit_summary` and `single_visit_star_reprocessed_footprints` ; we want to keep both until DR1 (promised in RTN-011) </p>
+
+<p>Also for clarity I separated out in a different tier the solar system catalog types that should not be necessary once PPDB is available. </p>
+
+<p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A5afef4b4-f1bc-4238-977f-9f8d3183e55c" class="user-hover" rel="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" data-account-id="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" accountid="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" rel="noreferrer">Gregory Dubois-Felsmann</a> please take a look. </p>
+        </td></tr>
+                <tr id="comment-header-624817"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="5c2f5797a217aa69bce53f54"
+                id="word_commented_5c2f5797a217aa69bce53f54"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=5c2f5797a217aa69bce53f54">
+                    Jim Bosch
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">23/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-624817"><td bgcolor="#ffffff">
+            <p>👍  to <tt>preliminary_visit_summary</tt>.  But why a (presumably afw.table/FITS) <tt>_footprints</tt> catalog instead of an SDM-standardized Parquet variant?</p>
+        </td></tr>
+                <tr id="comment-header-624819"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                id="word_commented_557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438">
+                    Ian Sullivan
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">23/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-624819"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=5c2f5797a217aa69bce53f54" class="user-hover" rel="5c2f5797a217aa69bce53f54" data-account-id="5c2f5797a217aa69bce53f54" accountid="5c2f5797a217aa69bce53f54" rel="noreferrer">Jim Bosch</a> We could use <tt>single_visit_star_reprocessed_unstandardized</tt> as the equivalent Parquet file to the <tt>_footprints</tt> catalog. To my knowledge we don’t have an equivalent of the 5-sigma direct source catalogs produced by AP in <tt>sdm_schemas</tt>, so there isn’t currently a standardized version. If we define one it would be easy to add a standardization step to the Daytime AP pipeline.</p>
+        </td></tr>
+                <tr id="comment-header-624934"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="5c2f5797a217aa69bce53f54"
+                id="word_commented_5c2f5797a217aa69bce53f54"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=5c2f5797a217aa69bce53f54">
+                    Jim Bosch
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">24/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-624934"><td bgcolor="#ffffff">
+            <p>I think we do need to make a standardized catalog with an official schema for any public table dataset.  I imagine this can be done with just a slight reconfiguration of the DRP source-transform and -consolidate tasks.</p>
+
+<p>I also think we should just this standardized visit-level dataset <tt>source</tt>, as it is pretty analogous to the DRP <tt>source</tt> (and then rename its predecessors accordingly).  If we want to clarify that it’s not as fully calibrated as the DRP <tt>source</tt>, maybe <tt>ap_source</tt> or <tt>nightly_source</tt>?</p>
+        </td></tr>
+                <tr id="comment-header-625264"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae"
+                id="word_commented_557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A20ad3b56-9b88-4b76-bb4e-576e831f79ae">
+                    William O&#39;Mullane
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">26/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625264"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63764f019960988ef6bcba0e" class="user-hover" rel="63764f019960988ef6bcba0e" data-account-id="63764f019960988ef6bcba0e" accountid="63764f019960988ef6bcba0e" rel="noreferrer">Leanne Guy</a> <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A75b6608f-df26-4775-a93d-f50ab790c78d" class="user-hover" rel="712020:75b6608f-df26-4775-a93d-f50ab790c78d" data-account-id="712020:75b6608f-df26-4775-a93d-f50ab790c78d" accountid="712020:75b6608f-df26-4775-a93d-f50ab790c78d" rel="noreferrer">Adam Bolton</a> we need to discuss the footprint - do we need <tt>single_visit_star_reprocessed_footprints</tt> as opposed to a MOC ? otherwise we need to find 2PB .. </p>
+        </td></tr>
+                <tr id="comment-header-625281"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                id="word_commented_557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438">
+                    Ian Sullivan
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">26/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625281"><td bgcolor="#ffffff">
+            <p>I have filed 
+    <span class="jira-issue-macro" data-jira-key="DM-53973" >
+                <a href="https://rubinobs.atlassian.net/browse/DM-53973" class="jira-issue-macro-key issue-link"  title="Add timeouts to mobu for TAP queries" >
+            <img class="icon" src="https://rubinobs.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10318?size=medium" />
+            DM-53973
+        </a>
+                                                    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-current jira-macro-single-issue-export-pdf">In Progress</span>
+            </span>
+ to write the standardization task. One question from the ticket: should the source catalog be consolidated per-visit (and called e.g. <tt>ap_source</tt>), or should it be left as per-detector (and called <tt>ap_source_detector</tt>)?</p>
+        </td></tr>
+                <tr id="comment-header-625297"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625297"><td bgcolor="#ffffff">
+            <p>If I understood <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A5afef4b4-f1bc-4238-977f-9f8d3183e55c" class="user-hover" rel="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" data-account-id="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" accountid="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" rel="noreferrer">Gregory Dubois-Felsmann</a>  correctly, per-detector is preferable from an RSP perspective? <br/>
+But from the Pipelines perspective and infrastructure perspective, per-visit might be preferable, so to be analogous to the DRP <tt>source</tt> and to occupy fewer rows in the database? </p>
+        </td></tr>
+                <tr id="comment-header-625460"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="5c2f5797a217aa69bce53f54"
+                id="word_commented_5c2f5797a217aa69bce53f54"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=5c2f5797a217aa69bce53f54">
+                    Jim Bosch
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625460"><td bgcolor="#ffffff">
+            <p>From the butler database-sizing perspective I like per-visit better, but I’m not familiar with the RSP preference.</p>
+
+<p>I do think we should call it <tt>ap_source</tt> (no <tt>_detector</tt>) either way; the public dataset type should the short name, while suffix modifiers are only for intermediates.</p>
+        </td></tr>
+                <tr id="comment-header-625517"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c"
+                id="word_commented_557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A5afef4b4-f1bc-4238-977f-9f8d3183e55c">
+                    Gregory Dubois-Felsmann
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625517"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A20ad3b56-9b88-4b76-bb4e-576e831f79ae" class="user-hover" rel="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae" data-account-id="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae" accountid="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae" rel="noreferrer">William O'Mullane</a> Can you explain this comment more?  What do you mean by a “star footprint” in this context?  We use “footprint” with a lot of different meanings.</p>
+        </td></tr>
+                <tr id="comment-header-625518"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c"
+                id="word_commented_557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A5afef4b4-f1bc-4238-977f-9f8d3183e55c">
+                    Gregory Dubois-Felsmann
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625518"><td bgcolor="#ffffff">
+            <p>A couple of comments on this thread:</p>
+
+<ul>
+	<li>I would definitely want a representation of the schema in sdm_schemas, and the data to be in the “VOParquet” format.</li>
+	<li>Regarding visit vs. visit-detector: as I noted on Slack, I would be OK with visit dimensions if the Parquet file had the detectors as indexed row groups.  We would very much like to be able to load one detector’s sources efficiently, whether that’s done directly in the Butler (in analogy with the way we handle zipped raws) or as something that we do “by hand” reading from a deferred-dataset-handle.</li>
+</ul>
+
+
+<p>As quantitative grist for the mill, could we get an estimate of the range for the number of rows we’re likely to see per detector, between sparse extragalactic fields and crowded MW fields?</p>
+        </td></tr>
+                <tr id="comment-header-625519"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae"
+                id="word_commented_557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A20ad3b56-9b88-4b76-bb4e-576e831f79ae">
+                    William O&#39;Mullane
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625519"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A5afef4b4-f1bc-4238-977f-9f8d3183e55c" class="user-hover" rel="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" data-account-id="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" accountid="557058:5afef4b4-f1bc-4238-977f-9f8d3183e55c" rel="noreferrer">Gregory Dubois-Felsmann</a> </p>
+
+<ul>
+	<li><tt>single_visit_star_reprocessed_footprints  was added to the products .. it doubles the size</tt></li>
+</ul>
+
+        </td></tr>
+                <tr id="comment-header-625521"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                id="word_commented_557058:1624b468-e862-4644-aaf5-3bd8197af8ab"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab">
+                    Kian-Tat Lim
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625521"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A20ad3b56-9b88-4b76-bb4e-576e831f79ae" class="user-hover" rel="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae" data-account-id="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae" accountid="557058:20ad3b56-9b88-4b76-bb4e-576e831f79ae" rel="noreferrer">William O'Mullane</a> My understanding is that <tt>single_visit_star_reprocessed_footprints</tt> is mostly for the measurements; the actual footprints might be removed from the catalog as it is standardized into <tt>ap_source</tt>, which might reduce the size a lot.</p>
+        </td></tr>
+                <tr id="comment-header-625525"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                id="word_commented_557058:b2e80694-0bc8-49fc-80b3-03ed86d92438"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3Ab2e80694-0bc8-49fc-80b3-03ed86d92438">
+                    Ian Sullivan
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625525"><td bgcolor="#ffffff">
+            <p><a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=557058%3A1624b468-e862-4644-aaf5-3bd8197af8ab" class="user-hover" rel="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" data-account-id="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" accountid="557058:1624b468-e862-4644-aaf5-3bd8197af8ab" rel="noreferrer">Kian-Tat Lim</a> is correct, the final catalog will not contain footprints. The <tt>single_visit_star_reprocessed_footprints</tt> catalog is a placeholder until we define and start creating a new, standardized, catalog.</p>
+        </td></tr>
+                <tr id="comment-header-625531"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="63e809f7db4f715c97259960"
+                id="word_commented_63e809f7db4f715c97259960"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960">
+                    Tim Jenness
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625531"><td bgcolor="#ffffff">
+            <p>Someone needs to edit the RFC to note that this dataset type isn’t really adding 5TB per night then</p>
+
+<p><em>This comment was left via Slack.</em></p>
+        </td></tr>
+                <tr id="comment-header-625536"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">27/Jan/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-625536"><td bgcolor="#ffffff">
+            <p>The description has been updated. The new proposal is to store and publish a new type <tt>ap_source</tt>   instead of  <tt>single_visit_star_reprocessed_footprints</tt> .  Then the overall size addition is relatively small.  <a href="https://rubinobs.atlassian.net/browse/DM-53937" title="smart-link" class="external-link" rel="nofollow noreferrer">https://rubinobs.atlassian.net/browse/DM-53937</a> is the ticket to add a new pipeline for it. </p>
+        </td></tr>
+                <tr id="comment-header-626875"><td bgcolor="#f0f0f0">
+            Comment by  
+                                                    
+                
+        
+            <a class="user-hover" rel="712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                id="word_commented_712020:34995da4-22f6-4b5f-9b25-34bff6b9b0e6"
+                href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=712020%3A34995da4-22f6-4b5f-9b25-34bff6b9b0e6">
+                    Hsin-Fang Chiang
+                </a>
+
+                                        <font size="-2">
+            [
+                <font color="#336699">02/Feb/26</font>
+
+                            ]
+            </font>
+
+        </td></tr>
+        <tr id="comment-body-626875"><td bgcolor="#ffffff">
+            <p>Thanks to <a href="https://rubinobs.atlassian.net/secure/ViewProfile.jspa?accountId=63e809f7db4f715c97259960" class="user-hover" rel="63e809f7db4f715c97259960" data-account-id="63e809f7db4f715c97259960" accountid="63e809f7db4f715c97259960" rel="noreferrer">Tim Jenness</a>  bringing up the RTN-011 timeline at Slack. </p>
+
+<p>The thinking that there is about 1 year between survey start and DR1 is outdated. That was true with RTN-011 v6.2 where 6-month DR1 was expected in Sep 2026 and DR2 expected in Sep 2027.  But v7.0 from last Nov has changed to 1yr DR1 at Oct 2027. And the current v7.3 put DR1 at Feb 2028. </p>
+
+<p>I will update the description and use 2yr as the baseline estimate. </p>
+
+<p>TLDR: Consider 4PB o f Tier 1 instead of 2PB.  </p>
+        </td></tr>
+            </table>
+Generated at Thu Mar 19 15:35:31 UTC 2026 by Aditya Tanikanti using Jira 1001.0.0-SNAPSHOT#100291-rev:840e5159782fc36d75c17fda78b78de23945cb77.
+
+</body>
+</html>

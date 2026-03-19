@@ -1,0 +1,2035 @@
+Date: Thu, 19 Mar 2026 15:36:14 +0000 (UTC)
+Message-ID: <2011423835.17.1773934574756@52ffb549e7ea>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_16_1571210483.1773934574756"
+
+------=_Part_16_1571210483.1773934574756
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>DRP Resource Usage Estimates</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>DRP Resource Usage Estimates</h1>
+    <div class=3D"Section1">
+        <style type=3D"text/css">/*<![CDATA[*/
+div.rbtoc1773934574296 {padding: 0px;}
+div.rbtoc1773934574296 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1773934574296 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style>
+<div class=3D"toc-macro rbtoc1773934574296">
+<ul class=3D"toc-indentation">
+<li><a href=3D"#DRPResourceUsageEstimates-1.1.DP2">1.1. DP2</a>
+<ul class=3D"toc-indentation">
+<li><a href=3D"#DRPResourceUsageEstimates-1.1.1.Storagebydatasettype,nocomp=
+ression,2025-10-14visitlist">1.1.1. Storage by dataset type, no compression=
+, 2025-10-14 visit list</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.1.2.Storagebydatasettypeusingco=
+mpression,2025-10-14visitlist">1.1.2. Storage by dataset type using compres=
+sion, 2025-10-14 visit list</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.1.3.Storagebydatasettypeusingco=
+mpression,DM-53733visitlist,2026-02-04">1.1.3. Storage by dataset type usin=
+g compression, DM-53733 visit list, 2026-02-04</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.1.4.CPUtimebytask">1.1.4. CPU t=
+ime by task</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.1.5.DataSelection,2025-10-14">1=
+.1.5. Data Selection, 2025-10-14</a></li>
+</ul></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.2.DR1">1.2. DR1</a>
+<ul class=3D"toc-indentation">
+<li><a href=3D"#DRPResourceUsageEstimates-1.2.1.Storagebydatasettype,nocomp=
+ression">1.2.1. Storage by dataset type, no compression</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.2.2.Storagebydatasettype,usingc=
+ompression">1.2.2. Storage by dataset type, using compression</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.2.3.CPUtimebytask">1.2.3. CPU t=
+ime by task</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.2.4.DataSelection">1.2.4. Data =
+Selection</a></li>
+</ul></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.3.Methodology">1.3. Methodology=
+</a>
+<ul class=3D"toc-indentation">
+<li><a href=3D"#DRPResourceUsageEstimates-1.3.1.Estimatingnumbersofquantape=
+rtask">1.3.1. Estimating numbers of quanta per task</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.3.2.Usingexistingresourceusaged=
+atatopredictcputimeandmemoryrequirements">1.3.2. Using existing resource us=
+age data to predict cpu time and memory requirements</a></li>
+</ul></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.4.Wall-to-cputimeratios">1.4. W=
+all-to-cpu time ratios</a></li>
+</ul>
+</div>
+<p local-id=3D"ed414dac-6d58-445b-b737-6f866c892f7b">This has been written =
+up at <a class=3D"external-link" href=3D"https://rtn-109.lsst.io/" rel=3D"n=
+ofollow">RTN-109</a>, with updated numbers using DM-52836 data.</p>
+<h2 local-id=3D"5174effd-9aa9-4e2e-8b92-f3b1cf7697f1" id=3D"DRPResourceUsag=
+eEstimates-1.1.DP2">1.1. DP2</h2>
+<p local-id=3D"0525d660-d6a8-4103-a6b7-cd157224bfbb">These estimates use th=
+e DRP.yaml pipeline definition in w_2025_41, and are based on resource usag=
+e data from <a class=3D"external-link" href=3D"https://rubinobs.atlassian.n=
+et/browse/DM-52645" rel=3D"nofollow">DM-52645</a>. The input observations a=
+re a selection of science observations using LSSTCam, extracted from the co=
+nsolidated database (consdb). The query used for the selection is shown bel=
+ow. For computing the number of datasets per dataset type and information s=
+uch as the number of visits per patch per band, the <code>lsst_cells_v1</co=
+de>skymap was used.</p>
+<div id=3D"expander-1571882696" class=3D"expand-container">
+<div id=3D"expander-control-1571882696" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"03fbc5efaf4ce050065d09c80269f81b450c23=
+8eb1ba92445e86c437c8e8a295" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Storage by dataset type, no compression, 2025-10-1=
+4 visit list</span>
+</div>
+<div id=3D"expander-content-1571882696" class=3D"expand-content">
+<h3 local-id=3D"e9ad964983f2" id=3D"DRPResourceUsageEstimates-1.1.1.Storage=
+bydatasettype,nocompression,2025-10-14visitlist">1.1.1. Storage by dataset =
+type, no compression, 2025-10-14 visit list</h3>
+<p local-id=3D"fb7a5169-bed1-4225-94cd-e6afeb273517">There are 413 dataset =
+types (dstype) in the w_2025_41 LSSTCam DRP pipeline. I=E2=80=99ve sorted t=
+he entries below by total size for each dstype, and computed the cumulative=
+ sizes and fractions. Below, I just show the top 20 entries, which add up t=
+o ~96% of the 5.7 PB total.</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: plain; gutter: false; theme: Confluence" data-theme=3D"Confluence">      =
+                           dstype     count  mean_size (GB)  total_size (GB=
+)  cumulative size (PB)  cumulative fraction
+0                           direct_warp  11571944        0.080683    933659=
+.705799              0.933660             0.163049
+1                      psf_matched_warp  11571944        0.055675    644267=
+.974794              1.577928             0.275560
+2                     template_detector   3823388        0.145941    557988=
+.227574              2.135916             0.373003
+3          deep_coadd_cell_predetection   1072709        0.404132    433515=
+.875685              2.569432             0.448710
+4         difference_image_predetection   3823388        0.107713    411827=
+.785368              2.981260             0.520629
+5                      template_matched   3823388        0.107600    411397=
+.252303              3.392657             0.592473
+6                           visit_image   3823388        0.107399    410626=
+.347169              3.803283             0.664182
+7               preliminary_visit_image   3823388        0.107233    409993=
+.898843              4.213277             0.735781
+8                      difference_image   3823388        0.107193    409839=
+.134214              4.623116             0.807353
+9                        post_isr_image   3823388        0.092732    354549=
+.533884              4.977666             0.869269
+10                           deep_coadd   1072709        0.079557     85341=
+.511973              5.063007             0.884173
+11              deep_coadd_predetection   1072709        0.077303     82923=
+.687331              5.145931             0.898654
+12                       template_coadd   1072709        0.076009     81535=
+.733357              5.227467             0.912893
+13                object_unstandardized    293894        0.212947     62583=
+.775798              5.290050             0.923822
+14                    source_footprints   3823388        0.013923     53234=
+.308441              5.343285             0.933119
+15               deconvolved_deep_coadd   1072709        0.045133     48414=
+.480899              5.391699             0.941574
+16         single_visit_star_footprints   3823388        0.010950     41864=
+.465249              5.433564             0.948884
+17          object_unforced_measurement   1072709        0.029861     32032=
+.170314              5.465596             0.954478
+18            object_forced_measurement   1072709        0.029106     31222=
+.521485              5.496818             0.959931
+19  object_forced_source_unstandardized   6507208        0.003880     25245=
+.716834              5.522064             0.964340</pre>
+</div>
+</div>
+<p local-id=3D"a591ff5b-1207-4362-81d6-f498765c757e">Limiting to the datase=
+t types that are identified as =E2=80=9Crelease=E2=80=9D products in our re=
+cent <a class=3D"external-link" href=3D"https://docs.google.com/spreadsheet=
+s/d/17RB5mJNM6B8TkCXyWDbqc2Yk5FPRl8tdJ9gnXP8MiUs/edit?usp=3Dsharing" rel=3D=
+"nofollow">storage model exercise</a>, I find the following data volumes, t=
+otaling ~610 TB:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                      dstype    count  mean_size (GB)  total_size (GB)  cum=
+ulative size (PB)  cumulative fraction
+0                       visit_image  3823388        0.107399    410626.3471=
+69              0.410626             0.676171
+1                        deep_coadd  1072709        0.079557     85341.5119=
+73              0.495968             0.816701
+2                    template_coadd  1072709        0.076009     81535.7333=
+57              0.577504             0.950965
+3             object_scarlet_models   293894        0.023260      6836.0173=
+65              0.584340             0.962221
+4                 object_nonprimary     3650        1.379719      5035.9737=
+79              0.589376             0.970514
+5                            object     3650        1.226649      4477.2700=
+26              0.593853             0.977887
+6                           source2    22229        0.196303      4363.6177=
+12              0.598216             0.985072
+7   object_forced_source_nonprimary   293894        0.009279      2727.0930=
+16              0.600944             0.989563
+8              object_forced_source   293894        0.006973      2049.3005=
+55              0.602993             0.992937
+9        compare_warp_artifact_mask  1072709        0.000797       854.4822=
+30              0.603847             0.994344
+10                source_nonprimary    22229        0.037773       839.6598=
+64              0.604687             0.995727
+11         dia_object_forced_source   293894        0.002036       598.4718=
+97              0.605285             0.996712
+12               deep_coadd_n_image  1072709        0.000506       543.2836=
+85              0.605829             0.997607
+13                    visit_summary    22229        0.021019       467.2419=
+85              0.606296             0.998376
+14           visit_image_background  3823388        0.000115       440.4542=
+98              0.606736             0.999102
+15                    isolated_star     3650        0.067902       247.8422=
+89              0.606984             0.999510
+16                       dia_source     3650        0.058957       215.1921=
+45              0.607199             0.999864
+17            deep_coadd_background  1072709        0.000049        52.5198=
+33              0.607252             0.999951
+18                       dia_object     3650        0.008206        29.9531=
+02              0.607282             1.000000</pre>
+</div>
+</div>
+</div>
+</div>
+<div id=3D"expander-1045249299" class=3D"expand-container">
+<div id=3D"expander-control-1045249299" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"03fbc5efaf4ce050065d09c80269f81b450c23=
+8eb1ba92445e86c437c8e8a295" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Storage by dataset type using compression, 2025-10=
+-14 visit list</span>
+</div>
+<div id=3D"expander-content-1045249299" class=3D"expand-content">
+<h3 local-id=3D"809713576b9f" id=3D"DRPResourceUsageEstimates-1.1.2.Storage=
+bydatasettypeusingcompression,2025-10-14visitlist">1.1.2. Storage by datase=
+t type using compression, 2025-10-14 visit list</h3>
+<p local-id=3D"99c51cf38f87">I=E2=80=99ve updated these tables using datase=
+t sizes from <span class=3D"confluence-jim-macro jira-issue" data-jira-key=
+=3D"DM-53697" data-client-id=3D"SINGLE_b683e871-1d59-38b1-9a05-9d6b3fd8fd32=
+_1062404112_712020:7400e038-f77c-4b75-a0fd-1307eaa2c725"> <a href=3D"https:=
+//rubinobs.atlassian.net/browse/DM-53697" class=3D"jira-issue-key"><span cl=
+ass=3D"aui-icon aui-icon-wait issue-placeholder"></span>DM-53697</a> - <spa=
+n class=3D"summary">Getting issue details...</span> <span class=3D"aui-loze=
+nge aui-lozenge-subtle aui-lozenge-default issue-placeholder">STATUS</span>=
+ </span> with lossy compression enabled.</p>
+<p local-id=3D"83ec12a0107b">The top 20 entries account for 95.4% of the 5.=
+13 PB total:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: plain; gutter: false; theme: Confluence" data-theme=3D"Confluence">      =
+                           dstype     count  mean_size (GB)  total_size (GB=
+)  cumulative size (PB)  cumulative fraction
+0                           direct_warp  11571944        0.069252    801378=
+.788382              0.764254             0.148843
+1                    direct_warp_noise0  11571944        0.069090    799507=
+.732792              1.526724             0.297339
+2                      psf_matched_warp  11571944        0.050112    579889=
+.258464              2.079750             0.405045
+3                     template_detector   3823388        0.142507    544858=
+.681372              2.599368             0.506244
+4         difference_image_predetection   3823388        0.108640    415373=
+.299316              2.995498             0.583393
+5                      template_matched   3823388        0.104686    400254=
+.507346              3.377211             0.657734
+6                      difference_image   3823388        0.103910    397286=
+.362914              3.756093             0.731523
+7                        post_isr_image   3823388        0.093855    358844=
+.183513              4.098313             0.798173
+8          deep_coadd_cell_predetection   1072709        0.207278    222348=
+.769799              4.310361             0.839471
+9               preliminary_visit_image   3823388        0.029217    111707=
+.864798              4.416894             0.860219
+10                          visit_image   3823388        0.029056    111091=
+.537100              4.522840             0.880852
+11              deep_coadd_predetection   1072709        0.072228     77479=
+.988142              4.596730             0.895243
+12                    source_footprints   3823388        0.017015     65054=
+.152779              4.658771             0.907326
+13               deconvolved_deep_coadd   1072709        0.045573     48886=
+.665088              4.705393             0.916406
+14         single_visit_star_footprints   3823388        0.012409     47443=
+.666802              4.750638             0.925218
+15                object_unstandardized    293894        0.158945     46713=
+.006649              4.795187             0.933894
+16                source_unstandardized   3823388        0.008763     33503=
+.135348              4.827139             0.940116
+17                           deep_coadd   1072709        0.026605     28539=
+.487136              4.854356             0.945417
+18  object_forced_source_unstandardized   6507208        0.003908     25431=
+.108121              4.878609             0.950141
+19          object_unforced_measurement   1072709        0.019475     20890=
+.838544              4.898532             0.954021</pre>
+</div>
+</div>
+<p local-id=3D"179e5cf70712">For the =E2=80=9Crelease=E2=80=9D dataset type=
+s, the total data volume is ~190 TB:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                      dstype    count  mean_size (GB)  total_size (GB)  cum=
+ulative size (PB)  cumulative fraction
+0                       visit_image  3823388        0.029056    111091.5371=
+00              0.105945             0.570250
+1                        deep_coadd  1072709        0.026605     28539.4871=
+36              0.133163             0.716748
+2                    template_coadd  1072709        0.018585     19936.1855=
+47              0.152175             0.819083
+3             object_scarlet_models   293894        0.067458     19825.4811=
+32              0.171082             0.920850
+4                            object     3650        0.976566      3564.4658=
+45              0.174482             0.939147
+5              object_forced_source   293894        0.009005      2646.4793=
+10              0.177005             0.952732
+6                 object_nonprimary     3650        0.452221      1650.6070=
+39              0.178580             0.961205
+7   object_forced_source_nonprimary   293894        0.004494      1320.8967=
+73              0.179839             0.967985
+8                 source_nonprimary    22229        0.048011      1067.2262=
+66              0.180857             0.973464
+9            visit_image_background  3823388        0.000260       992.8170=
+21              0.181804             0.978560
+10                    visit_summary    22229        0.044504       989.2742=
+45              0.182747             0.983638
+11         dia_object_forced_source   293894        0.003319       975.3406=
+74              0.183677             0.988645
+12       compare_warp_artifact_mask  1072709        0.000730       782.6320=
+10              0.184424             0.992662
+13               deep_coadd_n_image  1072709        0.000564       604.6793=
+70              0.185001             0.995766
+14                    isolated_star     3650        0.098526       359.6196=
+79              0.185343             0.997612
+15                       dia_source     3650        0.098486       359.4725=
+83              0.185686             0.999457
+16                       dia_object     3650        0.013662        49.8657=
+41              0.185734             0.999713
+17            deep_coadd_background  1072709        0.000040        42.7974=
+85              0.185775             0.999933
+18                          skyCorr    22229        0.000590        13.1184=
+96              0.185787             1.000000
+</pre>
+</div>
+</div>
+</div>
+</div>
+<h3 local-id=3D"b382bab36f7b" id=3D"DRPResourceUsageEstimates-1.1.3.Storage=
+bydatasettypeusingcompression,DM-53733visitlist,2026-02-04">1.1.3. Storage =
+by dataset type using compression, DM-53733 visit list, 2026-02-04</h3>
+<p local-id=3D"4fbe6594d27e">Here are revised dataset size tables using the=
+ dataset sizes from <span class=3D"confluence-jim-macro jira-issue" data-ji=
+ra-key=3D"DM-53697" data-client-id=3D"SINGLE_b683e871-1d59-38b1-9a05-9d6b3f=
+d8fd32_1062404112_712020:7400e038-f77c-4b75-a0fd-1307eaa2c725"> <a href=3D"=
+https://rubinobs.atlassian.net/browse/DM-53697" class=3D"jira-issue-key"><s=
+pan class=3D"aui-icon aui-icon-wait issue-placeholder"></span>DM-53697</a> =
+- <span class=3D"summary">Getting issue details...</span> <span class=3D"au=
+i-lozenge aui-lozenge-subtle aui-lozenge-default issue-placeholder">STATUS<=
+/span> </span> and the DP2 visits defined in <span class=3D"confluence-jim-=
+macro jira-issue" data-jira-key=3D"DM-53733" data-client-id=3D"SINGLE_b683e=
+871-1d59-38b1-9a05-9d6b3fd8fd32_1062404112_712020:7400e038-f77c-4b75-a0fd-1=
+307eaa2c725"> <a href=3D"https://rubinobs.atlassian.net/browse/DM-53733" cl=
+ass=3D"jira-issue-key"><span class=3D"aui-icon aui-icon-wait issue-placehol=
+der"></span>DM-53733</a> - <span class=3D"summary">Getting issue details...=
+</span> <span class=3D"aui-lozenge aui-lozenge-subtle aui-lozenge-default i=
+ssue-placeholder">STATUS</span> </span> . The current visit list has ~30k v=
+isits, whereas the previous visit list from 2025-10-14 had ~22k visits.</p>
+<p local-id=3D"e7e282c723d4">The top 20 entries account for 95.4% of the 7.=
+43 PB total:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                    dstype     count  mean_size (GB)  total_size (GB)  cumu=
+lative size (PB)  cumulative fraction
+0                     direct_warp  15748826        0.069252     1.090636e+0=
+6              1.040111             0.139993
+1              direct_warp_noise0  15748826        0.069090     1.088089e+0=
+6              2.077794             0.279658
+2                psf_matched_warp  15748826        0.050112     7.891997e+0=
+5              2.830434             0.380959
+3               template_detector   5197668        0.142507     7.407029e+0=
+5              3.536823             0.476035
+4   difference_image_predetection   5197668        0.108640     5.646752e+0=
+5              4.075339             0.548516
+5                template_matched   5197668        0.104686     5.441221e+0=
+5              4.594254             0.618359
+6                difference_image   5197668        0.103910     5.400871e+0=
+5              5.109322             0.687684
+7                  post_isr_image   5197668        0.093855     4.878273e+0=
+5              5.574550             0.750301
+8    deep_coadd_cell_predetection   2290712        0.207278     4.748138e+0=
+5              6.027368             0.811247
+9         deep_coadd_predetection   2290712        0.072228     1.654543e+0=
+5              6.185157             0.832485
+10        preliminary_visit_image   5197668        0.029217     1.518602e+0=
+5              6.329982             0.851977
+11                    visit_image   5197668        0.029056     1.510223e+0=
+5              6.474008             0.871362
+12          object_unstandardized    735200        0.158945     1.168564e+0=
+5              6.585451             0.886362
+13         deconvolved_deep_coadd   2290712        0.045573     1.043948e+0=
+5              6.685010             0.899762
+14              source_footprints   5197668        0.017015     8.843724e+0=
+4              6.769350             0.911113
+15   single_visit_star_footprints   5197668        0.012409     6.449684e+0=
+4              6.830859             0.919392
+16                     deep_coadd   2290712        0.026605     6.094453e+0=
+4              6.888981             0.927215
+17          object_scarlet_models    735200        0.067458     4.959507e+0=
+4              6.936278             0.933581
+18          source_unstandardized   5197668        0.008763     4.554551e+0=
+4              6.979714             0.939427
+19    object_unforced_measurement   2290712        0.019475     4.461125e+0=
+4              7.022258             0.945153</pre>
+</div>
+</div>
+<p local-id=3D"b584849ece1c">For the =E2=80=9Crelease=E2=80=9D dataset type=
+s, the total data volume is ~320 TB:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                      dstype    count  mean_size (GB)  total_size (GB)  cum=
+ulative size (PB)  cumulative fraction
+0                       visit_image  5197668        0.029056    151022.3203=
+75              0.144026             0.448507
+1                        deep_coadd  2290712        0.026605     60944.5298=
+36              0.202147             0.629501
+2             object_scarlet_models   735200        0.067458     49595.0707=
+68              0.249445             0.776789
+3                    template_coadd  2290712        0.018585     42572.6450=
+19              0.290045             0.903221
+4                            object     7933        0.976566      7747.0979=
+58              0.297434             0.926229
+5              object_forced_source   735200        0.009005      6620.3855=
+44              0.303747             0.945890
+6                 object_nonprimary     7933        0.452221      3587.4700=
+38              0.307169             0.956544
+7   object_forced_source_nonprimary   735200        0.004494      3304.3318=
+58              0.310320             0.966357
+8          dia_object_forced_source   735200        0.003319      2439.8948=
+73              0.312647             0.973603
+9        compare_warp_artifact_mask  2290712        0.000730      1671.2682=
+90              0.314240             0.978567
+10                source_nonprimary    30219        0.048011      1450.8304=
+71              0.315624             0.982875
+11           visit_image_background  5197668        0.000260      1349.6755=
+39              0.316911             0.986883
+12                    visit_summary    30219        0.044504      1344.8593=
+46              0.318194             0.990877
+13               deep_coadd_n_image  2290712        0.000564      1291.2600=
+60              0.319425             0.994712
+14                    isolated_star     7933        0.098526       781.6062=
+79              0.320171             0.997033
+15                       dia_source     7933        0.098486       781.2865=
+76              0.320916             0.999354
+16                       dia_object     7933        0.013662       108.3794=
+32              0.321019             0.999676
+17            deep_coadd_background  2290712        0.000040        91.3917=
+12              0.321106             0.999947
+18                          skyCorr    30219        0.000590        17.8338=
+13              0.321123             1.000000</pre>
+</div>
+</div>
+<h3 local-id=3D"b99ae783-d792-42d2-8ce4-6d94ab5c322b" id=3D"DRPResourceUsag=
+eEstimates-1.1.4.CPUtimebytask">1.1.4. CPU time by task</h3>
+<p local-id=3D"95dd04e5-7beb-4abf-a41f-a753de69c994">Using estimates (descr=
+ibed below) based on DRP performance in DM-52645, here are the CPU time req=
+uirements for each task. The cpu times (in seconds) are weighted by the num=
+ber of cores implied by the memory needs for each job. In the final column,=
+ I=E2=80=99ve computed the =E2=80=9Ccumulative node days=E2=80=9D assuming =
+120 cores per node, from the <code>cpu_time</code> column. The ordering of =
+the rows is the nominal execution order of the tasks inferred from the LSST=
+Cam DRP pipeline yaml.</p>
+<p local-id=3D"8674771c-d226-4b6b-8be6-57a0c89bfc08">The total cpu time is =
+~650 node days, so assuming we run at full capacity on 110 nodes at USDF, t=
+his implies a minimum end-to-end wall time of 6 days.</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                                          task      cpu_time  num_jobs  cum=
+ulative node days
+0                                                 isr  3.036067e+08   38233=
+88             29.283050
+1                                      calibrateImage  4.342452e+08   38233=
+88             71.166264
+2                          standardizeSingleVisitStar  2.249832e+06   38233=
+88             71.383262
+3                             consolidateVisitSummary  5.832541e+05     222=
+29             71.439517
+4                          consolidateSingleVisitStar  2.341690e+05     222=
+29             71.462103
+5                       makeInitialVisitDetectorTable  5.088519e+02        =
+ 1             71.462152
+6                               makeInitialVisitTable  3.687754e+02        =
+ 1             71.462187
+7                               associateIsolatedStar  3.333426e+05      36=
+50             71.494338
+8                   analyzeSingleVisitStarAssociation  4.326484e+06      36=
+50             71.911630
+9   makeAnalysisSingleVisitStarAssociationMetricTable  2.455894e+00        =
+ 1             71.911631
+10  makeAnalysisSingleVisitStarAssociationWholeSky...  4.749920e+01        =
+ 1             71.911635
+11                          fgcmBuildFromIsolatedStar  1.282110e+04        =
+ 1             71.912872
+12                        gbdesHealpix3AstrometricFit  2.210863e+08     125=
+90             93.236780
+13                              refitPsfModelDetector  1.514451e+08   38233=
+88            107.843756
+14                                       fgcmFitCycle  4.957384e+05        =
+ 1            107.891570
+15                   consolidateRefitPsfModelDetector  1.806950e+06     222=
+29            108.065852
+16                                 fgcmOutputProducts  4.756851e+02        =
+ 1            108.065898
+17                                 updateVisitSummary  2.069903e+07     222=
+29            110.062331
+18                         recalibrateSingleVisitStar  2.540896e+07   38233=
+88            112.513041
+19                             makeVisitDetectorTable  2.469413e+03        =
+ 1            112.513280
+20                                     makeVisitTable  1.955326e+03        =
+ 1            112.513468
+21                        standardizeRecalibratedStar  1.049551e+06   38233=
+88            112.614698
+22                        consolidateRecalibratedStar  2.441126e+05     222=
+29            112.638243
+23                 analyzeRecalibratedStarAssociation  3.483208e+06      36=
+50            112.974200
+24  makeAnalysisRecalibratedStarAssociationMetricT...  2.418530e+00        =
+ 1            112.974201
+25  makeAnalysisRecalibratedStarAssociationWholeSk...  4.805858e+01        =
+ 1            112.974205
+26                                     makeDirectWarp  8.238873e+08  115719=
+44            192.438644
+27                              selectDeepCoaddVisits  3.084179e+07   10727=
+09            195.413354
+28                          selectTemplateCoaddVisits  3.078893e+07   10727=
+09            198.382965
+29                                 makePsfMatchedWarp  8.407762e+08  115719=
+44            279.476350
+30                                  assembleDeepCoadd  2.959595e+08   10727=
+09            308.021831
+31                              assembleTemplateCoadd  1.733240e+08   10727=
+09            324.739037
+32                               makeBinnedDeepNImage  6.408413e+04   10727=
+09            324.745218
+33                                  assembleCellCoadd  2.043007e+08   10727=
+09            344.450148
+34                         makeHealSparsePropertyMaps  9.650760e+06     125=
+90            345.380969
+35                                   detectCoaddPeaks  2.999021e+06   10727=
+09            345.670227
+36                           makeBinnedTemplateNImage  6.470784e+04   10727=
+09            345.676468
+37                           makeWholeTractDeepNImage  2.057546e+04     125=
+90            345.678452
+38                               plotPropertyMapTract  1.791788e+06     125=
+90            345.851272
+39                  consolidateHealSparsePropertyMaps  2.250462e+04        =
+ 7            345.853442
+40                               makeBinnedCoaddImage  1.380602e+06   10727=
+09            345.986602
+41                               mergeObjectDetection  1.544381e+06    2938=
+94            346.135559
+42                       makeWholeTractTemplateNImage  2.171216e+04     125=
+90            346.137653
+43                              plotPropertyMapSurvey  1.098059e+04        =
+ 7            346.138712
+44                                makeWholeTractImage  8.248382e+04     125=
+90            346.146667
+45                                         deconvolve  2.499778e+06   10727=
+09            346.387773
+46                             deblendCoaddFootprints  3.540757e+08    2938=
+94            380.538590
+47                              measureObjectUnforced  3.633901e+08   10727=
+09            415.587784
+48                           fitDeepCoaddPsfGaussians  1.412943e+08   10727=
+09            429.215706
+49                             mergeObjectMeasurement  1.101763e+06    2938=
+94            429.321972
+50                             fitDeblendedObjectsExp  1.375517e+08    2938=
+94            442.588915
+51                                measureObjectForced  7.799112e+08   10727=
+09            517.811831
+52                          fitDeblendedObjectsSersic  1.126625e+08    2938=
+94            528.678204
+53                                      rewriteObject  3.759850e+06    2938=
+94            529.040843
+54                                computeObjectEpochs  4.641207e+05    2938=
+94            529.085608
+55                                  standardizeObject  5.138703e+06    2938=
+94            529.581239
+56                                  consolidateObject  9.285212e+05      36=
+50            529.670796
+57                             analyzeObjectTableCore  3.404844e+05      36=
+50            529.703636
+58                       analyzeObjectTableSurveyCore  2.160043e+04        =
+ 1            529.705719
+59                                  catalogMatchTract  1.176687e+04      36=
+50            529.706854
+60                            photometricCatalogMatch  1.174280e+04      36=
+50            529.707987
+61                            validateObjectTableCore  2.456054e+03      36=
+50            529.708223
+62                                 splitPrimaryObject  1.364328e+06      36=
+50            529.839814
+63                     makeMetricTableObjectTableCore  6.000000e+01        =
+ 1            529.839819
+64                                  refCatObjectTract  6.766013e+04      36=
+50            529.846345
+65                       photometricRefCatObjectTract  6.559073e+04      36=
+50            529.852672
+66                        objectTableCoreWholeSkyPlot  6.000000e+01        =
+ 1            529.852677
+67          makeMetricTableObjectTableCoreRefCatMatch  1.668401e+00        =
+ 1            529.852678
+68             objectTableCoreRefCatMatchWholeSkyPlot  1.769698e+01        =
+ 1            529.852679
+69                 analyzeRecalibratedStarObjectMatch  8.973307e+05     222=
+29            529.939227
+70                                reprocessVisitImage  2.378441e+08   38233=
+88            552.879436
+71                                  standardizeSource  1.135188e+06   38233=
+88            552.988926
+72                                     rewarpTemplate  1.233128e+08   38233=
+88            564.882521
+73                                  consolidateSource  2.544324e+05     222=
+29            564.907061
+74                                     subtractImages  1.493775e+08   38233=
+88            579.314616
+75                            associateAnalysisSource  1.022287e+06      36=
+50            579.413216
+76                                 splitPrimarySource  1.007586e+05     222=
+29            579.422934
+77                          detectAndMeasureDiaSource  1.133381e+08   38233=
+88            590.354465
+78                           analyzeSourceAssociation  5.091725e+06      36=
+50            590.845565
+79                                    filterDiaSource  1.682118e+06   38233=
+88            591.007806
+80                           forcedPhotObjectDetector  5.149255e+08   65072=
+08            640.672685
+81           makeAnalysisSourceAssociationMetricTable  3.062347e+00        =
+ 1            640.672685
+82                                 computeReliability  1.583104e+07   38233=
+88            642.199599
+83                      standardizeObjectForcedSource  1.670529e+06    2938=
+94            642.360722
+84          makeAnalysisSourceAssociationWholeSkyPlot  4.842324e+01        =
+ 1            642.360727
+85                     filterDiaSourcePostReliability  1.974945e+05   38233=
+88            642.379775
+86                     splitPrimaryObjectForcedSource  1.255395e+05    2938=
+94            642.391884
+87                               standardizeDiaSource  3.623781e+06   38233=
+88            642.741400
+88                          consolidateVisitDiaSource  6.278371e+04     222=
+29            642.747455
+89                                 associateDiaSource  1.063065e+06    2938=
+94            642.849988
+90                                 calculateDiaObject  1.894677e+06    2938=
+94            643.032731
+91                               consolidateDiaSource  9.615559e+03      36=
+50            643.033659
+92                                consolidateSsTables  6.000000e+01        =
+ 1            643.033664
+93                               consolidateDiaObject  3.546718e+03      36=
+50            643.034006
+94                        forcedPhotDiaObjectDetector  6.306222e+07   65072=
+08            649.116397
+95                         analyzeDiaSourceTableTract  2.402834e+04      36=
+50            649.118714
+96                   standardizeDiaObjectForcedSource  1.815396e+06    2938=
+94            649.293810</pre>
+</div>
+</div>
+<h3 local-id=3D"b0bc74b1-42e1-4952-966d-8a091a88898c" id=3D"DRPResourceUsag=
+eEstimates-1.1.5.DataSelection,2025-10-14">1.1.5. Data Selection, 2025-10-1=
+4</h3>
+<p local-id=3D"6444a2ff-4fca-48e9-ae4f-3f53312ab4d7">In the absence of an =
+=E2=80=9Cofficial=E2=80=9D data selection, I made the following query to co=
+nsdb to obtain the input observations for these calculations:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">select =
+v.band, v.visit_id, v.exp_midpt_mjd, v.exp_time, v.sky_rotation,
+   cv.detector, cv.s_region, v.s_ra, v.s_dec, v.science_program, v.target_n=
+ame,
+   v.img_type from cdb_lsstcam.ccdvisit1 as cv, cdb_lsstcam.visit1 as v
+   where cv.visit_id=3Dv.visit_id and v.img_type=3D'science'
+   and -50 &lt; v.s_dec and v.s_dec &lt; 24 and cv.detector &lt; 189
+   and cv.detector not in (0, 20, 27, 65, 123, 161, 168, 188, 122, 169,
+   187, 120, 158, 30, 68, 1, 19)</pre>
+</div>
+</div>
+<p local-id=3D"b3126ad2-1b4b-48a9-8e57-4b6bace57d0a">This selection yielded=
+ 22229 visits.</p>
+<h2 local-id=3D"6cfa7635-d584-47e5-ab2c-66e81fde2113" id=3D"DRPResourceUsag=
+eEstimates-1.2.DR1">1.2. DR1</h2>
+<p local-id=3D"31f7c5a4-2e38-4344-bf5d-f708cee30955">The inputs used for th=
+ese calculations are the Y1 observations from the <a class=3D"external-link=
+" href=3D"https://community.lsst.org/t/release-of-v5-0-simulations/11114" r=
+el=3D"nofollow">baseline v5.0 simulations</a>, specifically, from the <code=
+>baseline_v5.0.0_10yrs.db</code> opsim db file.</p>
+<div id=3D"expander-674622223" class=3D"expand-container">
+<div id=3D"expander-control-674622223" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"03fbc5efaf4ce050065d09c80269f81b450c23=
+8eb1ba92445e86c437c8e8a295" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Storage by dataset type, no compression</span>
+</div>
+<div id=3D"expander-content-674622223" class=3D"expand-content">
+<h3 local-id=3D"b810108384a2" id=3D"DRPResourceUsageEstimates-1.2.1.Storage=
+bydatasettype,nocompression">1.2.1. Storage by dataset type, no compression=
+</h3>
+<p local-id=3D"94271192871b">These dataset sizes use mean sizes extracted f=
+rom the <a class=3D"external-link" href=3D"https://rubinobs.atlassian.net/b=
+rowse/DM-52645" rel=3D"nofollow">DM-52645</a> processing and the <code>lsst=
+_cells_v1</code> skymap.</p>
+<p local-id=3D"4cb2289e7c5e">Here are the top 20 entries by dataset type, w=
+hich add up to ~97% of the 52 PB total:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                          dstype      count  mean_size (GB)  total_size (GB=
+)  cumulative size (PB)  cumulative fraction
+0                           direct_warp  107391908        0.080683     8.66=
+4706e+06              8.664706             0.166182
+1                      psf_matched_warp  107391908        0.055675     5.97=
+9044e+06             14.643751             0.280856
+2                     template_detector   37270840        0.145941     5.43=
+9335e+06             20.083086             0.385178
+3         difference_image_predetection   37270840        0.107713     4.01=
+4546e+06             24.097632             0.462174
+4                      template_matched   37270840        0.107600     4.01=
+0349e+06             28.107982             0.539089
+5                           visit_image   37270840        0.107399     4.00=
+2834e+06             32.110816             0.615861
+6               preliminary_visit_image   37270840        0.107233     3.99=
+6669e+06             36.107485             0.692514
+7                      difference_image   37270840        0.107193     3.99=
+5161e+06             40.102646             0.769138
+8                        post_isr_image   37270840        0.092732     3.45=
+6191e+06             43.558837             0.835425
+9          deep_coadd_cell_predetection    7398852        0.404132     2.99=
+0112e+06             46.548948             0.892773
+10                           deep_coadd    7398852        0.079557     5.88=
+6305e+05             47.137579             0.904062
+11              deep_coadd_predetection    7398852        0.077303     5.71=
+9539e+05             47.709533             0.915032
+12                       template_coadd    7398852        0.076009     5.62=
+3807e+05             48.271913             0.925818
+13                    source_footprints   37270840        0.013923     5.18=
+9344e+05             48.790848             0.935771
+14         single_visit_star_footprints   37270840        0.010950     4.08=
+0998e+05             49.198948             0.943598
+15               deconvolved_deep_coadd    7398852        0.045133     3.33=
+9317e+05             49.532879             0.950002
+16                object_unstandardized    1285731        0.212947     2.73=
+7923e+05             49.806672             0.955254
+17                source_unstandardized   37270840        0.006515     2.42=
+8168e+05             50.049488             0.959911
+18  object_forced_source_unstandardized   61040677        0.003880     2.36=
+8167e+05             50.286305             0.964453
+19          object_unforced_measurement    7398852        0.029861     2.20=
+9372e+05             50.507242             0.968690</pre>
+</div>
+</div>
+<p local-id=3D"d01547c258c1">Here are the data volumes for the release data=
+set types, totaling 5.3 PB:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                      dstype     count  mean_size (GB)  total_size (GB)  cu=
+mulative size (PB)  cumulative fraction
+0                       visit_image  37270840        0.107399     4.002834e=
++06              4.002834             0.751624
+1                        deep_coadd   7398852        0.079557     5.886305e=
++05              4.591465             0.862153
+2                    template_coadd   7398852        0.076009     5.623807e=
++05              5.153846             0.967752
+3                           source2    267902        0.196303     5.258995e=
++04              5.206435             0.977627
+4             object_scarlet_models   1285731        0.023260     2.990629e=
++04              5.236342             0.983243
+5                 object_nonprimary     13015        1.379719     1.795704e=
++04              5.254299             0.986615
+6                            object     13015        1.226649     1.596484e=
++04              5.270264             0.989613
+7   object_forced_source_nonprimary   1285731        0.009279     1.193052e=
++04              5.282194             0.991853
+8                 source_nonprimary    267902        0.037773     1.011951e=
++04              5.292314             0.993753
+9              object_forced_source   1285731        0.006973     8.965305e=
++03              5.301279             0.995436
+10       compare_warp_artifact_mask   7398852        0.000797     5.893665e=
++03              5.307173             0.996543
+11                    visit_summary    267902        0.021019     5.631160e=
++03              5.312804             0.997600
+12           visit_image_background  37270840        0.000115     4.293601e=
++03              5.317097             0.998407
+13               deep_coadd_n_image   7398852        0.000506     3.747219e=
++03              5.320845             0.999110
+14         dia_object_forced_source   1285731        0.002036     2.618202e=
++03              5.323463             0.999602
+15                    isolated_star     13015        0.067902     8.837445e=
++02              5.324347             0.999768
+16                       dia_source     13015        0.058957     7.673221e=
++02              5.325114             0.999912
+17            deep_coadd_background   7398852        0.000049     3.622478e=
++02              5.325476             0.999980
+18                       dia_object     13015        0.008206     1.068054e=
++02              5.325583             1.000000</pre>
+</div>
+</div>
+</div>
+</div>
+<h3 local-id=3D"96287bf6-7a12-4689-a1d0-57170ba5858d" id=3D"DRPResourceUsag=
+eEstimates-1.2.2.Storagebydatasettype,usingcompression">1.2.2. Storage by d=
+ataset type, using compression</h3>
+<p local-id=3D"7fbce5b2-fc7b-4524-96b8-8e35fe76a084">These dataset sizes us=
+e mean sizes extracted from <a class=3D"external-link" href=3D"https://rubi=
+nobs.atlassian.net/browse/DM-53697" rel=3D"nofollow">DM-53697</a>, and the =
+<code>lsst_cells_v1</code> skymap.</p>
+<p local-id=3D"8d9e706f76ed">Here are the top 20 entries by dataset type, w=
+hich add up to ~96% of the 47 PB total:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                          dstype      count  mean_size (GB)  total_size (GB=
+)  cumulative size (PB)  cumulative fraction
+0                           direct_warp  107391908        0.069252     7.43=
+7091e+06              7.437091             0.150703
+1                    direct_warp_noise0  107391908        0.069090     7.41=
+9727e+06             14.856817             0.301055
+2                      psf_matched_warp  107391908        0.050112     5.38=
+1586e+06             20.238403             0.410106
+3                     template_detector   37270840        0.142507     5.31=
+1347e+06             25.549751             0.517734
+4         difference_image_predetection   37270840        0.108640     4.04=
+9108e+06             29.598859             0.599784
+5                      template_matched   37270840        0.104686     3.90=
+1728e+06             33.500587             0.678848
+6                      difference_image   37270840        0.103910     3.87=
+2795e+06             37.373382             0.757326
+7                        post_isr_image   35596260        0.093855     3.34=
+0888e+06             40.714270             0.825025
+8          deep_coadd_cell_predetection    7398852        0.207278     1.53=
+3618e+06             42.247888             0.856101
+9                           visit_image   37270840        0.029056     1.08=
+2933e+06             43.330821             0.878046
+10              preliminary_visit_image   35596260        0.029217     1.04=
+0015e+06             44.370836             0.899120
+11                    source_footprints   37270840        0.017015     6.34=
+1556e+05             45.004992             0.911971
+12              deep_coadd_predetection    7398852        0.072228     5.34=
+4068e+05             45.539399             0.922800
+13         single_visit_star_footprints   35596260        0.012409     4.41=
+7070e+05             45.981106             0.931750
+14               deconvolved_deep_coadd    7398852        0.045573     3.37=
+1886e+05             46.318294             0.938583
+15                source_unstandardized   37270840        0.008763     3.26=
+5925e+05             46.644887             0.945201
+16  object_forced_source_unstandardized   61040677        0.003908     2.38=
+5558e+05             46.883443             0.950035
+17                object_unstandardized    1285731        0.158945     2.04=
+3606e+05             47.087803             0.954176
+18                           deep_coadd    7398852        0.026605     1.96=
+8469e+05             47.284650             0.958165
+19     recalibrated_star_unstandardized   35596260        0.004737     1.68=
+6187e+05             47.453269             0.961582
+</pre>
+</div>
+</div>
+<p local-id=3D"822b9313-57e4-4f41-8c3b-1896f10f714a">Here are the data volu=
+mes for the release dataset types, totaling 1.6 PB:</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                      dstype     count  mean_size (GB)  total_size (GB)  cu=
+mulative size (PB)  cumulative fraction
+0                       visit_image  37270840        0.029056     1.082933e=
++06              1.082933             0.678618
+1                        deep_coadd   7398852        0.026605     1.968469e=
++05              1.279780             0.801971
+2                    template_coadd   7398852        0.018585     1.375069e=
++05              1.417287             0.888140
+3             object_scarlet_models   1285731        0.067458     8.673275e=
++04              1.504020             0.942491
+4                 source_nonprimary    267902        0.048011     1.286212e=
++04              1.516882             0.950551
+5                            object     13015        0.976566     1.271001e=
++04              1.529592             0.958515
+6              object_forced_source   1285731        0.009005     1.157785e=
++04              1.541170             0.965771
+7            visit_image_background  37270840        0.000260     9.678098e=
++03              1.550848             0.971835
+8                     isolated_star     93346        0.098526     9.197002e=
++03              1.560045             0.977599
+9                     visit_summary    188340        0.044504     8.381840e=
++03              1.568427             0.982851
+10                object_nonprimary     13015        0.452221     5.885658e=
++03              1.574313             0.986539
+11  object_forced_source_nonprimary   1285731        0.004494     5.778675e=
++03              1.580091             0.990161
+12       compare_warp_artifact_mask   7398852        0.000730     5.398089e=
++03              1.585489             0.993543
+13         dia_object_forced_source   1285731        0.003319     4.266932e=
++03              1.589756             0.996217
+14               deep_coadd_n_image   7398852        0.000564     4.170687e=
++03              1.593927             0.998831
+15                       dia_source     13015        0.098486     1.281791e=
++03              1.595209             0.999634
+16            deep_coadd_background   7398852        0.000040     2.951893e=
++02              1.595504             0.999819
+17                       dia_object     13015        0.013662     1.778089e=
++02              1.595682             0.999930
+18                          skyCorr    188340        0.000590     1.111493e=
++02              1.595793             1.000000</pre>
+</div>
+</div>
+<h3 local-id=3D"f7c3dd7d-25df-41f8-8948-fc7bcaa02058" id=3D"DRPResourceUsag=
+eEstimates-1.2.3.CPUtimebytask">1.2.3. CPU time by task</h3>
+<p local-id=3D"1b53fe98-800f-4967-9df6-a1069b365e67">For DR1, the total cpu=
+ time estimate is ~5700 node days, assuming 120 cores / node.</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                                          task      cpu_time   num_jobs    =
+node_days
+0                                                 isr  2.826619e+09   35596=
+260   272.629159
+1                                      calibrateImage  4.042881e+09   35596=
+260   662.567553
+2                          standardizeSingleVisitStar  2.094624e+07   35596=
+260   664.587831
+3                             consolidateVisitSummary  4.941746e+06     188=
+340   665.064466
+4                          consolidateSingleVisitStar  1.984047e+06     188=
+340   665.255828
+5                       makeInitialVisitDetectorTable  8.141630e+03        =
+ 16   665.256614
+6                               makeInitialVisitTable  5.900406e+03        =
+ 16   665.257183
+7                               associateIsolatedStar  8.524986e+06      93=
+346   666.079423
+8                   analyzeSingleVisitStarAssociation  1.106466e+08      93=
+346   676.751351
+9   makeAnalysisSingleVisitStarAssociationMetricTable  3.929430e+01        =
+ 16   676.751355
+10  makeAnalysisSingleVisitStarAssociationWholeSky...  7.599871e+02        =
+ 16   676.751428
+11                          fgcmBuildFromIsolatedStar  2.051375e+05        =
+ 16   676.771214
+12                        gbdesHealpix3AstrometricFit  6.195333e+09     352=
+800  1274.314880
+13                              refitPsfModelDetector  1.409975e+09   35596=
+260  1410.307807
+14                                       fgcmFitCycle  7.931815e+06        =
+ 16  1411.072835
+15                   consolidateRefitPsfModelDetector  1.530977e+07     188=
+340  1412.549472
+16                                 fgcmOutputProducts  7.610961e+03        =
+ 16  1412.550206
+17                                 updateVisitSummary  1.753770e+08     188=
+340  1429.465423
+18                         recalibrateSingleVisitStar  2.365609e+08   35596=
+260  1452.281864
+19                             makeVisitDetectorTable  3.951061e+04        =
+ 16  1452.285675
+20                                     makeVisitTable  3.128522e+04        =
+ 16  1452.288693
+21                        standardizeRecalibratedStar  9.771459e+06   35596=
+260  1453.231156
+22                        consolidateRecalibratedStar  2.068297e+06     188=
+340  1453.430644
+23                 analyzeRecalibratedStarAssociation  8.908042e+07      93=
+346  1462.022506
+24  makeAnalysisRecalibratedStarAssociationMetricT...  3.869648e+01        =
+ 16  1462.022510
+25  makeAnalysisRecalibratedStarAssociationWholeSk...  7.689373e+02        =
+ 16  1462.022584
+26                                     makeDirectWarp  7.645978e+09  107391=
+908  2199.481884
+27                              selectDeepCoaddVisits  2.303439e+08    7398=
+852  2221.698699
+28                          selectTemplateCoaddVisits  2.295395e+08    7398=
+852  2243.837922
+29                                 makePsfMatchedWarp  7.802713e+09  107391=
+908  2996.414439
+30                                  assembleDeepCoadd  2.524389e+09    7398=
+852  3239.893341
+31                              assembleTemplateCoadd  1.323094e+09    7398=
+852  3367.506537
+32                               makeBinnedDeepNImage  4.420109e+05    7398=
+852  3367.549170
+33                                  assembleCellCoadd  1.828518e+09    7398=
+852  3543.910869
+34                         makeHealSparsePropertyMaps  5.744157e+07      74=
+936  3549.451144
+35                                   detectCoaddPeaks  2.478631e+07    7398=
+852  3551.841799
+36                           makeBinnedTemplateNImage  4.463128e+05    7398=
+852  3551.884846
+37                           makeWholeTractDeepNImage  1.224657e+05      74=
+936  3551.896658
+38                               plotPropertyMapTract  1.066477e+07      74=
+936  3552.925282
+39                  consolidateHealSparsePropertyMaps  1.928967e+05        =
+ 60  3552.943887
+40                               makeBinnedCoaddImage  9.522497e+06    7398=
+852  3553.862337
+41                               mergeObjectDetection  6.756378e+06    1285=
+731  3554.513994
+42                       makeWholeTractTemplateNImage  1.292314e+05      74=
+936  3554.526459
+43                              plotPropertyMapSurvey  9.411935e+04        =
+ 60  3554.535537
+44                                makeWholeTractImage  4.909458e+05      74=
+936  3554.582889
+45                                         deconvolve  1.724185e+07    7398=
+852  3556.245876
+46                             deblendCoaddFootprints  1.572113e+09    1285=
+731  3707.877106
+47                              measureObjectUnforced  2.154060e+09    7398=
+852  3915.637504
+48                           fitDeepCoaddPsfGaussians  9.884841e+08    7398=
+852  4010.977407
+49                             mergeObjectMeasurement  4.820007e+06    1285=
+731  4011.442300
+50                             fitDeblendedObjectsExp  6.017627e+08    1285=
+731  4069.482683
+51                                measureObjectForced  4.885839e+09    7398=
+852  4540.724862
+52                          fitDeblendedObjectsSersic  4.928775e+08    1285=
+731  4588.263199
+53                                      rewriteObject  1.644864e+07    1285=
+731  4589.849680
+54                                computeObjectEpochs  2.030441e+06    1285=
+731  4590.045517
+55                                  standardizeObject  2.248086e+07    1285=
+731  4592.213810
+56                                  consolidateObject  3.310878e+06      13=
+015  4592.533146
+57                             analyzeObjectTableCore  1.214083e+06      13=
+015  4592.650245
+58                       analyzeObjectTableSurveyCore  2.160043e+05        =
+ 10  4592.671079
+59                                  catalogMatchTract  4.195776e+04      13=
+015  4592.675126
+60                            photometricCatalogMatch  4.187192e+04      13=
+015  4592.679164
+61                            validateObjectTableCore  8.757685e+03      13=
+015  4592.680009
+62                                 splitPrimaryObject  4.864856e+06      13=
+015  4593.149228
+63                     makeMetricTableObjectTableCore  6.000000e+02        =
+ 10  4593.149285
+64                                  refCatObjectTract  2.412594e+05      13=
+015  4593.172555
+65                       photometricRefCatObjectTract  2.338804e+05      13=
+015  4593.195113
+66                        objectTableCoreWholeSkyPlot  6.000000e+02        =
+ 10  4593.195171
+67          makeMetricTableObjectTableCoreRefCatMatch  1.668401e+01        =
+ 10  4593.195172
+68             objectTableCoreRefCatMatchWholeSkyPlot  1.769698e+02        =
+ 10  4593.195189
+69                 analyzeRecalibratedStarObjectMatch  1.081455e+07     267=
+902  4594.238260
+70                                reprocessVisitImage  2.318532e+09   37270=
+840  4817.862138
+71                                  standardizeSource  1.106595e+07   37270=
+840  4818.929456
+72                                     rewarpTemplate  1.202068e+09   37270=
+840  4934.869635
+73                                  consolidateSource  3.066398e+06     267=
+902  4935.165391
+74                                     subtractImages  1.456150e+09   37270=
+840  5075.611940
+75                            associateAnalysisSource  3.645223e+06      13=
+015  5075.963524
+76                                 splitPrimarySource  1.214335e+06     267=
+902  5076.080648
+77                          detectAndMeasureDiaSource  1.104833e+09   37270=
+840  5182.642505
+78                           analyzeSourceAssociation  1.815584e+07      13=
+015  5184.393647
+79                                    filterDiaSource  1.639749e+07   37270=
+840  5185.975195
+80                           forcedPhotObjectDetector  4.830243e+09   61040=
+677  5651.855155
+81           makeAnalysisSourceAssociationMetricTable  3.062347e+01        =
+ 10  5651.855158
+82                                 computeReliability  1.543229e+08   37270=
+840  5666.739695
+83                      standardizeObjectForcedSource  1.428544e+07    1285=
+731  5668.117534
+84          makeAnalysisSourceAssociationWholeSkyPlot  4.842324e+02        =
+ 10  5668.117581
+85                     filterDiaSourcePostReliability  1.925200e+06   37270=
+840  5668.303268
+86                     splitPrimaryObjectForcedSource  4.280745e+05    1285=
+731  5668.344556
+87                               standardizeDiaSource  3.532505e+07   37270=
+840  5671.751678
+88                          consolidateVisitDiaSource  7.566639e+05     267=
+902  5671.824659
+89                                 associateDiaSource  9.164340e+06    1285=
+731  5672.708565
+90                                 calculateDiaObject  9.911995e+06    1285=
+731  5673.664583
+91                               consolidateDiaSource  3.428671e+04      13=
+015  5673.667890
+92                                consolidateSsTables  6.000000e+02        =
+ 10  5673.667948
+93                               consolidateDiaObject  1.264672e+04      13=
+015  5673.669168
+94                        forcedPhotDiaObjectDetector  5.915534e+08   61040=
+677  5730.724856
+95                         analyzeDiaSourceTableTract  8.567915e+04      13=
+015  5730.733120
+96                   standardizeDiaObjectForcedSource  1.878258e+07    1285=
+731  5732.544711</pre>
+</div>
+</div>
+<h3 local-id=3D"4a16ad3a-14aa-4ff1-b339-036b3d13cd10" id=3D"DRPResourceUsag=
+eEstimates-1.2.4.DataSelection">1.2.4. Data Selection</h3>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">select =
+* from observations where
+   observationStartMJD &lt;=3D (select min(observationStartMJD) from observ=
+ations) + 365.25</pre>
+</div>
+</div>
+<p local-id=3D"2edab5b7-bd48-4c50-bdb8-5280d0aac727">This yields the first =
+188340 visits from <code>baseline_v5.0.0_10yrs.db</code>.</p>
+<h2 local-id=3D"66969490-18e1-4403-9ba5-4c9c92bc04c8" id=3D"DRPResourceUsag=
+eEstimates-1.3.Methodology">1.3. Methodology</h2>
+<h3 local-id=3D"834c5c33-c88a-4e2a-9d90-c6527b706dcf" id=3D"DRPResourceUsag=
+eEstimates-1.3.1.Estimatingnumbersofquantapertask">1.3.1. Estimating number=
+s of quanta per task</h3>
+<h3 local-id=3D"e328cc41-8f8d-4a40-8130-bfba5e0294fb" id=3D"DRPResourceUsag=
+eEstimates-1.3.2.Usingexistingresourceusagedatatopredictcputimeandmemoryreq=
+uirements">1.3.2. Using existing resource usage data to predict cpu time an=
+d memory requirements</h3>
+<h2 local-id=3D"6c97e430-706f-4e94-b175-0a4bf7b27952" id=3D"DRPResourceUsag=
+eEstimates-1.4.Wall-to-cputimeratios">1.4. Wall-to-cpu time ratios</h2>
+<p local-id=3D"f42d8c78-e316-44fe-b2ab-727a0b8bcc5b">The estimates shown ab=
+ove were derived using the per-job cpu time information in the task metadat=
+a outputs. Some tasks can have a lot of I/O and that may dominate the wall =
+time for those jobs. To get a sense of how prevalent those kinds of jobs ar=
+e, I=E2=80=99ve extracted the distributions of wall-to-cpu time ratios for =
+each of the tasks. The plot below shows the 0, 32, 50, 68, 100 percentile r=
+anges of the wall-to-cpu time ratios for the tasks in DM-52645 (using w_202=
+5_39), sorted by integrated wall time, in descending order.</p><span class=
+=3D"confluence-embedded-file-wrapper image-center-wrapper confluence-embedd=
+ed-manual-size"><img class=3D"confluence-embedded-image image-center" alt=
+=3D"wall_to_cpu_time_ratio_stats_DM-52645_w_2025_39.png" width=3D"468" load=
+ing=3D"lazy" src=3D"f9c3f317cbe14acf610e15baba4b471c5f9d7a939720dc9c1b8ddd5=
+38c22b95f" data-image-src=3D"https://rubinobs.atlassian.net/wiki/download/a=
+ttachments/1062404112/wall_to_cpu_time_ratio_stats_DM-52645_w_2025_39.png?v=
+ersion=3D1&amp;modificationDate=3D1760990322748&amp;cacheVersion=3D1&amp;ap=
+i=3Dv2" data-height=3D"1500" data-width=3D"1000" data-unresolved-comment-co=
+unt=3D"0" data-linked-resource-id=3D"1070923827" data-linked-resource-versi=
+on=3D"1" data-linked-resource-type=3D"attachment" data-linked-resource-defa=
+ult-alias=3D"wall_to_cpu_time_ratio_stats_DM-52645_w_2025_39.png" data-base=
+-url=3D"https://rubinobs.atlassian.net/wiki" data-linked-resource-content-t=
+ype=3D"image/png" data-linked-resource-container-id=3D"1062404112" data-lin=
+ked-resource-container-version=3D"16" data-media-id=3D"280ef0ce-9f6c-4507-8=
+7e2-4d2c0e8cf26c" data-media-type=3D"file" height=3D"700"></span>
+<p local-id=3D"2bfb756c-2478-4f6f-87cc-cf2795669413">Taking the ratio of th=
+e integrated wall time and integrated cpu times over all jobs, I find an av=
+erage ratio of <code>integrated wall time / integrated cpu time =3D 1.14</c=
+ode> , i.e., for this DRP processing, wall times were ~14% larger than the =
+cpu times.</p>
+<p local-id=3D"6cd2f943-c1b5-4c98-91fc-92e43e457e08"></p>
+    </div>
+</body>
+</html>
+------=_Part_16_1571210483.1773934574756
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: file:///C:/03fbc5efaf4ce050065d09c80269f81b450c238eb1ba92445e86c437c8e8a295
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAA3NCSVQICAjb4U/gAAAAFVBMVEX/
+//9wcHBwcHBwcHBwcHBwcHBwcHA3RenHAAAAB3RSTlMAZoiZzN3/SzZomQAAAAlwSFlzAAALEgAA
+CxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAAUdEVYdENy
+ZWF0aW9uIFRpbWUANi8xLzEzOKlF0AAAACFJREFUCJljYCATsCgwqIAZTMnMyRAhsTABCIMxkVxT
+GQCLcwHyUKXpLgAAAABJRU5ErkJggg==
+------=_Part_16_1571210483.1773934574756
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: file:///C:/f9c3f317cbe14acf610e15baba4b471c5f9d7a939720dc9c1b8ddd538c22b95f
+
+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
+xKs9/DQvdsMO6BiX2aThyfcd8N8pbW48vuDkZs//QgBU/gc6d+4ct99+O4eHh5w9e5bNzU2e9rSn
+UUrh6OiIcRyZzWYMw8BsNuPOO+/k9OnT7O7u8vCHP5z77ruP2267jQsXLrC1tcU0TdRaKaVweHhI
+rZVz586xXC6JCIZh4NVe7dU4duwYwzAgiRdMeBqYd8HprTmzGrQ0Y0uu+g8DQOV/oIc85CE86EEP
+Ypompmmi73taa0hiHEf29/eJCC5cuMDm5iYv8zIvw3q9Zm9vj8Viwd7eHi//8i/PXXfdhW3OnDlD
+13VcunSJ1WqFJB75yEcyDANPe9rTuPnmm6m10vc9x44dIzOJCO7X0tx0fIMI2J5Vrn+r1+Yp9+zy
+10+/D2NuOr7gZW85Qdr8T9LSHK4n/iMt+kJI/CcDoPI/UCmFUgpd1/HcWms8/vGP54477iAiOH36
+NMeOHeP222+n6zruvvtubrrpJv7qr/6K06dPM5vNuPPOO7nnnnu46aab6LqOu+66i+PHj7O7u8ux
+Y8e4cOECfd9zdHTEfffdR0TwQPftrfir23bpStBsfunv7+Fn/vTJtP3z/MBfnecVH3ycD3iNhzK2
+5P+yELzaw0+zOav8JwNAts1/otYa97PNpUuXOHHiBNM0UUphmibOnj3LddddR0TQWqOUwqVLlxiG
+gY2NDTY3N7HNarUiIjg4OODChQsMw0Df98znc2qt9H3PfffdhyQigsViQd/3LBYLzp07R2ZiG4Bh
+GOj7nlOnTnHfffdxzTXXcPr0af72b/+WF3/xFycieG5jS5587z7XHVvgTJ54zyUedcMJZjXYmlWu
++vf727/9W17sxV6MUgqV/0TTNPETP/ETrNdrbrrpJu6++242Nzc5fvw46/Wa3d1dAO69915OnTrF
+fD7noQ99KM94xjNorTEMA5LY2dlBEvfddx/b29vYRhKZSUSwtbXF3t4es9mMUgrTNHHu3Dluuukm
+zp8/z9bWFidPnuTuu+/mvvvu4+TJk0QEmclNN93E7u4u586d4+Ve7uU4d+4cEcED/eVtFzl/MPCn
+T7/AN/7cH/LRb/1qvMJDTvF3d+5zOIINafP8pM2xRcerPuw0Ele9aACo/CeyzZkzZzhx4gS1ViRx
+3XXXcc8993Dttddy/fXX01rj1V/91bnrrrvY3Nyk6zp2dnY4fvw4fd+zXC45ffo0586d48yZM3Rd
+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
+
+------=_Part_16_1571210483.1773934574756--
