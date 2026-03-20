@@ -143,20 +143,17 @@ precursor:
 
 # ---------------------------------------------------------------------------
 # Current Hardware on the Ground (2026 -- Rubin USDF specific)
-# Source: 2026_HW_Initial_Capacity_Capture.xlsx (FY24 planners + initial
-#         capture tabs, Rubin USDF rows only).
-# Milano count: 50 from FY24 CPU Planner. Usage confirms ~60% utilization
-#   (2.76M core-hours/month avg ÷ 92,160 core-hours/node/month ≈ 30 nodes
-#    active; 50 purchased for Rubin matches capacity).
-# Torino count: 10 confirmed by user as specifically available to Rubin.
+# Source: Adam Bolton (confirmed March 2026).
+#   145 total batch nodes: 110 Milano + 35 Torino. Both 120 cores.
+#   A few Milanos may have been redeployed to K8s.
 # ---------------------------------------------------------------------------
 current_fleet:
   batch:
-    milano_nodes: 50             # FY24 CPU Planner, Rubin USDF row
-    milano_cores_per_node: 128   # FY24 CPU Planner B22
-    milano_ram_gb: 512           # FY24 CPU Planner B23
-    torino_nodes: 10             # user confirmed, available to Rubin
-    torino_cores_per_node: 120   # Initial CPU Capture, "Torino node usable cores"
+    milano_nodes: 110            # Adam Bolton confirmed, March 2026
+    milano_cores_per_node: 120   # confirmed: both Milano and Torino are 120 cores
+    milano_ram_gb: 512
+    torino_nodes: 35             # Adam Bolton confirmed, March 2026
+    torino_cores_per_node: 120   # confirmed: both Milano and Torino are 120 cores
     torino_ram_gb: 720
   k8s:
     nodes: 75                    # Initial k8s Capture, Rubin USDF row
@@ -181,17 +178,17 @@ current_fleet:
 costs:
   nodes:
     milano_usd: 11800            # FY24 CPU Planner, $11.8K per node
-    milano_cores: 128
+    milano_cores: 120            # confirmed: 120 cores per Milano
     milano_ram_gb: 512
-    torino_usd: 16000            # estimated for future purchases
-    torino_cores: 120            # usable cores from HW Capture
+    torino_usd: 16000            # estimated for future purchases (Adam: quotes now $50-75K)
+    torino_cores: 120            # confirmed: 120 cores per Torino
     torino_ram_gb: 720
     k8s_usd: 8000
     k8s_cores: 48
     qserv_usd: 20000
     gpu_h200_usd: 250000
-    eff_cores_milano: 128        # physical cores per Milano
-    eff_cores_torino: 120        # usable cores per Torino (from HW Capture)
+    eff_cores_milano: 120        # confirmed: 120 cores per Milano
+    eff_cores_torino: 120        # confirmed: 120 cores per Torino
     eff_cores_xeon: 27           # for K8s reference (from DMTN-135 Table 29)
   storage:
     flash_per_tb: 320            # NVMe / Weka
