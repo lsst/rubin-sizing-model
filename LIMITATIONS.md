@@ -5,6 +5,14 @@ that would benefit from refinement to increase the model's robustness.
 
 ---
 
+## 0. Hardware refresh & DRP document
+
+| # | Gap | Impact | Suggested Fix |
+|---|-----|--------|---------------|
+| 0.1 | **Hardware Refresh tab is cohort-based** — Replacement counts assume strict `MOD(FY−delivery, lifetime)=0`; real procurement may slip. | Planning noise. | Adjust cohorts/dates in `sizing_params.yaml` as POs close. |
+| 0.2 | **JBOD cohort quantities** — JTM “Total JBODs” (62) may not equal the sum of per-PO lines in YAML; cohort list is for EOL timing, not audit. | Minor inventory mismatch. | Reconcile with asset DB. |
+| 0.3 | **`core_hours_per_input_tb` vs DRP doc** — The DRP Resource Usage Estimates doc now includes DM-53697 / DM-52836 CPU sections; the model still uses a single calibrated `core_hours_per_input_tb`. | May diverge from latest task-level totals until recalibrated. | Re-derive from updated doc or Jim’s node-day totals. |
+
 ## 1. Compute
 
 | # | Gap | Impact | Suggested Fix |
@@ -26,7 +34,7 @@ that would benefit from refinement to increase the model's robustness.
 | 2.3 | **Object Store ≠ Ceph HDD** — the model lumps Object Store into the "online" bucket, but Object Store may sit on different Ceph pools with different cost/performance. | Cost granularity is lost. | Split Object Store into its own cost line in Ops Costs. |
 | 2.4 | **EFD and node-local storage are not tracked as purchasable items** — EFD telemetry (~1 TB/yr) lives on K8s node-local NVMe. When K8s nodes are added, local storage comes for free, but this is implicit. | Minor — EFD is small. | Note in README; no code change needed unless EFD grows. |
 | 2.5 | **No Weka vs. Ceph flash split** — Flash storage is modelled as a single tier. Weka (parallel NVMe) and Ceph NVMe have different costs. | Undercounts cost if Weka is used heavily. | Add separate Weka and Ceph NVMe rows. |
-| 2.6 | **Compression factors are applied uniformly** — The same lossless/lossy16 factors are used for all image types. Actual compression varies by filter and depth. | Storage estimates could be off by ±10-15%. | Per-filter compression ratios from commissioning data. |
+| 2.6 | **Compression is simplified** — Science/engineering raws use Key Numbers ratio; calibrations use the same factor as raws (0.464) until better measurements exist. Lossy output uses a single DRP-derived factor. | Uncertainty on calibration and coadd-related storage. | Update `imaging.calibration_compression` and per-product factors from ops data. |
 | 2.7 | **Sliding window boundaries are exact years** — e.g., a "3-year window" drops data at the LOY boundary. In reality, retention may be calendar-date based. | Minor mismatch between model and policy enforcement. | Acceptable approximation for planning. |
 
 ## 3. Cost

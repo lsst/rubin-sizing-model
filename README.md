@@ -28,7 +28,7 @@ be changed directly in Excel and downstream cells will update automatically.
 | `charts/` | Generated PNG forecast charts (storage by tier, detail, data products, DRP core-hours, cost) |
 | `LIMITATIONS.md` | Known gaps and suggested improvements |
 | `dp-drp-derivations/` | DRP resource usage estimates, RFC-1134 prompt products doc, K8s batch usage report |
-| `sizing-model-spreadsheet/` | Rubin Key Numbers spreadsheet and machine/storage pricing reference |
+| `sizing-model-spreadsheet/` | Rubin Key Numbers, machine/storage pricing, **Rubin Hardware Summary for March 2025 JTM** (cohorts for refresh tab) |
 
 ## Spreadsheet Tabs
 
@@ -36,7 +36,8 @@ be changed directly in Excel and downstream cells will update automatically.
 |-----|-------------|
 | **Reference Data** | Key numbers, fleet inventory, data product baselines |
 | **Ops Storage** | Per-LOY storage by tier (Flash, HDD, Object Store, Qserv, Tape) with sliding-window retention policies |
-| **Ops Compute** | DRP, AP, DAC, Staff, Qserv, GPU, K8s core and node requirements per LOY |
+| **Ops Compute** | DRP (batch), AP on K8s (not batch), DAC/Staff increments + refresh, Qserv from windowed storage ÷ TB/node, batch purchase totals |
+| **Hardware Refresh** | EOL model: cohorts from JTM delivery dates × lifetimes → units to replace per FY |
 | **Model** | Machine catalog, price factors, storage cost curves |
 | **Ops Costs** | Annual CapEx for compute and storage, broken out by line item |
 | **Purchase Plan** | Actionable per-year purchase requirements (batch nodes, K8s, storage by tier), with LOY1 (FY2026) detail for the current purchase cycle |
@@ -78,13 +79,14 @@ repository. Their key numbers have been captured in `sizing_params.yaml`.
 - **prompt** — alert rates, tier-1/tier-2 retention, DR1 target year
 - **qserv** — storage per node, replication factor
 - **observing** — nightly visits, image count, calibration images, engineering fraction
-- **imaging** — image size, raw compression (science only), calibration compression, lossy compression, per-visit DRP output constants
+- **imaging** — image size, raw compression (science + engineering), calibration compression (often same as raw), lossy compression, per-visit DRP output constants
 - **storage_fractions** — APDB, scratch, misc overhead, sims output
 - **catalogs** — object/source/forced-source row sizes and counts
 - **users** — science user counts and storage per user
 - **precursor** — HSC RC2/PDR2 reference data for coadd scaling
-- **current_fleet** — Rubin USDF-specific node counts (batch, K8s, interactive, GPU, Qserv) and installed storage
-- **costs** — unit costs for nodes and storage tiers, hosting/overhead
+- **current_fleet** — batch, K8s, interactive, GPU, Qserv, **Cassandra (12)**, **NVMe servers (4)**, **JBOD counts**, installed storage (batch core/RAM specs are authoritative — not duplicated under `costs.nodes`)
+- **hardware_refresh** — cohorts (label, category, qty, delivery FY, lifetime) from JTM; drives **Hardware Refresh** tab
+- **costs** — USD pricing only for nodes/storage (batch core counts come from `current_fleet.batch`)
 - **price_factors** — annual price change rates (currently 0 = flat pricing)
 - **lifecycle** — compute (3 yr) and storage (5 yr) refresh periods
 - **storage_retention** — sliding window lengths for Qserv, output images, coadds, Parquet
@@ -105,18 +107,17 @@ repository. Their key numbers have been captured in `sizing_params.yaml`.
 1. **Data product sizing** starts from per-image byte counts (raw, processed,
    coadd, difference, Parquet catalogs) multiplied by nightly visit rates and
    accumulated over survey years.
-2. **Compression**: Raw compression (0.464) is applied only to science and
-   engineering images where measurements exist. Calibration images use a
-   separate factor (default 1.0 = uncompressed) since no measured compression
-   data is available. Lossy compression (0.27) is applied to output images on
-   the object store.
+2. **Compression**: Raw compression (0.464) applies to science and engineering
+   exposures; calibrations use the same factor (0.464) as a placeholder until
+   measured. Lossy compression (0.27) applies to output images on the object store.
 3. **Storage retention** applies sliding windows (DMTN-135 policy): e.g.,
    Qserv czar tables kept for 3 years, output images 2 years, coadds 3 years
    after initial construction. Raw images are permanent on object store + tape.
-4. **Compute** uses a linear scaling model: input TB per year of observations
-   multiplied by cumulative years and a calibrated `core_hours_per_input_tb`
-   factor (derived from actual DR1 processing). AP and DAC are additive
-   fractions.
+4. **Compute** uses a linear scaling model for DRP (batch). AP is sized on
+   **K8s** (not Slurm batch), with initial purchase in LOY1 and full refresh
+   every compute lifetime. DAC/Staff track **incremental** growth plus refresh.
+   Qserv node counts use **windowed** Qserv DB storage from Ops Storage (no
+   second 3-year stack).
 5. **International sharing** reduces USDF DRP compute by 65% (France 40% +
    UK 25%) in the International Compute tab only. All other tabs assume 100%
    USDF. Storage remains entirely at USDF.

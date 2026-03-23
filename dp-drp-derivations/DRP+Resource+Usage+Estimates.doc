@@ -1,11 +1,11 @@
-Date: Thu, 19 Mar 2026 15:36:14 +0000 (UTC)
-Message-ID: <2011423835.17.1773934574756@52ffb549e7ea>
+Date: Mon, 23 Mar 2026 18:55:54 +0000 (UTC)
+Message-ID: <1857963910.61.1774292154458@0e9f2fd3f163>
 Subject: Exported From Confluence
 MIME-Version: 1.0
 Content-Type: multipart/related; 
-	boundary="----=_Part_16_1571210483.1773934574756"
+	boundary="----=_Part_60_343170979.1774292154458"
 
-------=_Part_16_1571210483.1773934574756
+------=_Part_60_343170979.1774292154458
 Content-Type: text/html; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Content-Location: file:///C:/exported.html
@@ -231,12 +231,12 @@ d of the content */
     <h1>DRP Resource Usage Estimates</h1>
     <div class=3D"Section1">
         <style type=3D"text/css">/*<![CDATA[*/
-div.rbtoc1773934574296 {padding: 0px;}
-div.rbtoc1773934574296 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1773934574296 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1774292154289 {padding: 0px;}
+div.rbtoc1774292154289 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1774292154289 li {margin-left: 0px;padding-left: 0px;}
 
 /*]]>*/</style>
-<div class=3D"toc-macro rbtoc1773934574296">
+<div class=3D"toc-macro rbtoc1774292154289">
 <ul class=3D"toc-indentation">
 <li><a href=3D"#DRPResourceUsageEstimates-1.1.DP2">1.1. DP2</a>
 <ul class=3D"toc-indentation">
@@ -260,9 +260,13 @@ ime by task</a></li>
 ression">1.2.1. Storage by dataset type, no compression</a></li>
 <li><a href=3D"#DRPResourceUsageEstimates-1.2.2.Storagebydatasettype,usingc=
 ompression">1.2.2. Storage by dataset type, using compression</a></li>
-<li><a href=3D"#DRPResourceUsageEstimates-1.2.3.CPUtimebytask">1.2.3. CPU t=
-ime by task</a></li>
-<li><a href=3D"#DRPResourceUsageEstimates-1.2.4.DataSelection">1.2.4. Data =
+<li><a href=3D"#DRPResourceUsageEstimates-1.2.3.CPUtimebytaskusingruntimeda=
+tafromDM-52836(w_2025_41)">1.2.3. CPU time by task using runtime data from =
+DM-52836 (w_2025_41)</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.2.4.CPUtimebytaskusingruntimeda=
+tafromDM-53697(v30_0_0_rc2)">1.2.4. CPU time by task using runtime data fro=
+m DM-53697 (v30_0_0_rc2)</a></li>
+<li><a href=3D"#DRPResourceUsageEstimates-1.2.5.DataSelection">1.2.5. Data =
 Selection</a></li>
 </ul></li>
 <li><a href=3D"#DRPResourceUsageEstimates-1.3.Methodology">1.3. Methodology=
@@ -292,15 +296,15 @@ nsolidated database (consdb). The query used for the selection is shown bel=
 ow. For computing the number of datasets per dataset type and information s=
 uch as the number of visits per patch per band, the <code>lsst_cells_v1</co=
 de>skymap was used.</p>
-<div id=3D"expander-1571882696" class=3D"expand-container">
-<div id=3D"expander-control-1571882696" class=3D"expand-control">
+<div id=3D"expander-516466572" class=3D"expand-container">
+<div id=3D"expander-control-516466572" class=3D"expand-control">
 <span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
 lass=3D"expand-control-image" src=3D"03fbc5efaf4ce050065d09c80269f81b450c23=
 8eb1ba92445e86c437c8e8a295" width=3D"16" height=3D"16"></span><span class=
 =3D"expand-control-text">Storage by dataset type, no compression, 2025-10-1=
 4 visit list</span>
 </div>
-<div id=3D"expander-content-1571882696" class=3D"expand-content">
+<div id=3D"expander-content-516466572" class=3D"expand-content">
 <h3 local-id=3D"e9ad964983f2" id=3D"DRPResourceUsageEstimates-1.1.1.Storage=
 bydatasettype,nocompression,2025-10-14visitlist">1.1.1. Storage by dataset =
 type, no compression, 2025-10-14 visit list</h3>
@@ -411,15 +415,15 @@ ulative size (PB)  cumulative fraction
 </div>
 </div>
 </div>
-<div id=3D"expander-1045249299" class=3D"expand-container">
-<div id=3D"expander-control-1045249299" class=3D"expand-control">
+<div id=3D"expander-1495883510" class=3D"expand-container">
+<div id=3D"expander-control-1495883510" class=3D"expand-control">
 <span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
 lass=3D"expand-control-image" src=3D"03fbc5efaf4ce050065d09c80269f81b450c23=
 8eb1ba92445e86c437c8e8a295" width=3D"16" height=3D"16"></span><span class=
 =3D"expand-control-text">Storage by dataset type using compression, 2025-10=
 -14 visit list</span>
 </div>
-<div id=3D"expander-content-1045249299" class=3D"expand-content">
+<div id=3D"expander-content-1495883510" class=3D"expand-content">
 <h3 local-id=3D"809713576b9f" id=3D"DRPResourceUsageEstimates-1.1.2.Storage=
 bydatasettypeusingcompression,2025-10-14visitlist">1.1.2. Storage by datase=
 t type using compression, 2025-10-14 visit list</h3>
@@ -895,14 +899,14 @@ ese calculations are the Y1 observations from the <a class=3D"external-link=
 " href=3D"https://community.lsst.org/t/release-of-v5-0-simulations/11114" r=
 el=3D"nofollow">baseline v5.0 simulations</a>, specifically, from the <code=
 >baseline_v5.0.0_10yrs.db</code> opsim db file.</p>
-<div id=3D"expander-674622223" class=3D"expand-container">
-<div id=3D"expander-control-674622223" class=3D"expand-control">
+<div id=3D"expander-2028292900" class=3D"expand-container">
+<div id=3D"expander-control-2028292900" class=3D"expand-control">
 <span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
 lass=3D"expand-control-image" src=3D"03fbc5efaf4ce050065d09c80269f81b450c23=
 8eb1ba92445e86c437c8e8a295" width=3D"16" height=3D"16"></span><span class=
 =3D"expand-control-text">Storage by dataset type, no compression</span>
 </div>
-<div id=3D"expander-content-674622223" class=3D"expand-content">
+<div id=3D"expander-content-2028292900" class=3D"expand-content">
 <h3 local-id=3D"b810108384a2" id=3D"DRPResourceUsageEstimates-1.2.1.Storage=
 bydatasettype,nocompression">1.2.1. Storage by dataset type, no compression=
 </h3>
@@ -1116,10 +1120,21 @@ mulative size (PB)  cumulative fraction
 +02              1.595793             1.000000</pre>
 </div>
 </div>
-<h3 local-id=3D"f7c3dd7d-25df-41f8-8948-fc7bcaa02058" id=3D"DRPResourceUsag=
-eEstimates-1.2.3.CPUtimebytask">1.2.3. CPU time by task</h3>
-<p local-id=3D"1b53fe98-800f-4967-9df6-a1069b365e67">For DR1, the total cpu=
- time estimate is ~5700 node days, assuming 120 cores / node.</p>
+<div id=3D"expander-763735908" class=3D"expand-container">
+<div id=3D"expander-control-763735908" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"03fbc5efaf4ce050065d09c80269f81b450c23=
+8eb1ba92445e86c437c8e8a295" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">CPU time by task using runtime data from DM-52836 =
+(w_2025_41)</span>
+</div>
+<div id=3D"expander-content-763735908" class=3D"expand-content">
+<h3 local-id=3D"07fa99730342" id=3D"DRPResourceUsageEstimates-1.2.3.CPUtime=
+bytaskusingruntimedatafromDM-52836(w_2025_41)">1.2.3. CPU time by task usin=
+g runtime data from DM-52836 (w_2025_41)</h3>
+<p local-id=3D"8a56aee0a273">For DR1, the total cpu time estimate is ~5700 =
+node days, assuming 120 cores / node. This is using pipetask run times from=
+ DM-52836 (w_2025_41).</p>
 <div class=3D"code panel pdl" style=3D"border-width: 1px;">
 <div class=3D"codeContent panelContent pdl">
 <pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
@@ -1322,8 +1337,274 @@ node_days
 731  5732.544711</pre>
 </div>
 </div>
+</div>
+</div>
+<h3 local-id=3D"f7c3dd7d-25df-41f8-8948-fc7bcaa02058" id=3D"DRPResourceUsag=
+eEstimates-1.2.4.CPUtimebytaskusingruntimedatafromDM-53697(v30_0_0_rc2)">1.=
+2.4. CPU time by task using runtime data from DM-53697 (v30_0_0_rc2)</h3>
+<p local-id=3D"1b53fe98-800f-4967-9df6-a1069b365e67">Using pipetask run tim=
+es from DM-53697 (v30_0_0_rc2), the total cpu time estimate is ~11k node da=
+ys, assuming 120 cores / node, running on milano.</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                                           task      cpu_time   num_jobs   =
+  node_days
+0                                                  isr  1.260124e+09   3559=
+6260    121.539782
+1                                       calibrateImage  2.784906e+09   3559=
+6260    390.145694
+2                           standardizeSingleVisitStar  1.003481e+07   3559=
+6260    391.113558
+3                              consolidateVisitSummary  5.053982e+06     18=
+8340    391.601017
+4                           consolidateSingleVisitStar  1.728270e+06     18=
+8340    391.767710
+5                        makeInitialVisitDetectorTable  1.893838e+04       =
+  16    391.769537
+6                                makeInitialVisitTable  1.443393e+04       =
+  16    391.770929
+7                                associateIsolatedStar  2.693714e+07      9=
+3346    394.369032
+8                    analyzeSingleVisitStarAssociation  1.660378e+08      9=
+3346    410.383476
+9    makeAnalysisSingleVisitStarAssociationMetricTable  5.119225e+01       =
+  16    410.383481
+10   makeAnalysisSingleVisitStarAssociationWholeSky...  5.959221e+02       =
+  16    410.383539
+11                           fgcmBuildFromIsolatedStar  1.243380e+06       =
+  16    410.503464
+12                         gbdesHealpix3AstrometricFit  3.575991e+10     35=
+2800   3859.568943
+13                               refitPsfModelDetector  1.361434e+10   3559=
+6260   5172.679986
+14                                             skyCorr  3.807864e+09     18=
+8340   5539.950818
+15                                        fgcmFitCycle  4.737550e+07       =
+  16   5544.520214
+16                      gaussianProcessesTurbulenceFit  1.461429e+10    227=
+4573   6954.077669
+17                    consolidateRefitPsfModelDetector  6.010948e+07     18=
+8340   6959.875265
+18                                  fgcmOutputProducts  1.847832e+04       =
+  16   6959.877047
+19                                  updateVisitSummary  7.317470e+08     18=
+8340   7030.454500
+20                          recalibrateSingleVisitStar  1.375509e+09   3559=
+6260   7163.123210
+21                              makeVisitDetectorTable  1.030072e+05       =
+  16   7163.133145
+22                                      makeVisitTable  7.979597e+04       =
+  16   7163.140842
+23                         standardizeRecalibratedStar  6.016997e+07   3559=
+6260   7168.944273
+24                         consolidateRecalibratedStar  1.192141e+07     18=
+8340   7170.094100
+25                                    fitStellarMotion  4.428121e+08      9=
+3346   7212.803604
+26                  analyzeRecalibratedStarAssociation  2.883769e+08      9=
+3346   7240.617737
+27   makeAnalysisRecalibratedStarAssociationMetricT...  3.096569e+01       =
+  16   7240.617740
+28   makeAnalysisRecalibratedStarAssociationWholeSk...  5.835356e+02       =
+  16   7240.617796
+29                                      makeDirectWarp  5.318029e+09  10739=
+1908   7753.544930
+30                               selectDeepCoaddVisits  1.581081e+08    739=
+8852   7768.794558
+31                           selectTemplateCoaddVisits  1.554248e+08    739=
+8852   7783.785380
+32                                  makePsfMatchedWarp  5.918696e+09  10739=
+1908   8354.647226
+33                                   assembleDeepCoadd  7.286187e+08    739=
+8852   8424.922945
+34                               assembleTemplateCoadd  7.525043e+08    739=
+8852   8497.502453
+35                                makeBinnedDeepNImage  4.105787e+05    739=
+8852   8497.542054
+36                      makeDeepCoaddInputSummaryTract  9.972917e+05      7=
+4936   8497.638243
+37                                   assembleCellCoadd  1.548516e+09    739=
+8852   8646.993552
+38                          makeHealSparsePropertyMaps  3.451837e+07      7=
+4936   8650.322870
+39                            makeBinnedTemplateNImage  3.982827e+05    739=
+8852   8650.361285
+40                  makeTemplateCoaddInputSummaryTract  5.543115e+05      7=
+4936   8650.414748
+41                            makeWholeTractDeepNImage  9.763088e+04      7=
+4936   8650.424165
+42                           makeDeepCoaddInputSummary  6.950110e+02       =
+  10   8650.424232
+43                                    detectCoaddPeaks  3.671806e+08    739=
+8852   8685.839027
+44                                plotPropertyMapTract  2.040171e+07      7=
+4936   8687.806784
+45                   consolidateHealSparsePropertyMaps  5.305708e+05       =
+  60   8687.857958
+46                        makeWholeTractTemplateNImage  9.397471e+04      7=
+4936   8687.867022
+47                       makeTemplateCoaddInputSummary  6.342699e+02       =
+  10   8687.867083
+48                                makeBinnedCoaddImage  6.101854e+06    739=
+8852   8688.455611
+49                                mergeObjectDetection  2.816689e+07    128=
+5731   8691.172325
+50                               plotPropertyMapSurvey  9.930986e+04       =
+  60   8691.181904
+51                                 makeWholeTractImage  3.359636e+05      7=
+4936   8691.214308
+52                                          deconvolve  4.435864e+09    739=
+8852   9119.056154
+53                              deblendCoaddFootprints  6.770309e+08    128=
+5731   9184.356200
+54                               measureObjectUnforced  2.549555e+09    739=
+8852   9430.262393
+55                              consolidateParentTable  1.542178e+05      1=
+3015   9430.277268
+56                            fitDeepCoaddPsfGaussians  6.154154e+08    739=
+8852   9489.634468
+57                              mergeObjectMeasurement  2.857219e+06    128=
+5731   9489.910048
+58                        analyzeObjectParentTableCore  5.682957e+03      1=
+3015   9489.910596
+59                              fitDeblendedObjectsExp  6.889983e+08    128=
+5731   9556.364911
+60                                 measureObjectForced  2.917598e+09    739=
+8852   9837.768991
+61                makeMetricTableObjectParentTableCore  1.633141e+01       =
+  10   9837.768992
+62                           fitDeblendedObjectsSersic  5.459141e+08    128=
+5731   9890.422740
+63                                       rewriteObject  8.924713e+06    128=
+5731   9891.283534
+64                   objectParentTableCoreWholeSkyPlot  2.695556e+01       =
+  10   9891.283536
+65                                 computeObjectEpochs  1.671654e+06    128=
+5731   9891.444768
+66                                   standardizeObject  1.629476e+07    128=
+5731   9893.016408
+67                                   consolidateObject  8.354779e+05      1=
+3015   9893.096990
+68                              analyzeObjectTableCore  1.920592e+06      1=
+3015   9893.282232
+69                        analyzeObjectTableSurveyCore  5.782416e+05       =
+  10   9893.338004
+70                                   catalogMatchTract  1.025633e+05      1=
+3015   9893.347897
+71                             photometricCatalogMatch  1.023389e+05      1=
+3015   9893.357767
+72                             validateObjectTableCore  7.428748e+03      1=
+3015   9893.358484
+73                                  splitPrimaryObject  1.267482e+06      1=
+3015   9893.480733
+74                      makeMetricTableObjectTableCore  4.056517e+01       =
+  10   9893.480737
+75                                   refCatObjectTract  1.865976e+05      1=
+3015   9893.498734
+76                        photometricRefCatObjectTract  1.778106e+05      1=
+3015   9893.515884
+77                         objectTableCoreWholeSkyPlot  4.816242e+02       =
+  10   9893.515931
+78           makeMetricTableObjectTableCoreRefCatMatch  1.623066e+01       =
+  10   9893.515932
+79              objectTableCoreRefCatMatchWholeSkyPlot  1.513006e+02       =
+  10   9893.515947
+80                  analyzeRecalibratedStarObjectMatch  1.075746e+07     26=
+7902   9894.553511
+81                                 reprocessVisitImage  2.210334e+09   3727=
+0840  10107.741542
+82                                 generateEphemerides  6.691965e+06       =
+  10  10108.386986
+83                                   standardizeSource  9.338005e+06   3727=
+0840  10109.287643
+84                                       buildTemplate  1.849688e+09   3727=
+0840  10287.691147
+85                                   consolidateSource  3.313196e+06     26=
+7902  10288.010707
+86                                      subtractImages  2.679375e+09   3727=
+0840  10546.438049
+87                             associateAnalysisSource  5.997949e+06      1=
+3015  10547.016555
+88                                  splitPrimarySource  1.369671e+06     26=
+7902  10547.148661
+89                           detectAndMeasureDiaSource  2.713893e+09   3727=
+0840  10808.905298
+90                            analyzeSourceAssociation  2.853869e+07      1=
+3015  10811.657872
+91                                     filterDiaSource  3.120110e+07   3727=
+0840  10814.667237
+92                            forcedPhotObjectDetector  2.397384e+09   6104=
+0677  11045.896364
+93            makeAnalysisSourceAssociationMetricTable  1.882119e+01       =
+  10  11045.896366
+94                                  computeReliability  2.460223e+08   3727=
+0840  11069.625367
+95                       standardizeObjectForcedSource  2.183303e+07    128=
+5731  11071.731176
+96           makeAnalysisSourceAssociationWholeSkyPlot  3.572163e+02       =
+  10  11071.731211
+97                      filterDiaSourcePostReliability  3.752615e+06   3727=
+0840  11072.093153
+98                      splitPrimaryObjectForcedSource  9.422703e+05    128=
+5731  11072.184036
+99                                standardizeDiaSource  6.750480e+07   3727=
+0840  11078.694915
+100                          consolidateVisitDiaSource  7.769828e+05     26=
+7902  11078.769856
+101                                 associateDiaSource  1.877861e+08    128=
+5731  11096.881941
+102                                 calculateDiaObject  1.117867e+07    128=
+5731  11097.960131
+103                               consolidateDiaSource  4.613073e+04      1=
+3015  11097.964580
+104                                consolidateSsTables  2.084603e+05       =
+  10  11097.984686
+105                               consolidateDiaObject  2.038199e+04      1=
+3015  11097.986652
+106                        forcedPhotDiaObjectDetector  5.678675e+08   6104=
+0677  11152.757820
+107                         analyzeDiaSourceTableTract  1.392013e+05      1=
+3015  11152.771246
+108                   standardizeDiaObjectForcedSource  2.019019e+07    128=
+5731  11154.718602</pre>
+</div>
+</div>
+<p local-id=3D"76d0755ebfe0">The increase largely arises from 4-5 tasks, 2 =
+of which were not in the DM-52836 (w_2025_41) processing. The 10 highest CP=
+U time task for v_30_0_0_rc2 are</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">       =
+                       task      cpu_time   num_jobs     node_days
+12     gbdesHealpix3AstrometricFit  3.575991e+10     352800   3859.568943
+16  gaussianProcessesTurbulenceFit  1.461429e+10    2274573   6954.077669
+13           refitPsfModelDetector  1.361434e+10   35596260   5172.679986
+32              makePsfMatchedWarp  5.918696e+09  107391908   8354.647226
+29                  makeDirectWarp  5.318029e+09  107391908   7753.544930
+52                      deconvolve  4.435864e+09    7398852   9119.056154
+14                         skyCorr  3.807864e+09     188340   5539.950818
+60             measureObjectForced  2.917598e+09    7398852   9837.768991
+1                   calibrateImage  2.784906e+09   35596260    390.145694
+89       detectAndMeasureDiaSource  2.713893e+09   37270840  10808.905298</=
+pre>
+</div>
+</div>
+<p local-id=3D"214e63ba6cd9">The <code>deconvolve</code> task increased by =
+2 orders of magnitude and the tasks <code>gbdesHealpix3AstrometricFit</code=
+> and <code>refitPsfModelDetector</code> have increased by nearly an order =
+of magnitude compared to using DM-52836 numbers, and <code>gaussianProcesse=
+sTurbulenceFit</code> and <code>skyCorr</code> are the largest =E2=80=9Cnew=
+=E2=80=9D contributing tasks. A likely reason for the increase in effective=
+ CPU time for these tasks is that the DM-53697 processing sampled a larger =
+fraction of high stellar density regions near the Galactic plane, thereby i=
+ncreasing both the memory and CPU time usage by <code>deconvolve</code>, <c=
+ode>gbdesHealpix3AstrometricFit</code> and <code>refitPsfModelDetector</cod=
+e> tasks.</p>
 <h3 local-id=3D"4a16ad3a-14aa-4ff1-b339-036b3d13cd10" id=3D"DRPResourceUsag=
-eEstimates-1.2.4.DataSelection">1.2.4. Data Selection</h3>
+eEstimates-1.2.5.DataSelection">1.2.5. Data Selection</h3>
 <div class=3D"code panel pdl" style=3D"border-width: 1px;">
 <div class=3D"codeContent panelContent pdl">
 <pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
@@ -1367,7 +1648,7 @@ on=3D"1" data-linked-resource-type=3D"attachment" data-linked-resource-defa=
 ult-alias=3D"wall_to_cpu_time_ratio_stats_DM-52645_w_2025_39.png" data-base=
 -url=3D"https://rubinobs.atlassian.net/wiki" data-linked-resource-content-t=
 ype=3D"image/png" data-linked-resource-container-id=3D"1062404112" data-lin=
-ked-resource-container-version=3D"16" data-media-id=3D"280ef0ce-9f6c-4507-8=
+ked-resource-container-version=3D"17" data-media-id=3D"280ef0ce-9f6c-4507-8=
 7e2-4d2c0e8cf26c" data-media-type=3D"file" height=3D"700"></span>
 <p local-id=3D"2bfb756c-2478-4f6f-87cc-cf2795669413">Taking the ratio of th=
 e integrated wall time and integrated cpu times over all jobs, I find an av=
@@ -1378,7 +1659,7 @@ cpu times.</p>
     </div>
 </body>
 </html>
-------=_Part_16_1571210483.1773934574756
+------=_Part_60_343170979.1774292154458
 Content-Type: application/octet-stream
 Content-Transfer-Encoding: base64
 Content-Location: file:///C:/03fbc5efaf4ce050065d09c80269f81b450c238eb1ba92445e86c437c8e8a295
@@ -1388,7 +1669,7 @@ iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAA3NCSVQICAjb4U/gAAAAFVBMVEX/
 CxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAAUdEVYdENy
 ZWF0aW9uIFRpbWUANi8xLzEzOKlF0AAAACFJREFUCJljYCATsCgwqIAZTMnMyRAhsTABCIMxkVxT
 GQCLcwHyUKXpLgAAAABJRU5ErkJggg==
-------=_Part_16_1571210483.1773934574756
+------=_Part_60_343170979.1774292154458
 Content-Type: application/octet-stream
 Content-Transfer-Encoding: base64
 Content-Location: file:///C:/f9c3f317cbe14acf610e15baba4b471c5f9d7a939720dc9c1b8ddd538c22b95f
@@ -2032,4 +2313,4 @@ tzOfz9ne3uaRj3wkd999N9M0MZvNOHv2LNdccw2PfvSjue222/iHf/gHHvKQh3D33XdTa+Wmm26i
 6zr+BwFAts1V/2OtVits01qj1kqtFYDVakWtlfl8zsWLF9nd3eWGG25gHEc2NjZYLpf0fQ9AZpKZ
 zGYzxnFkHEcigoigtcbm5ib/wwAg2+aqq/5nAaBy1VX/8wDwj67gvLupKmKqAAAAAElFTkSuQmCC
 
-------=_Part_16_1571210483.1773934574756--
+------=_Part_60_343170979.1774292154458--

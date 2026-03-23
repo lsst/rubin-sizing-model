@@ -89,6 +89,16 @@ def set_col_widths(ws, widths):
         ws.column_dimensions[get_column_letter(i)].width = w
 
 
+def fleet_batch(P):
+    """Authoritative Slurm batch hardware specs (no duplicate costs.* fields)."""
+    return P["current_fleet"]["batch"]
+
+
+def eff_torino_cores(P):
+    """Effective cores per new batch node (Torino class)."""
+    return int(P["current_fleet"]["batch"]["torino_cores_per_node"])
+
+
 # ── MAIN ─────────────────────────────────────────────────────────────────────
 
 def generate_png_charts(P, N, FY0):
@@ -322,6 +332,7 @@ def main():
     ws_pp = wb.create_sheet("Purchase Plan")
     ws_intl = wb.create_sheet("International Compute")
     ws_yr = wb.create_sheet("Yearly Readiness")
+    ws_hr = wb.create_sheet("Hardware Refresh")
     ws_charts = wb.create_sheet("Charts")
 
     last_col = N + 2  # column index of LOY10
@@ -334,6 +345,7 @@ def main():
     build_purchase_plan_tab(ws_pp, P, N, FY0)
     build_international_tab(ws_intl, P, N, FY0)
     build_yearly_readiness_tab(ws_yr, P, N, FY0)
+    build_hardware_refresh_tab(ws_hr, P, N, FY0)
     build_charts_tab(ws_charts, P, N, FY0)
 
     # ── Define Named Ranges ──────────────────────────────────────────
@@ -371,7 +383,9 @@ def build_reference_tab(ws, P, N, FY0):
 
     row += 1
     ws.cell(row=row, column=1, value="DRP Estimates").font = section_font()
-    add("DR1 node-days", P["drp"]["dr1_node_days"], "Jim Bosch, DRP Resource Usage Estimates")
+    add("DR1 node-days (reference only)", P["drp"]["dr1_node_days"],
+        "Not used in formulas; see core_hours_per_input_tb")
+    add("DRP CPU doc reference", P["drp"].get("document_cpu_reference", ""), "DRP Resource Usage Estimates")
     add("Safety margin", P["drp"]["safety_margin"])
     add("Cores per node", P["drp"]["cores_per_node"])
     add("Processing window (days)", P["drp"]["processing_window_days"])
@@ -402,6 +416,12 @@ def build_reference_tab(ws, P, N, FY0):
     add("Interactive nodes", fleet["interactive"]["nodes"], "Initial InteractiveWorkflow Cap")
     add("GPU H200 nodes", fleet["gpu"]["h200_nodes"], "Initial GPU Capture, Rubin USDF")
     add("Qserv nodes", fleet["qserv"]["nodes"], "From conversation with Igor")
+    add("Cassandra nodes", fleet.get("cassandra", {}).get("nodes", ""), "Rubin Hardware Summary Mar 2025 JTM (Yemi)")
+    add("NVMe servers", fleet.get("nvme_servers", {}).get("nodes", ""), "Weka / flash tier (JTM)")
+    add("JBOD enclosures (total / deployed)", (
+        f'{fleet.get("jbods", {}).get("total_enclosures", "")} / '
+        f'{fleet.get("jbods", {}).get("deployed_enclosures", "")}'
+    ), "JTM")
     add("Installed storage (PB)", fleet["storage"]["total_installed_pb"], "Initial Storage Capture, Rubin USDF")
 
     total_batch_cores = (
@@ -457,12 +477,18 @@ def build_model_tab(ws, P, N, FY0):
     apply_header_style(ws, r, 6)
 
     cn = P["costs"]["nodes"]
+    fb = fleet_batch(P)
     machines = [
-        ("Milano (batch)", cn["milano_cores"], cn["milano_ram_gb"], cn["eff_cores_milano"], cn["milano_usd"], "Current Slurm batch"),
-        ("Torino (batch)", cn["torino_cores"], cn["torino_ram_gb"], cn["eff_cores_torino"], cn["torino_usd"], "Future Slurm batch"),
-        ("K8s node", cn["k8s_cores"], P["current_fleet"]["k8s"]["ram_gb_per_node"], cn["eff_cores_xeon"], cn["k8s_usd"], "Kubernetes infra"),
-        ("Qserv node", P["qserv"]["cores_per_node"], P["qserv"]["ram_gb_per_node"], P["qserv"]["cores_per_node"], cn["qserv_usd"], "Qserv/Cassandra bare-metal"),
-        ("GPU H200", P["current_fleet"]["gpu"]["h200_cores"], P["current_fleet"]["gpu"]["h200_ram_gb"], P["current_fleet"]["gpu"]["h200_eff_cores"], cn["gpu_h200_usd"], "GPU compute"),
+        ("Milano (batch)", fb["milano_cores_per_node"], fb["milano_ram_gb"],
+         fb["milano_cores_per_node"], cn["milano_usd"], "Current Slurm batch"),
+        ("Torino (batch)", fb["torino_cores_per_node"], fb["torino_ram_gb"],
+         fb["torino_cores_per_node"], cn["torino_usd"], "Future Slurm batch"),
+        ("K8s node", cn["k8s_cores"], P["current_fleet"]["k8s"]["ram_gb_per_node"],
+         cn["eff_cores_xeon"], cn["k8s_usd"], "Kubernetes infra"),
+        ("Qserv node", P["qserv"]["cores_per_node"], P["qserv"]["ram_gb_per_node"],
+         P["qserv"]["cores_per_node"], cn["qserv_usd"], "Qserv/Cassandra bare-metal"),
+        ("GPU H200", P["current_fleet"]["gpu"]["h200_cores"], P["current_fleet"]["gpu"]["h200_ram_gb"],
+         P["current_fleet"]["gpu"]["h200_eff_cores"], cn["gpu_h200_usd"], "GPU compute"),
     ]
     for i, (name, cores, ram, eff, cost, purpose) in enumerate(machines):
         r = 3 + i
@@ -960,7 +986,7 @@ def build_ops_storage_tab(ws, P, N, FY0):
 
 def build_ops_compute_tab(ws, P, N, FY0):
     ws.sheet_properties.tabColor = "ED7D31"
-    widths = [38, 14] + [18] * N
+    widths = [40, 14] + [18] * N
     set_col_widths(ws, widths)
 
     drp = P["drp"]
@@ -976,6 +1002,13 @@ def build_ops_compute_tab(ws, P, N, FY0):
     ch_per_tb = drp["core_hours_per_input_tb"]
     carryover = drp.get("commissioning_carryover_ch", 0)
 
+    lt = P["lifecycle"]["compute_lifetime_years"]
+    ap_cores = P["alert_production"]["ap_cores"]
+    eff = eff_torino_cores(P)
+    fb = fleet_batch(P)
+    existing_cores = (fb["milano_nodes"] * fb["milano_cores_per_node"] +
+                      fb["torino_nodes"] * fb["torino_cores_per_node"])
+
     r = 1
     ws.cell(row=r, column=1, value="Ops Compute — USDF").font = Font(bold=True, size=13)
     r = 2
@@ -985,9 +1018,11 @@ def build_ops_compute_tab(ws, P, N, FY0):
         ws.cell(row=r, column=i + 3, value=f"LOY{i+1}")
     apply_header_style(ws, r, N + 2)
 
-    # ── DRP Section ──────────────────────────────────────────────────
-    # Row 3: DRP core-hours = input_TB × cumulative_years × core_hours_per_TB + carryover
-    # Matches original spreadsheet: linear growth with cumulative data volume.
+    # Constant for AP formulas (K8s / prompt — not Slurm batch); off-grid to avoid header clash
+    ws.cell(row=99, column=1, value="AP cores (for formulas)").font = Font(italic=True, color="999999")
+    ws.cell(row=99, column=2, value=ap_cores).number_format = num_fmt_int()
+
+    # ── DRP (batch) ──────────────────────────────────────────────────
     ws.cell(row=3, column=1, value="DRP core-hours needed")
     ws.cell(row=3, column=2, value="core-hours")
     for i in range(N):
@@ -997,15 +1032,13 @@ def build_ops_compute_tab(ws, P, N, FY0):
             ch += carryover
         ws.cell(row=3, column=i + 3, value=round(ch)).number_format = num_fmt_int()
 
-    # Row 4: DRP instantaneous cores = core-hours / processing_window_hours
-    ws.cell(row=4, column=1, value="DRP cores needed")
+    ws.cell(row=4, column=1, value="DRP cores needed (batch)")
     ws.cell(row=4, column=2, value="cores")
     for i in range(N):
         c = col(i)
         ws.cell(row=4, column=i + 3).value = f"={c}3/{proc_hours}"
         ws.cell(row=4, column=i + 3).number_format = num_fmt_int()
 
-    # Row 5: DRP cores annual increase
     ws.cell(row=5, column=1, value="DRP cores annual increase")
     ws.cell(row=5, column=2, value="cores")
     for i in range(N):
@@ -1016,8 +1049,6 @@ def build_ops_compute_tab(ws, P, N, FY0):
             ws.cell(row=5, column=i + 3).value = f"={c}4-{col(i-1)}4"
         ws.cell(row=5, column=i + 3).number_format = num_fmt_int()
 
-    # Row 6: DRP cores refresh (after compute_lifetime years)
-    lt = P["lifecycle"]["compute_lifetime_years"]
     ws.cell(row=6, column=1, value=f"DRP cores refresh ({lt}yr cycle)")
     ws.cell(row=6, column=2, value="cores")
     for i in range(N):
@@ -1027,7 +1058,6 @@ def build_ops_compute_tab(ws, P, N, FY0):
             ws.cell(row=6, column=i + 3).value = f"={col(i-lt)}5"
             ws.cell(row=6, column=i + 3).number_format = num_fmt_int()
 
-    # Row 7: DRP cores to purchase = increase + refresh
     ws.cell(row=7, column=1, value="DRP cores to purchase")
     ws.cell(row=7, column=2, value="cores")
     for i in range(N):
@@ -1035,107 +1065,186 @@ def build_ops_compute_tab(ws, P, N, FY0):
         ws.cell(row=7, column=i + 3).value = f"={c}5+{c}6"
         ws.cell(row=7, column=i + 3).number_format = num_fmt_int()
 
-    # Row 8: blank
-    # ── Alert Production ─────────────────────────────────────────────
-    ap_cores = P["alert_production"]["ap_cores"]
-    ws.cell(row=9, column=1, value="AP cores (alert production)")
+    # ── AP (K8s — not batch) ─────────────────────────────────────────
+    ws.cell(row=9, column=1, value="AP cores needed (K8s / prompt, not batch)")
     ws.cell(row=9, column=2, value="cores")
     for i in range(N):
-        ws.cell(row=9, column=i + 3, value=ap_cores).number_format = num_fmt_int()
+        ws.cell(row=9, column=i + 3, value="=$B$99").number_format = num_fmt_int()
 
-    # Row 10: blank
-    # ── DAC / Staff ──────────────────────────────────────────────────
+    ws.cell(row=10, column=1, value="AP cores initial purchase (LOY1 only)")
+    ws.cell(row=10, column=2, value="cores")
+    for i in range(N):
+        ws.cell(row=10, column=i + 3).value = "=IF(COLUMN()=3,$B$99,0)"
+        ws.cell(row=10, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=11, column=1, value=f"AP cores refresh ({lt}yr full replace)")
+    ws.cell(row=11, column=2, value="cores")
+    for i in range(N):
+        ws.cell(row=11, column=i + 3).value = (
+            f"=IF(AND(COLUMN()>={3+lt},MOD(COLUMN()-3,{lt})=0),$B$99,0)"
+        )
+        ws.cell(row=11, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=12, column=1, value="AP cores to purchase (K8s budget)")
+    ws.cell(row=12, column=2, value="cores")
+    for i in range(N):
+        c = col(i)
+        ws.cell(row=12, column=i + 3).value = f"={c}10+{c}11"
+        ws.cell(row=12, column=i + 3).number_format = num_fmt_int()
+
+    # ── DAC / Staff (batch path) ─────────────────────────────────────
     cf = P["compute_fractions"]
     dac_frac = cf["dac_drp_fraction"]
     staff_frac = cf["staff_dac_fraction"]
-    ws.cell(row=11, column=1, value=f"DAC/LSP cores ({dac_frac*100:.0f}% of DRP)")
-    ws.cell(row=11, column=2, value="cores")
+    ws.cell(row=14, column=1, value=f"DAC/LSP cores ({dac_frac*100:.0f}% of DRP)")
+    ws.cell(row=14, column=2, value="cores")
     for i in range(N):
-        ws.cell(row=11, column=i + 3).value = f"={dac_frac}*{col(i)}4"
-        ws.cell(row=11, column=i + 3).number_format = num_fmt_int()
+        ws.cell(row=14, column=i + 3).value = f"={dac_frac}*{col(i)}4"
+        ws.cell(row=14, column=i + 3).number_format = num_fmt_int()
 
-    ws.cell(row=12, column=1, value=f"Staff LSP cores ({staff_frac*100:.0f}% of DAC)")
-    ws.cell(row=12, column=2, value="cores")
-    for i in range(N):
-        ws.cell(row=12, column=i + 3).value = f"={staff_frac}*{col(i)}11"
-        ws.cell(row=12, column=i + 3).number_format = num_fmt_int()
-
-    # Row 13: LSP cores per user
-    ws.cell(row=13, column=1, value="LSP cores per science user")
-    ws.cell(row=13, column=2, value="cores/user")
-    for i in range(N):
-        ws.cell(row=13, column=i + 3).value = f"={col(i)}11/'Ops Storage'!{col(i)}8"
-
-    # Row 14: blank
-    # ── Qserv ────────────────────────────────────────────────────────
-    # Row 15: Qserv data per node (TB)
-    ws.cell(row=15, column=1, value="Qserv data per node")
-    ws.cell(row=15, column=2, value="TB/node")
-    for i in range(N):
-        ws.cell(row=15, column=i + 3, value=qd[i]).number_format = num_fmt_tb()
-
-    # Row 16: Qserv nodes needed — per-year-vintage cumulative (matches original).
-    # Each year's Qserv DB data is stored on nodes with that year's capacity.
-    # 3-year sliding window: sum CEILING(year_i_db / year_i_capacity) for last 3 years.
-    ws.cell(row=16, column=1, value="Qserv nodes needed")
-    ws.cell(row=16, column=2, value="nodes")
-    retention = P["storage_retention"]["qserv_window_years"]
-    for i in range(N):
-        parts = []
-        start = max(0, i - retention + 1)
-        for j in range(start, i + 1):
-            cj = col(j)
-            parts.append(f"CEILING('Ops Storage'!{cj}43/{cj}15,1)")
-        ws.cell(row=16, column=i + 3).value = f"={'+'.join(parts)}"
-        ws.cell(row=16, column=i + 3).number_format = num_fmt_int()
-
-    # Row 17: blank
-    # ── GPU ──────────────────────────────────────────────────────────
-    ws.cell(row=18, column=1, value="GPU H200 nodes")
-    ws.cell(row=18, column=2, value="nodes")
-    gpu = P["current_fleet"]["gpu"]["h200_nodes"]
-    for i in range(N):
-        ws.cell(row=18, column=i + 3, value=gpu if i == 0 else gpu).number_format = num_fmt_int()
-
-    # Row 19: blank
-    # ── K8s Infrastructure ───────────────────────────────────────────
-    k8s_total = P["current_fleet"]["k8s"]["nodes"]
-    ws.cell(row=20, column=1, value="K8s infrastructure nodes")
-    ws.cell(row=20, column=2, value="nodes")
-    for i in range(N):
-        ws.cell(row=20, column=i + 3, value=k8s_total).number_format = num_fmt_int()
-
-    # ── Totals ───────────────────────────────────────────────────────
-    # Row 22: Total compute cores to purchase annually
-    ws.cell(row=22, column=1, value="Total cores annual purchase").font = section_font()
-    ws.cell(row=22, column=2, value="cores")
-    for i in range(N):
-        c = col(i)
-        ws.cell(row=22, column=i + 3).value = f"={c}7+{c}9+{c}11+{c}12"
-        ws.cell(row=22, column=i + 3).number_format = num_fmt_int()
-
-    # Row 23: Total batch nodes to purchase = ROUNDUP(cores / eff_cores)
-    eff = P["costs"]["nodes"]["eff_cores_torino"]
-    ws.cell(row=23, column=1, value="Batch nodes to purchase")
-    ws.cell(row=23, column=2, value="nodes")
-    for i in range(N):
-        c = col(i)
-        ws.cell(row=23, column=i + 3).value = f"=ROUNDUP({c}22/{eff},0)"
-        ws.cell(row=23, column=i + 3).number_format = num_fmt_int()
-
-    # Row 24: Cumulative batch cores
-    ws.cell(row=24, column=1, value="Cumulative batch cores owned")
-    ws.cell(row=24, column=2, value="cores")
-    fleet = P["current_fleet"]["batch"]
-    existing_cores = (fleet["milano_nodes"] * fleet["milano_cores_per_node"] +
-                      fleet["torino_nodes"] * fleet["torino_cores_per_node"])
+    ws.cell(row=15, column=1, value="DAC cores annual increase")
+    ws.cell(row=15, column=2, value="cores")
     for i in range(N):
         c = col(i)
         if i == 0:
-            ws.cell(row=24, column=i + 3).value = f"={existing_cores}+{c}22"
+            ws.cell(row=15, column=i + 3).value = f"={c}14"
         else:
-            ws.cell(row=24, column=i + 3).value = f"={col(i-1)}24+{c}22"
+            ws.cell(row=15, column=i + 3).value = f"={c}14-{col(i-1)}14"
+        ws.cell(row=15, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=16, column=1, value=f"DAC cores refresh ({lt}yr)")
+    ws.cell(row=16, column=2, value="cores")
+    for i in range(N):
+        if i < lt:
+            ws.cell(row=16, column=i + 3, value=0).number_format = num_fmt_int()
+        else:
+            ws.cell(row=16, column=i + 3).value = f"={col(i-lt)}15"
+            ws.cell(row=16, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=17, column=1, value="DAC cores to purchase")
+    ws.cell(row=17, column=2, value="cores")
+    for i in range(N):
+        c = col(i)
+        ws.cell(row=17, column=i + 3).value = f"={c}15+{c}16"
+        ws.cell(row=17, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=18, column=1, value=f"Staff LSP cores ({staff_frac*100:.0f}% of DAC)")
+    ws.cell(row=18, column=2, value="cores")
+    for i in range(N):
+        ws.cell(row=18, column=i + 3).value = f"={staff_frac}*{col(i)}14"
+        ws.cell(row=18, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=19, column=1, value="Staff cores annual increase")
+    ws.cell(row=19, column=2, value="cores")
+    for i in range(N):
+        c = col(i)
+        if i == 0:
+            ws.cell(row=19, column=i + 3).value = f"={c}18"
+        else:
+            ws.cell(row=19, column=i + 3).value = f"={c}18-{col(i-1)}18"
+        ws.cell(row=19, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=20, column=1, value=f"Staff cores refresh ({lt}yr)")
+    ws.cell(row=20, column=2, value="cores")
+    for i in range(N):
+        if i < lt:
+            ws.cell(row=20, column=i + 3, value=0).number_format = num_fmt_int()
+        else:
+            ws.cell(row=20, column=i + 3).value = f"={col(i-lt)}19"
+            ws.cell(row=20, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=21, column=1, value="Staff cores to purchase")
+    ws.cell(row=21, column=2, value="cores")
+    for i in range(N):
+        c = col(i)
+        ws.cell(row=21, column=i + 3).value = f"={c}19+{c}20"
+        ws.cell(row=21, column=i + 3).number_format = num_fmt_int()
+
+    # ── Qserv (single 3yr window from Ops Storage — no double-count) ──
+    ws.cell(row=23, column=1, value="Qserv data per node (capacity this LOY)")
+    ws.cell(row=23, column=2, value="TB/node")
+    for i in range(N):
+        ws.cell(row=23, column=i + 3, value=qd[i]).number_format = num_fmt_tb()
+
+    ws.cell(row=24, column=1, value="Qserv nodes needed (total on floor)")
+    ws.cell(row=24, column=2, value="nodes")
+    for i in range(N):
+        c = col(i)
+        ws.cell(row=24, column=i + 3).value = (
+            f"=CEILING('Ops Storage'!{c}55/{c}23,1)"
+        )
         ws.cell(row=24, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=25, column=1, value="Qserv nodes annual increase")
+    ws.cell(row=25, column=2, value="nodes")
+    for i in range(N):
+        c = col(i)
+        if i == 0:
+            ws.cell(row=25, column=i + 3).value = f"={c}24"
+        else:
+            ws.cell(row=25, column=i + 3).value = f"={c}24-{col(i-1)}24"
+        ws.cell(row=25, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=26, column=1, value=f"Qserv nodes refresh ({lt}yr)")
+    ws.cell(row=26, column=2, value="nodes")
+    for i in range(N):
+        if i < lt:
+            ws.cell(row=26, column=i + 3, value=0).number_format = num_fmt_int()
+        else:
+            ws.cell(row=26, column=i + 3).value = f"={col(i-lt)}25"
+            ws.cell(row=26, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=27, column=1, value="Qserv nodes to purchase")
+    ws.cell(row=27, column=2, value="nodes")
+    for i in range(N):
+        c = col(i)
+        ws.cell(row=27, column=i + 3).value = f"={c}25+{c}26"
+        ws.cell(row=27, column=i + 3).number_format = num_fmt_int()
+
+    # ── GPU ──────────────────────────────────────────────────────────
+    ws.cell(row=29, column=1, value="GPU H200 nodes")
+    ws.cell(row=29, column=2, value="nodes")
+    gpu = P["current_fleet"]["gpu"]["h200_nodes"]
+    for i in range(N):
+        ws.cell(row=29, column=i + 3, value=gpu).number_format = num_fmt_int()
+
+    # ── K8s Infrastructure ───────────────────────────────────────────
+    k8s_total = P["current_fleet"]["k8s"]["nodes"]
+    ws.cell(row=31, column=1, value="K8s infrastructure nodes (workers)")
+    ws.cell(row=31, column=2, value="nodes")
+    for i in range(N):
+        ws.cell(row=31, column=i + 3, value=k8s_total).number_format = num_fmt_int()
+
+    # ── LSP cores per user (DAC only) ───────────────────────────────
+    ws.cell(row=33, column=1, value="LSP cores per science user")
+    ws.cell(row=33, column=2, value="cores/user")
+    for i in range(N):
+        ws.cell(row=33, column=i + 3).value = f"={col(i)}14/'Ops Storage'!{col(i)}8"
+
+    # ── Batch totals (excludes AP) ───────────────────────────────────
+    ws.cell(row=34, column=1, value="BATCH cores to purchase (DRP+DAC+Staff)").font = section_font()
+    ws.cell(row=34, column=2, value="cores")
+    for i in range(N):
+        c = col(i)
+        ws.cell(row=34, column=i + 3).value = f"={c}7+{c}17+{c}21"
+        ws.cell(row=34, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=35, column=1, value="Batch nodes to purchase (Torino-class)")
+    ws.cell(row=35, column=2, value="nodes")
+    for i in range(N):
+        c = col(i)
+        ws.cell(row=35, column=i + 3).value = f"=ROUNDUP({c}34/{eff},0)"
+        ws.cell(row=35, column=i + 3).number_format = num_fmt_int()
+
+    ws.cell(row=36, column=1, value="Cumulative batch cores owned")
+    ws.cell(row=36, column=2, value="cores")
+    for i in range(N):
+        c = col(i)
+        if i == 0:
+            ws.cell(row=36, column=i + 3).value = f"={existing_cores}+{c}34"
+        else:
+            ws.cell(row=36, column=i + 3).value = f"={col(i-1)}36+{c}34"
+        ws.cell(row=36, column=i + 3).number_format = num_fmt_int()
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -1160,7 +1269,6 @@ def build_ops_costs_tab(ws, P, N, FY0):
     apply_header_style(ws, r, total_col)
 
     node_cost = P["costs"]["nodes"]["torino_usd"]  # future purchases are Torino
-    eff_cores = P["costs"]["nodes"]["eff_cores_torino"]
     qserv_cost = P["costs"]["nodes"]["qserv_usd"]
     gpu_cost = P["costs"]["nodes"]["gpu_h200_usd"]
     k8s_cost = P["costs"]["nodes"]["k8s_usd"]
@@ -1190,7 +1298,7 @@ def build_ops_costs_tab(ws, P, N, FY0):
     ws.cell(row=3, column=2, value="$M")
     for i in range(N):
         c = col(i)
-        ws.cell(row=3, column=i + 3).value = f"='Ops Compute'!{c}23*{node_cost}/1000000"
+        ws.cell(row=3, column=i + 3).value = f"='Ops Compute'!{c}35*{node_cost}/1000000"
         ws.cell(row=3, column=i + 3).number_format = num_fmt_millions()
     ws.cell(row=3, column=total_col).value = total_formula(3)
     ws.cell(row=3, column=total_col).number_format = num_fmt_millions()
@@ -1211,13 +1319,9 @@ def build_ops_costs_tab(ws, P, N, FY0):
     ws.cell(row=5, column=2, value="$M")
     for i in range(N):
         c = col(i)
-        if i == 0:
-            ws.cell(row=5, column=i + 3).value = f"='Ops Compute'!{c}16*{qserv_cost}/1000000"
-        else:
-            # Annual increase only
-            ws.cell(row=5, column=i + 3).value = (
-                f"=MAX(0,'Ops Compute'!{c}16-'Ops Compute'!{col(i-1)}16)*{qserv_cost}/1000000"
-            )
+        ws.cell(row=5, column=i + 3).value = (
+            f"='Ops Compute'!{c}27*{qserv_cost}/1000000"
+        )
         ws.cell(row=5, column=i + 3).number_format = num_fmt_millions()
     ws.cell(row=5, column=total_col).value = total_formula(5)
     ws.cell(row=5, column=total_col).number_format = num_fmt_millions()
@@ -1238,7 +1342,7 @@ def build_ops_costs_tab(ws, P, N, FY0):
     ws.cell(row=7, column=2, value="$M")
     for i in range(N):
         c = col(i)
-        ws.cell(row=7, column=i + 3).value = f"='Ops Compute'!{c}18*{gpu_cost}/1000000"
+        ws.cell(row=7, column=i + 3).value = f"='Ops Compute'!{c}29*{gpu_cost}/1000000"
         ws.cell(row=7, column=i + 3).number_format = num_fmt_millions()
     ws.cell(row=7, column=total_col).value = total_formula(7)
     ws.cell(row=7, column=total_col).number_format = num_fmt_millions()
@@ -1249,7 +1353,7 @@ def build_ops_costs_tab(ws, P, N, FY0):
     for i in range(N):
         c = col(i)
         if i == 0:
-            ws.cell(row=8, column=i + 3).value = f"='Ops Compute'!{c}20*{k8s_cost}/1000000"
+            ws.cell(row=8, column=i + 3).value = f"='Ops Compute'!{c}31*{k8s_cost}/1000000"
         else:
             ws.cell(row=8, column=i + 3, value=0).number_format = num_fmt_millions()
     ws.cell(row=8, column=total_col).value = total_formula(8)
@@ -1362,7 +1466,7 @@ def build_ops_costs_tab(ws, P, N, FY0):
     for i in range(N):
         c = col(i)
         ws.cell(row=20, column=i + 3).value = (
-            f"=CEILING('Ops Compute'!{c}24/'Model'!$D$4,1)*'Model'!$B$30/1000000"
+            f"=CEILING('Ops Compute'!{c}36/'Model'!$D$4,1)*'Model'!$B$30/1000000"
         )
         ws.cell(row=20, column=i + 3).number_format = num_fmt_millions()
     ws.cell(row=20, column=total_col).value = total_formula(20)
@@ -1417,6 +1521,88 @@ def build_ops_costs_tab(ws, P, N, FY0):
 
 
     # DR Readiness has been replaced by build_yearly_readiness_tab + build_purchase_plan_tab
+
+
+# ══════════════════════════════════════════════════════════════════════
+# Hardware Refresh (EOL) Tab
+# ══════════════════════════════════════════════════════════════════════
+
+def build_hardware_refresh_tab(ws, P, N, FY0):
+    """Cohort-based replacements: FY hits EOL when FY > delivery_year and
+    MOD(FY - delivery_year, lifetime_years) = 0."""
+    ws.sheet_properties.tabColor = "548235"
+    widths = [36, 14, 10, 12, 10, 14] + [11] * N
+    set_col_widths(ws, widths)
+
+    hdr = P.get("hardware_refresh", {})
+    cohorts = hdr.get("cohorts", [])
+
+    ws.cell(row=1, column=1, value="Hardware Refresh / EOL (annual units to replace)").font = Font(
+        bold=True, size=14
+    )
+    ws.cell(row=2, column=1,
+            value="Each cohort: replace `Qty` in FY when FY > delivery_year and "
+                  "MOD(FY − delivery_year, lifetime_years) = 0. "
+                  "Lifetimes: compute-class 3 yr, JBOD/NVMe 5 yr (from YAML). "
+                  "Source: Rubin Hardware Summary for March 2025 JTM + sizing_params.yaml."
+            ).font = Font(italic=True, color="444444")
+
+    base_col = 7  # column G = first LOY FY
+    hdr_row = 5
+    ws.cell(row=hdr_row, column=1, value="Fiscal Year (FY)").font = Font(bold=True)
+    for i in range(N):
+        c = get_column_letter(base_col + i)
+        fy = FY0 + i
+        ws.cell(row=hdr_row, column=base_col + i, value=fy).number_format = num_fmt_int()
+
+    hrow = 6
+    ws.cell(row=hrow, column=1, value="Label")
+    ws.cell(row=hrow, column=2, value="Category")
+    ws.cell(row=hrow, column=3, value="Qty")
+    ws.cell(row=hrow, column=4, value="Delivery FY")
+    ws.cell(row=hrow, column=5, value="Lifetime (yr)")
+    ws.cell(row=hrow, column=6, value="First EOL FY")
+    for i in range(N):
+        ws.cell(row=hrow, column=base_col + i, value=f"LOY{i+1}")
+    apply_header_style(ws, hrow, base_col + N - 1)
+
+    for idx, coh in enumerate(cohorts):
+        rr = 7 + idx
+        ws.cell(row=rr, column=1, value=coh.get("label", ""))
+        ws.cell(row=rr, column=2, value=coh.get("category", ""))
+        ws.cell(row=rr, column=3, value=coh.get("quantity", 0)).number_format = num_fmt_int()
+        d_y = coh.get("delivery_year", 0)
+        lt_y = int(coh.get("lifetime_years", 3))
+        ws.cell(row=rr, column=4, value=d_y).number_format = num_fmt_int()
+        ws.cell(row=rr, column=5, value=lt_y).number_format = num_fmt_int()
+        ws.cell(row=rr, column=6, value=d_y + lt_y).number_format = num_fmt_int()
+        for i in range(N):
+            cc = get_column_letter(base_col + i)
+            ws.cell(row=rr, column=base_col + i).value = (
+                f"=IF(AND({cc}${hdr_row}>$D{rr},MOD({cc}${hdr_row}-$D{rr},$E{rr})=0),$C{rr},0)"
+            )
+            ws.cell(row=rr, column=base_col + i).number_format = num_fmt_int()
+
+    tot_row = 7 + len(cohorts)
+    ws.cell(row=tot_row, column=1, value="TOTAL units to replace (all cohorts)").font = Font(bold=True)
+    for i in range(N):
+        cc = get_column_letter(base_col + i)
+        first_data = 7
+        last_data = 6 + len(cohorts)
+        if last_data >= first_data:
+            ws.cell(row=tot_row, column=base_col + i).value = (
+                f"=SUM({cc}{first_data}:{cc}{last_data})"
+            )
+        else:
+            ws.cell(row=tot_row, column=base_col + i, value=0)
+        ws.cell(row=tot_row, column=base_col + i).number_format = num_fmt_int()
+
+    # Optional subtotals by category (static note — user can pivot from data)
+    note_r = tot_row + 2
+    ws.cell(row=note_r, column=1,
+            value="Note: Milan batch / Qserv / k8s / Cassandra use compute lifetime; "
+                  "JBOD / NVMe use storage lifetime. Edit cohorts in sizing_params.yaml."
+            ).font = Font(italic=True, color="666666")
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -1636,7 +1822,7 @@ def build_purchase_plan_tab(ws, P, N, FY0):
     fleet = P["current_fleet"]["batch"]
     existing_cores = (fleet["milano_nodes"] * fleet["milano_cores_per_node"] +
                       fleet["torino_nodes"] * fleet["torino_cores_per_node"])
-    eff = P["costs"]["nodes"]["eff_cores_torino"]
+    eff = eff_torino_cores(P)
     lt = P["lifecycle"]["compute_lifetime_years"]
     k8s_base = P["current_fleet"]["k8s"]["nodes"]
     k8s_growth = P["k8s"]["growth_rate_per_year"]
@@ -1691,14 +1877,14 @@ def build_purchase_plan_tab(ws, P, N, FY0):
     ws.cell(row=10, column=2, value="cores")
     for i in range(N):
         c = col(i)
-        ws.cell(row=10, column=i + 3).value = f"='Ops Compute'!{c}11+'Ops Compute'!{c}12"
+        ws.cell(row=10, column=i + 3).value = f"='Ops Compute'!{c}14+'Ops Compute'!{c}18"
         ws.cell(row=10, column=i + 3).number_format = num_fmt_int()
 
-    ws.cell(row=11, column=1, value="Total USDF cores needed")
+    ws.cell(row=11, column=1, value="Total batch cores needed (DRP+DAC+Staff)")
     ws.cell(row=11, column=2, value="cores")
     for i in range(N):
         c = col(i)
-        ws.cell(row=11, column=i + 3).value = f"={c}8+{c}9+{c}10"
+        ws.cell(row=11, column=i + 3).value = f"={c}8+{c}10"
         ws.cell(row=11, column=i + 3).number_format = num_fmt_int()
     ws.cell(row=11, column=1).font = Font(bold=True)
 
@@ -1719,24 +1905,18 @@ def build_purchase_plan_tab(ws, P, N, FY0):
         ws.cell(row=13, column=i + 3).value = f"={c}11-{c}12"
         ws.cell(row=13, column=i + 3).number_format = num_fmt_int()
 
-    ws.cell(row=14, column=1, value="Batch cores to purchase")
+    ws.cell(row=14, column=1, value="Batch cores to purchase (= Ops Compute)")
     ws.cell(row=14, column=2, value="cores")
     for i in range(N):
         c = col(i)
-        if i == 0:
-            ws.cell(row=14, column=i + 3).value = f"=MAX(0,{c}11-{existing_cores})"
-        elif i < lt:
-            ws.cell(row=14, column=i + 3).value = f"=MAX(0,{c}11-{col(i-1)}12)"
-        else:
-            ws.cell(row=14, column=i + 3).value = (
-                f"=MAX(0,{c}11-{col(i-1)}12)+{col(i-lt)}14"
-            )
+        ws.cell(row=14, column=i + 3).value = f"='Ops Compute'!{c}34"
         ws.cell(row=14, column=i + 3).number_format = num_fmt_int()
 
-    ws.cell(row=15, column=1, value="Batch nodes to purchase")
+    ws.cell(row=15, column=1, value="Batch nodes to purchase (= Ops Compute)")
     ws.cell(row=15, column=2, value="nodes")
     for i in range(N):
-        ws.cell(row=15, column=i + 3).value = f"=CEILING(MAX(0,{col(i)}14)/{eff},1)"
+        c = col(i)
+        ws.cell(row=15, column=i + 3).value = f"='Ops Compute'!{c}35"
         ws.cell(row=15, column=i + 3).number_format = num_fmt_int()
 
     ws.cell(row=16, column=1, value="K8s nodes needed")
@@ -1754,19 +1934,11 @@ def build_purchase_plan_tab(ws, P, N, FY0):
             ws.cell(row=17, column=i + 3).value = f"=MAX(0,{c}16-{col(i-1)}16)"
             ws.cell(row=17, column=i + 3).number_format = num_fmt_int()
 
-    qserv_existing = P["current_fleet"]["qserv"]["nodes"]
-    ws.cell(row=18, column=1, value="Qserv nodes incremental")
+    ws.cell(row=18, column=1, value="Qserv nodes to purchase (annual, = Ops Compute)")
     ws.cell(row=18, column=2, value="nodes")
     for i in range(N):
         c = col(i)
-        if i == 0:
-            ws.cell(row=18, column=i + 3).value = (
-                f"=MAX(0,'Ops Compute'!{c}16-{qserv_existing})"
-            )
-        else:
-            ws.cell(row=18, column=i + 3).value = (
-                f"=MAX(0,'Ops Compute'!{c}16-'Ops Compute'!{col(i-1)}16)"
-            )
+        ws.cell(row=18, column=i + 3).value = f"='Ops Compute'!{c}27"
         ws.cell(row=18, column=i + 3).number_format = num_fmt_int()
 
     # ── STORAGE ──────────────────────────────────────────────────────
@@ -2009,7 +2181,7 @@ def build_international_tab(ws, P, N, FY0):
     # France detail
     ws.cell(row=19, column=1, value="FRANCE (CC-IN2P3) DETAIL").font = section_font()
 
-    eff = P["costs"]["nodes"]["eff_cores_torino"]
+    eff = eff_torino_cores(P)
     ws.cell(row=20, column=1, value="DRP cores")
     ws.cell(row=20, column=2, value="cores")
     for i in range(N):

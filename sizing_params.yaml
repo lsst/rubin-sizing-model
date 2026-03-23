@@ -22,8 +22,10 @@ drp:
   # Calibrated so that 1 year of input (798 TB) × 20571 = 16.4M core-hours = DR1 actual.
   core_hours_per_input_tb: 20571   # DR1 actual: 16,416,000 ch / 798 TB input
   commissioning_carryover_ch: 0    # no carry-over assumed
-  dr1_node_days: 5700              # DR1 estimate: 5700 node-days @ 120 cores/node
+  # Reference only (not used in formulas — sizing uses core_hours_per_input_tb):
+  dr1_node_days: 5700              # legacy estimate; see DM-53697 section in DRP Resource Usage Estimates
   dp2_node_days: 650               # DP2 actual: 650 node-days @ 120 cores/node
+  document_cpu_reference: "DRP Resource Usage Estimates — CPU from DM-53697 (v30_0_0_rc2), DM-52836 (w_2025_41)"
   safety_margin: 1.5
   cores_per_node: 120
   wall_to_cpu_ratio: 1.14
@@ -87,7 +89,7 @@ observing:
 imaging:
   lsstcam_image_size_tb: 0.00819222      # 8.19 GB logical per exposure (Key Numbers row 24)
   raw_compression: 0.464                  # 3.8 GB on disk / 8.19 GB logical (Key Numbers rows 24,31)
-  calibration_compression: 1.0            # no measured compression for cals — use full logical size
+  calibration_compression: 0.464        # same as on-sky raw (K-T): cals compress at least as well
   lossy_compression: 0.27                 # from DRP doc: compressed/uncompressed visit_image ratio
   # Per-visit DRP output constants from DRP Resource Usage Estimates (DR1 actual, uncompressed):
   output_image_tb_per_visit: 0.01906      # DR1 visit_image: 4,003 TB / 210k visits
@@ -151,7 +153,7 @@ current_fleet:
   batch:
     milano_nodes: 110            # Adam Bolton confirmed, March 2026
     milano_cores_per_node: 120   # confirmed: both Milano and Torino are 120 cores
-    milano_ram_gb: 512
+    milano_ram_gb: 480           # usable RAM (K-T); not full DIMM nominal
     torino_nodes: 35             # Adam Bolton confirmed, March 2026
     torino_cores_per_node: 120   # confirmed: both Milano and Torino are 120 cores
     torino_ram_gb: 720
@@ -169,26 +171,35 @@ current_fleet:
     h200_eff_cores: 128          # GPU H200 effective cores
   qserv:
     nodes: 92                    # from conversation with Igor
+  # Cassandra / NVMe / JBOD (Rubin Hardware Summary for March 2025 JTM — Yemi)
+  cassandra:
+    nodes: 12
+    notes: "PO 227883, delivered 2023-07-27"
+  nvme_servers:
+    nodes: 4
+    notes: "PO 220192, delivered 2022-09-22 (Weka / flash tier servers)"
+  jbods:
+    total_enclosures: 62         # sum across PO lines in JTM sheet
+    deployed_enclosures: 37
+    notes: "Enclosure counts by PO — see Hardware Refresh tab cohorts"
   storage:
     total_installed_pb: 30       # Initial Storage Capture, Rubin USDF = 30,000 TB
 
 # ---------------------------------------------------------------------------
 # Node Costs (2025-2026 actuals / estimates)
+# Batch core/RAM specs are authoritative in current_fleet.batch (no duplication).
 # ---------------------------------------------------------------------------
 costs:
   nodes:
     milano_usd: 11800            # FY24 CPU Planner, $11.8K per node
-    milano_cores: 120            # confirmed: 120 cores per Milano
-    milano_ram_gb: 512
     torino_usd: 16000            # estimated for future purchases (Adam: quotes now $50-75K)
-    torino_cores: 120            # confirmed: 120 cores per Torino
-    torino_ram_gb: 720
     k8s_usd: 8000
     k8s_cores: 48
+    cassandra_usd: 15000         # placeholder until priced
+    nvme_server_usd: 45000       # placeholder until priced
+    jbod_usd: 8000               # placeholder per enclosure refresh
     qserv_usd: 20000
     gpu_h200_usd: 250000
-    eff_cores_milano: 120        # confirmed: 120 cores per Milano
-    eff_cores_torino: 120        # confirmed: 120 cores per Torino
     eff_cores_xeon: 27           # for K8s reference (from DMTN-135 Table 29)
   storage:
     flash_per_tb: 320            # NVMe / Weka
@@ -216,6 +227,33 @@ price_factors:
 lifecycle:
   compute_lifetime_years: 3
   storage_lifetime_years: 5
+
+# ---------------------------------------------------------------------------
+# Hardware refresh cohorts (Rubin Hardware Summary for March 2025 JTM)
+# Used by "Hardware Refresh" tab: units to replace when FY meets
+#   FY >= delivery_year + lifetime_years  AND  MOD(FY - delivery_year, lifetime_years) = 0
+# Categories: compute → 3 yr default; jbod / nvme → 5 yr (storage_lifetime_years)
+# ---------------------------------------------------------------------------
+hardware_refresh:
+  compute_lifetime_years: 3    # default for batch, qserv, k8s, cassandra
+  storage_lifetime_years: 5    # JBOD enclosures, NVMe servers
+  cohorts:
+    - { category: k8s, label: "k8s PO215594", quantity: 16, delivery_year: 2022, lifetime_years: 3 }
+    - { category: jbod, label: "JBOD PO216503 del 2022-04-13", quantity: 4, delivery_year: 2022, lifetime_years: 5 }
+    - { category: jbod, label: "JBOD PO220246", quantity: 11, delivery_year: 2022, lifetime_years: 5 }
+    - { category: jbod, label: "JBOD PO222151 / dup PO216503", quantity: 4, delivery_year: 2022, lifetime_years: 5 }
+    - { category: nvme_server, label: "NVMe PO220192", quantity: 4, delivery_year: 2022, lifetime_years: 5 }
+    - { category: milan_batch, label: "Milan PO222151", quantity: 40, delivery_year: 2023, lifetime_years: 3 }
+    - { category: qserv, label: "Qserv PO222151", quantity: 15, delivery_year: 2023, lifetime_years: 3 }
+    - { category: k8s, label: "k8s PO222151", quantity: 32, delivery_year: 2023, lifetime_years: 3 }
+    - { category: milan_batch, label: "Milan PO227883", quantity: 32, delivery_year: 2023, lifetime_years: 3 }
+    - { category: qserv, label: "Qserv PO227883", quantity: 32, delivery_year: 2023, lifetime_years: 3 }
+    - { category: cassandra, label: "Cassandra PO227883", quantity: 12, delivery_year: 2023, lifetime_years: 3 }
+    - { category: jbod, label: "JBOD PO227883", quantity: 22, delivery_year: 2023, lifetime_years: 5 }
+    - { category: milan_batch, label: "Milan PO237013", quantity: 50, delivery_year: 2024, lifetime_years: 3 }
+    - { category: qserv, label: "Qserv PO237013", quantity: 55, delivery_year: 2024, lifetime_years: 3 }
+    - { category: k8s, label: "k8s PO237013", quantity: 30, delivery_year: 2024, lifetime_years: 3 }
+    - { category: jbod, label: "JBOD PO237013", quantity: 25, delivery_year: 2024, lifetime_years: 5 }
 
 # ---------------------------------------------------------------------------
 # Storage Retention Windows (years)
