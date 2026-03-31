@@ -391,7 +391,23 @@ def build_reference_tab(ws, P, N, FY0):
     add("Processing window (days)", P["drp"]["processing_window_days"])
     add("DR1 total storage (PB)", P["drp"]["dr1_storage_total_pb"], "Compressed")
     add("DR1 release products (PB)", P["drp"]["dr1_storage_release_pb"])
-    add("Wall-to-CPU ratio", P["drp"]["wall_to_cpu_ratio"])
+    add("Wall-to-CPU ratio", P["drp"]["wall_to_cpu_ratio"], "Task-level; see idle multiplier")
+    add(
+        "DRP idle / inter-stage core multiplier",
+        P["drp"].get("idle_and_inter_stage_multiplier", 1.0),
+        "Calendar / gap overhead on concurrent DRP cores (K-T; CM to refine)",
+    )
+    dp = P.get("developer_pilot") or {}
+    add(
+        "Developer-pilot node-days / year",
+        dp.get("additional_node_days_per_year", 0),
+        "Added to DRP core-hours (K-T; confirm with Yusra/CM)",
+    )
+    add(
+        "USDF-RSP extra fraction of DRP concurrent",
+        dp.get("usdf_rsp_extra_fraction_of_drp_concurrent", 0),
+        "Applied after idle multiplier on DRP cores row",
+    )
     add("DR2 multiplier", P["drp"]["dr2_multiplier"])
 
     row += 1
@@ -632,7 +648,7 @@ def build_ops_storage_tab(ws, P, N, FY0):
     param_row(12, "Raw image compression (science)", "factor", [img["raw_compression"]] * N)
     # Row 13: Lossy compression
     param_row(13, "Lossy image compression", "factor", [img["lossy_compression"]] * N)
-    # Row 14: Calibration compression (typically 1.0 = uncompressed — no measured data)
+    # Row 14: Calibration on-disk vs logical (LSST Key Numbers; see sizing_params)
     param_row(14, "Calibration image compression", "factor", [img["calibration_compression"]] * N)
 
     # Row 15: Nights per year
@@ -991,6 +1007,12 @@ def build_ops_compute_tab(ws, P, N, FY0):
 
     drp = P["drp"]
     proc_hours = drp["processing_window_days"] * 24
+    idle_mult = float(drp.get("idle_and_inter_stage_multiplier", 1.0))
+    dev_pilot = P.get("developer_pilot") or {}
+    pilot_node_days_yr = float(dev_pilot.get("additional_node_days_per_year", 0))
+    rsp_extra = float(dev_pilot.get("usdf_rsp_extra_fraction_of_drp_concurrent", 0))
+    pilot_ch_per_year = pilot_node_days_yr * drp["cores_per_node"] * 24
+    drp_core_scale = idle_mult * (1.0 + rsp_extra)
 
     obs = P["observing"]
     img = P["imaging"]
@@ -1027,7 +1049,7 @@ def build_ops_compute_tab(ws, P, N, FY0):
     ws.cell(row=3, column=2, value="core-hours")
     for i in range(N):
         year_num = i + 1
-        ch = input_tb_per_year * year_num * ch_per_tb
+        ch = input_tb_per_year * year_num * ch_per_tb + year_num * pilot_ch_per_year
         if i == 0:
             ch += carryover
         ws.cell(row=3, column=i + 3, value=round(ch)).number_format = num_fmt_int()
@@ -1036,7 +1058,9 @@ def build_ops_compute_tab(ws, P, N, FY0):
     ws.cell(row=4, column=2, value="cores")
     for i in range(N):
         c = col(i)
-        ws.cell(row=4, column=i + 3).value = f"={c}3/{proc_hours}"
+        ws.cell(row=4, column=i + 3).value = (
+            f"=ROUND({c}3/{proc_hours}*{drp_core_scale:.12g},0)"
+        )
         ws.cell(row=4, column=i + 3).number_format = num_fmt_int()
 
     ws.cell(row=5, column=1, value="DRP cores annual increase")
@@ -2061,8 +2085,15 @@ def build_purchase_plan_tab(ws, P, N, FY0):
     ws.cell(row=47, column=2).number_format = num_fmt_int()
 
     ws.cell(row=48, column=1, value="DP2 cores needed")
-    proc_hours = P["drp"]["processing_window_days"] * 24
-    ws.cell(row=48, column=2).value = f"=ROUND(B47/{proc_hours},0)"
+    drp_py = P["drp"]
+    proc_hours_pp = drp_py["processing_window_days"] * 24
+    idle_pp = float(drp_py.get("idle_and_inter_stage_multiplier", 1.0))
+    dp_dev = P.get("developer_pilot") or {}
+    rsp_pp = float(dp_dev.get("usdf_rsp_extra_fraction_of_drp_concurrent", 0))
+    drp_core_scale_pp = idle_pp * (1.0 + rsp_pp)
+    ws.cell(row=48, column=2).value = (
+        f"=ROUND(B47/{proc_hours_pp}*{drp_core_scale_pp:.12g},0)"
+    )
     ws.cell(row=48, column=2).number_format = num_fmt_int()
 
     ws.cell(row=49, column=1, value="Existing batch cores")

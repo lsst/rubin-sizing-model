@@ -28,7 +28,13 @@ drp:
   document_cpu_reference: "DRP Resource Usage Estimates — CPU from DM-53697 (v30_0_0_rc2), DM-52836 (w_2025_41)"
   safety_margin: 1.5
   cores_per_node: 120
+  # Task wall / CPU from DRP Resource Usage Estimates (DM stats). Does NOT include idle
+  # between tasks, inter-stage evaluation, or calendar stretch (K-T Mar 2026 — CM to refine).
   wall_to_cpu_ratio: 1.14
+  # Multiplier on DRP concurrent cores: same effect as lower “productive” hours in the
+  # processing window. K-T: 1.14 is task-level only; inter-stage gaps are extra. Placeholder
+  # between suggested 1.3–1.5 until CM supplies a value.
+  idle_and_inter_stage_multiplier: 1.35
   processing_window_days: 200
   # Storage totals from DRP Resource Usage Estimates (with lossy compression):
   dp2_storage_total_pb: 7.43      # DP2 total DRP output (compressed, ~30k visits)
@@ -50,6 +56,14 @@ alert_production:
 compute_fractions:
   dac_drp_fraction: 0.10         # DAC/LSP cores = 10% of DRP cores
   staff_dac_fraction: 0.10       # Staff LSP cores = 10% of DAC cores
+
+# Developer / pilot / RSP-adjacent batch load (K-T Mar 2026: confirm with Yusra / CM;
+# AOS and Solar System also use significant batch time).
+developer_pilot:
+  # Extra node-days of batch per survey year (spread from ~165 node-days “at present” / 3 yr).
+  additional_node_days_per_year: 55
+  # Added on top of DRP concurrent cores after idle multiplier (~1% USDF-RSP class load).
+  usdf_rsp_extra_fraction_of_drp_concurrent: 0.01
 
 # ---------------------------------------------------------------------------
 # Prompt Products (RFC-1134)
@@ -89,7 +103,8 @@ observing:
 imaging:
   lsstcam_image_size_tb: 0.00819222      # 8.19 GB logical per exposure (Key Numbers row 24)
   raw_compression: 0.464                  # 3.8 GB on disk / 8.19 GB logical (Key Numbers rows 24,31)
-  calibration_compression: 0.464        # same as on-sky raw (K-T): cals compress at least as well
+  # LSST Key Numbers wiki: compressed cal ~2.3 GB/exposure vs ~3.8 GB on-sky raw → 2.3/8.19 logical
+  calibration_compression: 0.281
   lossy_compression: 0.27                 # from DRP doc: compressed/uncompressed visit_image ratio
   # Per-visit DRP output constants from DRP Resource Usage Estimates (DR1 actual, uncompressed):
   output_image_tb_per_visit: 0.01906      # DR1 visit_image: 4,003 TB / 210k visits
@@ -103,7 +118,9 @@ imaging:
 storage_fractions:
   apdb_reference_tb: 4.5           # APDB reference total TB (OSS-REQ-0190 baseline)
   apdb_reference_visits: 57000     # visits corresponding to the APDB reference TB
-  scratch_fraction: 0.10           # scratch = 10% of output images
+  # K-T: intermediates can be much larger than 10% today; belongs in total vs release story.
+  # Placeholder until derived from Jim C. release vs intermediate split (DRP doc).
+  scratch_fraction: 0.35
   misc_overhead_fraction: 0.20     # other/misc = 20% of per-year subtotal
   sims_output_tb: 5.0              # simulation output (constant per year)
 
