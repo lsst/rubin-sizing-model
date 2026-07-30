@@ -357,6 +357,10 @@ def main():
     # ── Generate PNG charts via matplotlib ─────────────────────────
     generate_png_charts(P, N, FY0)
 
+    # ── Lean communication workbook (same params, never diverges) ──
+    from generate_comm_workbook import build_comm_workbook
+    build_comm_workbook(P, N, FY0, "rubin_usdf_model_2026_condensed.xlsx")
+
 
 # ══════════════════════════════════════════════════════════════════════
 # Reference Data Tab

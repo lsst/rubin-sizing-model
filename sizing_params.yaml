@@ -345,12 +345,20 @@ dr_schedule:
 # ---------------------------------------------------------------------------
 # International Compute Sharing (DRP only — storage stays at USDF)
 # France (CC-IN2P3) and UK (UKDF) contribute DRP compute.
-# DMTN-135 uses 50%/25%; user specifies 40%/25%.
+# DMTN-135 uses 50%/25%; earlier model used 40%/25%.
+# UPDATED Jul 2026: UK share recalibrated to 40% per George Beckett
+# (#dm-camelot, 2026-06-29): UK sized at 40M core-hours/yr, "in line with
+# 40% of the cost of processing DR1" per DMTN-135-era estimates.
+# NEEDS CONFIRMATION with UKDF/FrDF spreadsheets when provided.
 # USDF handles remaining fraction plus ALL AP, DAC, Qserv, K8s.
 # ---------------------------------------------------------------------------
 international_compute:
-  france_drp_share: 0.40       # CC-IN2P3 handles 40% of DRP compute
-  uk_drp_share: 0.25           # UKDF handles 25% of DRP compute
+  france_drp_share: 0.40       # CC-IN2P3 handles 40% of DRP compute (DMTN-135-era; confirm w/ FrDF)
+  uk_drp_share: 0.40           # UKDF 40% per G. Beckett #dm-camelot 2026-06-29 (was 25%)
+  # Provisioned capacity (core-hours/yr) for capacity-vs-need checks in the
+  # communication workbook. USDF derived from batch fleet; France TBD.
+  uk_capacity_ch_per_year: 40000000    # G. Beckett: 40M core-hours/yr shared infra
+  france_capacity_ch_per_year: null    # TBD — awaiting FrDF/CC-IN2P3 numbers
 
 # ---------------------------------------------------------------------------
 # Milestones by LOY (for purchase planning / readiness)
