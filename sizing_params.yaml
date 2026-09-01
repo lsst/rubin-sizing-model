@@ -24,7 +24,12 @@ drp:
   commissioning_carryover_ch: 0    # no carry-over assumed
   # Reference only (not used in formulas — sizing uses core_hours_per_input_tb):
   dr1_node_days: 5700              # legacy estimate; see DM-53697 section in DRP Resource Usage Estimates
-  dp2_node_days: 650               # DP2 actual: 650 node-days @ 120 cores/node
+  dp2_node_days: 970               # DP2 actual: 970 node-days @ 120 cores/node (~2.79M core-hours).
+                                   # CORRECTED Aug 2026 from DP2 performance metrics (was 650).
+                                   # DP2 was processed ENTIRELY on Milano nodes.
+  torino_per_core_speedup: 2.0     # Rubin pipelines run ~2x faster per core on Torino vs Milano
+                                   # across all tasks (+60% base clock, higher memory bandwidth).
+                                   # Use for Milano-equivalent capacity accounting.
   document_cpu_reference: "DRP Resource Usage Estimates — CPU from DM-53697 (v30_0_0_rc2), DM-52836 (w_2025_41)"
   safety_margin: 1.5
   cores_per_node: 120
@@ -75,16 +80,23 @@ prompt:
   dr1_target_year: 2027          # DR1 at LOY2 (~12-14 months after survey start) -- Tier 1 accumulates until this year
 
 # ---------------------------------------------------------------------------
-# Qserv (from conversation with Igor)
+# Qserv (confirmed via #dm-qserv thread 2026-07-30, /proc/cpuinfo capture)
+# Deployments Jul 2026: 35-node K8s prod + 35-node K8s int + 6-node Docker int.
+# Most USDF K8s nodes share this hardware configuration.
 # ---------------------------------------------------------------------------
 qserv:
-  current_nodes: 92              # Docker bare-metal nodes (15 Docker + 77 K8s v-cluster)
-  cores_per_node: 32
+  current_nodes: 92              # Mar 2026 snapshot (15 Docker + 77 K8s v-cluster); Jul 2026: 35 prod K8s
+  prod_nodes_dp2: 35             # K8s prod deployment serving DP2 (confirmed 2026-07-30)
+  cpu_model: "AMD EPYC 7543P"    # single socket, confirmed from /proc/cpuinfo 2026-07-30
+  cores_per_node: 32             # physical cores
+  hardware_threads_per_node: 64  # HT enabled (siblings: 64)
   ram_gb_per_node: 256
-  nvme_slots_populated: 12       # out of 24 total slots
+  nvme_slots_populated: 12       # out of 24 total slots (half-populated; can double raw capacity)
   nvme_slots_total: 24
-  storage_tb_per_node: 32        # with 12 slots (uncompressed)
-  max_storage_tb_per_node: 64    # if all 24 slots populated
+  storage_tb_per_node: 32        # raw, with 12 slots
+  effective_tb_per_node: 64      # ~2x via ZFS automatic compression on data filesystems
+  max_storage_tb_per_node: 64    # raw, if all 24 slots populated (~128 TB effective w/ ZFS)
+  internal_network: "100 GbE"
   replication_factor: 3
 
 # ---------------------------------------------------------------------------
@@ -176,7 +188,9 @@ current_fleet:
     torino_ram_gb: 720
   k8s:
     nodes: 75                    # Initial k8s Capture, Rubin USDF row
-    cores_per_node: 48           # FY24 k8s Planner B22
+    cores_per_node: 48           # FY24 k8s Planner B22 — NOTE: most K8s nodes confirmed (Jul 2026)
+                                 # to be AMD EPYC 7543P (32c/64HT) like Qserv; 48 may be an
+                                 # allocatable-cores planning figure. TO RECONCILE (DM-54218).
     ram_gb_per_node: 256         # K8s node RAM
   interactive:
     nodes: 11                    # Initial InteractiveWorkflow Cap, Rubin USDF
@@ -354,7 +368,13 @@ dr_schedule:
 # ---------------------------------------------------------------------------
 international_compute:
   france_drp_share: 0.40       # CC-IN2P3 handles 40% of DRP compute (DMTN-135-era; confirm w/ FrDF)
-  uk_drp_share: 0.40           # UKDF 40% per G. Beckett #dm-camelot 2026-06-29 (was 25%)
+  # UPDATED Aug 2026 (UKDF clarification): UK front-loaded purchases to cover
+  # ~40% of FIRST-YEAR requirements, tapering later years so the 10-year
+  # work-weighted aggregate is ~25%. Scalar below = long-run aggregate;
+  # per-LOY profile (provisional, sums to ~25% work-weighted) used by the
+  # condensed workbook's Facility Split tab.
+  uk_drp_share: 0.25           # 10-yr aggregate target
+  uk_drp_share_by_loy: [0.40, 0.40, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24]
   # Provisioned capacity (core-hours/yr) for capacity-vs-need checks in the
   # communication workbook. USDF derived from batch fleet; France TBD.
   uk_capacity_ch_per_year: 40000000    # G. Beckett: 40M core-hours/yr shared infra
@@ -381,7 +401,9 @@ milestones_by_loy:
 # Data Preview 2 (currently running — 10% of DR1 processing)
 # ---------------------------------------------------------------------------
 dp2:
-  drp_fraction: 0.10           # DP2 is ~10% of DR1 workload
+  drp_fraction: 0.10           # planning assumption: DP2 ~10% of DR1 workload
+                               # (measured: ~17% compute, 2.79M/16.42M ch)
+  visits: 30000                # DP2 input: ~30k visits (RTN-109); one survey-year = 210k
 
 # ---------------------------------------------------------------------------
 # K8s Infrastructure Growth
