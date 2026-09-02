@@ -361,6 +361,10 @@ def main():
     from generate_comm_workbook import build_comm_workbook
     build_comm_workbook(P, N, FY0, "rubin_usdf_model_2026_condensed.xlsx")
 
+    # ── Pricing edition (2026 capture unit costs) ──────────────────
+    from generate_pricing_workbook import build_pricing_workbook
+    build_pricing_workbook(P, N, FY0, "rubin_usdf_model_2026_condensed_pricing.xlsx")
+
 
 # ══════════════════════════════════════════════════════════════════════
 # Reference Data Tab

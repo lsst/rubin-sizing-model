@@ -245,6 +245,28 @@ costs:
     overhead_fixed_m: 0.15       # $150K fixed annual overhead (in $M)
 
 # ---------------------------------------------------------------------------
+# 2026 unit costs and FY2026 actual purchase requests
+# Source: 2026_HW_Initial_Capacity_Capture_with_costs (Aug 2026 revision),
+# Batch CPU / k8s / Storage tabs. Used by the condensed pricing workbook.
+# ---------------------------------------------------------------------------
+costs_2026_capture:
+  torino_768_usd: 89355          # Torino node, 768 GB RAM (current quote)
+  torino_384_usd: 58765          # Torino node, 384 GB RAM (reference)
+  k8s_node_usd: 30866            # K8s node (EPYC 7543P class; also Qserv-class proxy)
+  ceph_jbod_usd: 203320          # "Ceph 2026 Standard" JBOD
+  ceph_jbod_usable_tb: 865       # usable TB per JBOD
+  ceph_usable_per_tb: 235.052    # = 203320 / 865
+  tape_per_tb: 8.625             # archive/backup estimate per TB
+  fy2026_rubin_actuals:          # Rubin USDF row, deadline 2026-10-01
+    batch_nodes: 0
+    k8s_nodes: 24
+    k8s_cost: 740784
+    disk_tb: 10082
+    disk_cost: 2369794
+    archive_tb: 5000
+    archive_cost: 43125
+
+# ---------------------------------------------------------------------------
 # Price Decrease Factors (annual, compounding)
 # ---------------------------------------------------------------------------
 price_factors:
