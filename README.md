@@ -1,149 +1,143 @@
-# Rubin Sizing Model
+# Data Facility Sizing Model
 
-Compute, storage, and cost projections for Rubin Observatory USDF operations
-across 10 years of operations (LOY1–LOY10, FY2026–FY2035).
+Compute, storage, tape and cost projections for a Rubin data facility across
+the ten loop years of operations.
 
-## Quick Start
+One script reads one parameter file and writes one Excel workbook of live
+formulas. The script contains no facility data at all — every number, label
+and note lives in `sizing_params.yaml`. Change the YAML, re-run, and the
+whole workbook follows.
+
+## Prerequisites
+
+[uv](https://docs.astral.sh/uv/) is the only requirement; it installs Python
+and the two dependencies for you.
 
 ```bash
-pip install -r requirements.txt
-python generate_sizing_model.py          # → rubin_sizing_model_2026.xlsx + charts/
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Homebrew
+brew install uv
+
+# Windows (PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-All tunable parameters live in **`sizing_params.yaml`**. Edit that file and
-re-run the script to regenerate the spreadsheet with updated formulas and
-values. The spreadsheet itself contains live Excel formulas, so values can also
-be changed directly in Excel and downstream cells will update automatically.
+Anything from Python 3.10 works. If you would rather not use uv:
+`pip install openpyxl pyyaml` and run `python generate_model.py`.
 
----
+## Quick start
 
-## Repository Layout
+```bash
+uv run generate_model.py
+```
 
-| File / Directory | Purpose |
-|------------------|---------|
-| `generate_sizing_model.py` | Python script that reads YAML and writes `.xlsx` with live Excel formulas, plus PNG charts |
-| `sizing_params.yaml` | All tunable numbers: data product sizes, DRP estimates, hardware fleet, costs, retention policies, international compute shares |
-| `requirements.txt` | Python dependencies (`openpyxl`, `pyyaml`, `matplotlib`) |
-| `rubin_sizing_model_2026.xlsx` | Generated spreadsheet (regenerate with the script) |
-| `charts/` | Generated PNG forecast charts (storage by tier, detail, data products, DRP core-hours, cost) |
-| `LIMITATIONS.md` | Known gaps and suggested improvements |
-| `dp-drp-derivations/` | DRP resource usage estimates, RFC-1134 prompt products doc, K8s batch usage report |
-| `sizing-model-spreadsheet/` | Rubin Key Numbers, machine/storage pricing, **Rubin Hardware Summary for March 2025 JTM** (cohorts for refresh tab) |
+Writes the workbook named in `workbook.output` in the YAML. Open it once in
+Excel or LibreOffice to populate the formula results — `openpyxl` writes
+formulas without cached values, so a freshly generated file looks empty to
+anything that reads cached values only.
 
-## Spreadsheet Tabs
+```bash
+uv run generate_model.py --params other.yaml --output other.xlsx
+```
 
-| Tab | Description |
-|-----|-------------|
-| **Reference Data** | Key numbers, fleet inventory, data product baselines |
-| **Ops Storage** | Per-LOY storage by tier (Flash, HDD, Object Store, Qserv, Tape) with sliding-window retention policies |
-| **Ops Compute** | DRP (batch), AP on K8s (not batch), DAC/Staff increments + refresh, Qserv from windowed storage ÷ TB/node, batch purchase totals |
-| **Hardware Refresh** | EOL model: cohorts from JTM delivery dates × lifetimes → units to replace per FY |
-| **Model** | Machine catalog, price factors, storage cost curves |
-| **Ops Costs** | Annual CapEx for compute and storage, broken out by line item |
-| **Purchase Plan** | Actionable per-year purchase requirements (batch nodes, K8s, storage by tier), with LOY1 (FY2026) detail for the current purchase cycle |
-| **International Compute** | DRP compute split: USDF (35%), France / CC-IN2P3 (40%), UK / UKDF (25%) |
-| **Yearly Readiness** | Per-LOY readiness (LOY1–LOY10) with milestone markers (DP2, DR1–DR9) and on-track / gap status |
-| **Charts** | Forecast charts for storage and compute growth |
+## Repository layout
 
----
+| Path | Purpose |
+|---|---|
+| `generate_model.py` | The script. Formulas and layout mechanics only. |
+| `sizing_params.yaml` | Every input number, label, note and source citation. |
+| `rubin_usdf_model_2026_condensed_with_pricing.xlsx` | Generated output, committed so it can be read without running anything. |
+| `pyproject.toml` | Dependencies (`openpyxl`, `pyyaml`). |
+| `dp-drp-derivations/`, `sizing-model-spreadsheet/` | Source documents the parameters were derived from. |
 
-## References and How They Were Applied
+## What the workbook contains
 
-### Documents Included in the Repository
+Two tabs hold raw numbers. Every other tab is calculated from them, so no
+figure is stated in two places.
 
-| Document | Applied To |
-|----------|------------|
-| **DRP Resource Usage Estimates** (`dp-drp-derivations/DRP+Resource+Usage+Estimates.doc`) | DR1 core-hours, processing window, DRP output image and parquet sizes per visit, compression ratios. Used to calibrate `core_hours_per_input_tb`, `output_image_tb_per_visit`, and `parquet_tb_per_visit`. |
-| **RFC-1134** (`dp-drp-derivations/RFC-1134.doc`) | Prompt products: alert stream sizing, Tier-1 (6-month) and Tier-2 (30-day) retention, long-term data preservation products stored at USDF. |
-| **Rubin Key Numbers** (`sizing-model-spreadsheet/Rubin Key Numbers.xlsx`) | Visits per night (700), image size (8.19 GB logical), raw compression ratio (0.464), calibration images per day (450), images per visit (1). |
-| **Rubin k8s_batch usage** (`dp-drp-derivations/Rubin k8s_batch usage .pdf`) | S3DF-wide utilization context for K8s and batch partitions. |
-| **New sizing machines/storage** (`sizing-model-spreadsheet/new sizing machines_storage .xlsx`) | Torino node specs and flash/HDD tier pricing cross-reference. |
+| Tab | Role | Contents |
+|---|---|---|
+| **Key Numbers** | reference | Sizing and data-product inputs: observing, DRP compute, storage basis, tape, Alert Production, user/DAC, database, fleet, facility shares, and the dataset-type breakdown the campaign total is summed from. |
+| **Cost Inputs** | reference | Costs only: unit prices, hardware lifetimes, historic purchases by fiscal year, the current year's actual requests. |
+| **All at USDF** | calculated | Single-site scenario — DRP compute in core-hours, node-days and peak cores; the on-floor disk build-up; cumulative tape; Alert Production and services; file counts. |
+| **Facility Split** | calculated | The same workload split across partner facilities, with per-year shares and capacity checks. |
+| **Qserv** | calculated | Cluster specification, catalogue-driven database size, and node projection. |
+| **DF Template** | calculated | Blank-fill calculator so another facility can size its own share. |
+| **USDF Pricing Forecast** | calculated | Annual purchases and spend, with a ten-year total. |
 
-### External References (Not in Repository)
+Reference tabs may not read another tab. The projection tabs read only the
+reference tabs (and, for the split and the pricing forecast, the tabs that
+already computed demand and node counts — never re-deriving them, so the tabs
+cannot disagree).
 
-These documents were used during model construction but are not tracked in this
-repository. Their key numbers have been captured in `sizing_params.yaml`.
+### Cell colours
 
-| Document | Applied To |
-|----------|------------|
-| **DMTN-135** — DM Sizing Model & Cost Plan | Storage retention policies (sliding windows for Qserv 3 yr, Output Images 2 yr, Coadds 3 yr, Parquet 3 yr), tape model, compute scaling formulas, international compute shares, and the overall spreadsheet methodology. |
-| **2026 HW Initial Capacity Capture** spreadsheet | Rubin USDF-specific fleet: Milano/Torino batch nodes, K8s nodes, interactive nodes, GPU nodes, installed storage. |
-| **Original sizing model spreadsheet** (March 2026) | Blueprint for all formulas and inter-tab references. Storage retention logic, compute growth curves, tape accumulation, and chart structure were replicated from this spreadsheet. |
----
+| Colour | Meaning |
+|---|---|
+| Blue | Raw input — safe to edit |
+| Black | Formula |
+| Green | Link to another tab |
+| Yellow | Key assumption that materially moves the answer |
 
-## YAML Configuration
+## How the model works
 
-`sizing_params.yaml` is organized into these sections:
+**Compute.** DRP work is expressed in core-hours, calibrated against measured
+campaign usage. It is shown three ways — core-hours, node-days, and peak
+concurrent cores over the processing window — because campaigns are reported
+in node-days but hardware is bought in cores. Where a fleet mixes CPU
+generations, capacity is expressed in equivalents of whichever generation the
+measurements were taken on.
 
-- **general** — scale year, number of LOYs, first fiscal year
-- **prompt** — alert rates, tier-1/tier-2 retention, DR1 target year
-- **qserv** — storage per node, replication factor
-- **observing** — nightly visits, image count, calibration images, engineering fraction
-- **imaging** — image size, raw compression (science + engineering), calibration compression (often same as raw), lossy compression, per-visit DRP output constants
-- **storage_fractions** — APDB, scratch, misc overhead, sims output
-- **catalogs** — object/source/forced-source row sizes and counts
-- **users** — science user counts and storage per user
-- **precursor** — HSC RC2/PDR2 reference data for coadd scaling
-- **current_fleet** — batch, K8s, interactive, GPU, Qserv, **Cassandra (12)**, **NVMe servers (4)**, **JBOD counts**, installed storage (batch core/RAM specs are authoritative — not duplicated under `costs.nodes`)
-- **hardware_refresh** — cohorts (label, category, qty, delivery FY, lifetime) from JTM; drives **Hardware Refresh** tab
-- **costs** — USD pricing only for nodes/storage (batch core counts come from `current_fleet.batch`)
-- **price_factors** — annual price change rates (currently 0 = flat pricing)
-- **lifecycle** — compute (3 yr) and storage (5 yr) refresh periods
-- **storage_retention** — sliding window lengths for Qserv, output images, coadds, Parquet
-- **qserv_data_per_node** — per-LOY drive density ramp
-- **row_sizes** — per-LOY catalog row size growth
-- **dr_schedule** — DR1–DR9 target LOYs (annual; 11 total DRs per PSTN-019, DR10–DR11 beyond model window)
-- **international_compute** — France (40%) and UK (25%) DRP shares
-- **milestones_by_loy** — DP2, DR1–DR9 milestone labels per LOY (annual data releases)
-- **dp2** — Data Preview 2 parameters (10% of DR1)
-- **k8s** — K8s infrastructure growth rate
-- **efd** — Engineering Facility Database storage estimate
-- **current_year** — months elapsed/remaining for purchase cycle planning
+**Storage.** *Bytes written* and *on-floor need* are different quantities and
+the workbook keeps them apart. A data-release campaign writes far more than it
+retains, because most intermediates are created and deleted during the run.
+On-floor need is the live fraction of those intermediates, plus retained
+releases over a sliding window, plus cumulative raw data and prompt products.
+Purchases follow on-floor need, not bytes written.
 
----
+**Tape** is cumulative — raw data and every release are preserved — so the
+footprint only grows. Purchases start once it exceeds the capacity already
+available.
 
-## Methodology
+**Cost.** Refresh is cohort-based: hardware bought in FY*x* is replaced in
+FY*x* + lifetime, driven by the historic purchase grid. Changing a lifetime
+moves every replacement automatically. The first column uses actual capture
+requests rather than modelled figures.
 
-1. **Data product sizing** starts from per-image byte counts (raw, processed,
-   coadd, difference, Parquet catalogs) multiplied by nightly visit rates and
-   accumulated over survey years.
-2. **Compression**: Raw compression (0.464) applies to science and engineering
-   exposures; calibrations use the same factor (0.464) as a placeholder until
-   measured. Lossy compression (0.27) applies to output images on the object store.
-3. **Storage retention** applies sliding windows (DMTN-135 policy): e.g.,
-   Qserv czar tables kept for 3 years, output images 2 years, coadds 3 years
-   after initial construction. Raw images are permanent on object store + tape.
-4. **Compute** uses a linear scaling model for DRP (batch). AP is sized on
-   **K8s** (not Slurm batch), with initial purchase in LOY1 and full refresh
-   every compute lifetime. DAC/Staff track **incremental** growth plus refresh.
-   Qserv node counts use **windowed** Qserv DB storage from Ops Storage (no
-   second 3-year stack).
-5. **International sharing** reduces USDF DRP compute by 65% (France 40% +
-   UK 25%) in the International Compute tab only. All other tabs assume 100%
-   USDF. Storage remains entirely at USDF.
-6. **Purchase planning** compares per-LOY needs against cumulative available
-   inventory (starting from the current 30 PB / fleet), producing incremental
-   purchase amounts per year and per storage tier.
-7. **Cost** uses flat unit pricing (no annual deflation). Compute refresh
-   triggers after the 3-year lifecycle.
-8. **Yearly Readiness** summarizes compute and storage gaps per LOY and flags
-   each year as "On Track" or reports the specific gap. Available capacity
-   reflects inventory *before* that year's purchase.
+Each formula block is documented in a notes section at the foot of its tab.
 
----
+## Assumptions that move the answer
 
-## Known Limitations
+These are marked yellow in the workbook. The first is by far the most
+significant in any facility's instance of this model.
 
-See [`LIMITATIONS.md`](LIMITATIONS.md) for a detailed list of gaps, their
-impact, and suggested fixes. Key items include:
+| Assumption | Why it matters |
+|---|---|
+| **Live-intermediate fraction** | Sets how much transient campaign data is resident at once, and dominates the disk budget. Replace the placeholder with campaign telemetry as soon as you have it. |
+| Tape capacity assumed available | Shared-facility accounting rarely says what a single tenant may actually draw on; owning media does not reserve library slots or drive bandwidth. Set to 0 for the no-headroom case. |
+| Idle / inter-stage multiplier | Task-level CPU is usually measured; wall-clock inflation between stages usually is not. |
+| Facility shares | Provisional until each partner supplies its own plan. |
+| Hosting and overhead rates | Often carried forward from an older agreement rather than re-quoted. |
+| Per-core speedup between CPU generations | Measured on one era of tasks; re-measure per release. |
 
-- Storage refresh (5-year disk lifecycle) not yet subtracted from available
-- GPU growth not projected beyond the 2 existing H200 nodes
-- No operating costs (power, cooling, FTEs)
-- All parameters are point estimates (no sensitivity analysis)
+Network and WAN are deliberately not modelled here: measured throughput
+figures matter too much to guess at.
 
----
+## Adapting this for another facility
 
-## License
+Edit `sizing_params.yaml` only. The parameter blocks at the top hold the
+numbers; the `workbook:` block at the bottom declares the tabs, sections, rows
+and notes. A row draws its value from a `param:` pointer into those blocks, a
+literal `value:`, or `formula: true` when the script computes it.
 
-Internal Rubin Observatory planning document. Not for public distribution.
+Row numbers appear nowhere. They are derived from the order of the YAML — a
+section banner, then its rows, then one blank line — and formulas address
+rows by key, so inserting or deleting a row re-points every dependent formula
+automatically.
+
+Two conventions the script enforces, both of which raise rather than silently
+producing a broken workbook: a note may not begin with `=`, since Excel would
+parse it as a formula; and a `param:` path that does not resolve is an error,
+not a blank cell.

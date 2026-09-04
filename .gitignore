@@ -1,0 +1,14 @@
+# Working notes, provenance and superseded material — never committed.
+local/
+
+# Python / uv
+__pycache__/
+*.py[cod]
+.venv/
+uv.lock
+
+# Editor and OS cruft
+.DS_Store
+*~
+~$*.xlsx
+.~lock.*#

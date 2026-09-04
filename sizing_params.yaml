@@ -23,6 +23,7 @@ drp:
   core_hours_per_input_tb: 20571   # DR1 actual: 16,416,000 ch / 798 TB input
   commissioning_carryover_ch: 0    # no carry-over assumed
   # Reference only (not used in formulas — sizing uses core_hours_per_input_tb):
+  dr1_core_hours: 16416000        # DR1 measured basis (RTN-109); 5,700 node-days at 120 cores/node
   dr1_node_days: 5700              # legacy estimate; see DM-53697 section in DRP Resource Usage Estimates
   dp2_node_days: 970               # DP2 actual: 970 node-days @ 120 cores/node (~2.79M core-hours).
                                    # CORRECTED Aug 2026 from DP2 performance metrics (was 650).
@@ -54,6 +55,55 @@ drp:
 # ---------------------------------------------------------------------------
 alert_production:
   ap_cores: 1188                 # alert production cores (Compute!$F$27)
+  alerts_per_visit: 10000        # Rubin Key Numbers ("alerts per image")
+
+# Network / WAN is deliberately NOT modelled. Real throughput figures for the
+# hybrid DAC / WAN exist in Slack discussions but have not been gathered yet;
+# rather than carry guessed IDAC copy counts and peak factors, the section was
+# removed (Sep 2026). Add it back once the measured numbers are in hand.
+# ---------------------------------------------------------------------------
+# APDB off-site backup (Cassandra -> S3)
+# ---------------------------------------------------------------------------
+apdb:
+  offsite_backup_10yr_tb: 100    # order-of-magnitude projection; ~0.5 TB today
+
+# ---------------------------------------------------------------------------
+# Tape already on the floor at S3DF (Slack #usdf-team, 2026-03-19)
+#   "Rubin has this in use: HPSS archive 8.2 PB across 422 LTO-8 and 141 LTO-9
+#    tapes; TSM backup 10.8 PB across 428 LTO-8 and 373 LTO-9 tapes.
+#    Rubin owns 1400 LTO-8 and 2750 LTO-9 tapes."
+# Owned capacity at native densities (LTO-8 = 12 TB, LTO-9 = 18 TB):
+#   1400 x 12 + 2750 x 18 = 16,800 + 49,500 = 66,300 TB.
+#
+# *** TREAT THIS AS UNVERIFIED. ***
+# The thread does not stand up to scrutiny as a budget input:
+#   - Adam Bolton's question was "What is Rubin's current tape-storage usage?
+#     (Is that knowable?)" — even the USDF lead was unsure it could be
+#     determined.
+#   - Wei Yang, who performs the archiving, accounted for only ~1.65 PB
+#     (~450 TB raw + ~1.2 PB old NCSA data) of the 8.2 PB reported.
+#   - Lance prefixed the figures with "If I'm reading the info correctly".
+#   - The 5x discrepancy was never reconciled.
+# S3DF is multi-tenant, so "owns" may mean media purchased on Rubin's behalf,
+# a pool allocation, or an accounting attribution. Even if the media is
+# Rubin's, library slots, drive bandwidth and HPSS/TSM service capacity are
+# shared and are not reserved by owning tapes.
+# ACTION: confirm with Lance Nakata / Yemi Adesanya before relying on this.
+# Set available_capacity_tb to 0 to see the no-headroom (conservative) case.
+#
+# NOTE: S3DF tape is at SLAC, so it is NOT an off-site copy.
+# ---------------------------------------------------------------------------
+tape_onfloor:
+  raw_copies_on_tape: 1             # copies of raw+calib held here; others live at partner sites
+  release_archive_fraction: 1.0     # 1.0 = every data release preserved permanently
+  onfloor_backup_fraction: 0.0      # NEW backup modelled on top of the existing system
+  hpss_archive_in_use_tb: 8200      # the actual archive
+  tsm_backup_in_use_tb: 10800       # separate backup system, already in use
+  available_capacity_tb: 66300      # UNVERIFIED — see caveat above; 0 = assume none
+  lto8_owned: 1400
+  lto9_owned: 2750
+  lto8_native_tb: 12
+  lto9_native_tb: 18
 
 # ---------------------------------------------------------------------------
 # Compute Scaling Fractions
@@ -245,6 +295,50 @@ costs:
     overhead_fixed_m: 0.15       # $150K fixed annual overhead (in $M)
 
 # ---------------------------------------------------------------------------
+# DR1 storage basis — SOURCE OF TRUTH for DR-scale storage.
+# DRP Resource Usage Estimates (Confluence, DM space, page 1062404112),
+# published as RTN-109. DR1 section 1.2.2 "Storage by dataset type, using
+# compression": mean sizes from DM-53697, lsst_cells_v1 skymap, inputs =
+# Y1 observations from baseline_v5.0.0_10yrs.db (baseline v5.0 opsim).
+# Page states top 20 dstypes are ~96% of the 47 PB total.
+# NOTE: the page's cumulative-size column reaches 47.09 PB at the 18th entry
+# while its cumulative-fraction column reads 0.954 there — the two are
+# mutually inconsistent by ~5%. We use the page's stated 47 PB headline.
+# ---------------------------------------------------------------------------
+dr1_storage_basis:
+  campaign_total_pb: 47          # page, stated total (compressed)
+  retained_release_pb: 1.6       # visit_image 1.083 PB + standardized catalogs
+  live_intermediate_fraction: 0.35   # UNMEASURED — the "high watermark" question
+  release_retention_drs: 3       # releases kept on floor
+  raw_plus_calib_tb_per_year: 1117   # science + calibration + engineering frames
+  prompt_tier1_tb_per_year: 1680     # 5.6 TB/night x 300 nights (RFC-1134)
+  prompt_tier2_tb: 180               # 6.0 TB/night x 30-day rolling
+  other_onfloor_fraction: 0.20       # user areas, APDB, sims and misc headroom.
+                                     # These are NOT broken out as separate lines:
+                                     # per-year user arrays would be raw inputs on a
+                                     # calculated tab, which the architecture forbids. overhead
+  # Top-18 dataset types, compressed (PB) — verbatim from the page's DR1 table
+  dataset_types_pb:
+    - ["direct_warp", 7.437, 107391908]
+    - ["direct_warp_noise0", 7.420, 107391908]
+    - ["psf_matched_warp", 5.382, 107391908]
+    - ["template_detector", 5.311, 37270840]
+    - ["difference_image_predetection", 4.049, 37270840]
+    - ["template_matched", 3.902, 37270840]
+    - ["difference_image", 3.873, 37270840]
+    - ["post_isr_image", 3.341, 35596260]
+    - ["deep_coadd_cell_predetection", 1.534, 7398852]
+    - ["visit_image  (RELEASE)", 1.083, 37270840]
+    - ["preliminary_visit_image", 1.040, 35596260]
+    - ["source_footprints", 0.634, 37270840]
+    - ["deep_coadd_predetection", 0.534, 7398852]
+    - ["single_visit_star_footprints", 0.442, 35596260]
+    - ["deconvolved_deep_coadd", 0.337, 7398852]
+    - ["source_unstandardized", 0.327, 37270840]
+    - ["object_forced_source_unstandardized", 0.239, 61040677]
+    - ["object_unstandardized", 0.204, 1285731]
+
+# ---------------------------------------------------------------------------
 # 2026 unit costs and FY2026 actual purchase requests
 # Source: 2026_HW_Initial_Capacity_Capture_with_costs (Aug 2026 revision),
 # Batch CPU / k8s / Storage tabs. Used by the condensed pricing workbook.
@@ -278,7 +372,7 @@ price_factors:
 # Lifecycle / Depreciation
 # ---------------------------------------------------------------------------
 lifecycle:
-  compute_lifetime_years: 3
+  compute_lifetime_years: 5      # UPDATED Aug 2026: hardware kept 5 years (was 3)
   storage_lifetime_years: 5
 
 # ---------------------------------------------------------------------------
@@ -288,8 +382,10 @@ lifecycle:
 # Categories: compute → 3 yr default; jbod / nvme → 5 yr (storage_lifetime_years)
 # ---------------------------------------------------------------------------
 hardware_refresh:
-  compute_lifetime_years: 3    # default for batch, qserv, k8s, cassandra
+  compute_lifetime_years: 5    # default for batch, qserv, k8s, cassandra (5-yr policy, Aug 2026)
   storage_lifetime_years: 5    # JBOD enclosures, NVMe servers
+  # NOTE: per-cohort lifetime_years below still say 3 from the older policy;
+  # left as-is pending explicit re-baselining of the Hardware Refresh tab.
   cohorts:
     - { category: k8s, label: "k8s PO215594", quantity: 16, delivery_year: 2022, lifetime_years: 3 }
     - { category: jbod, label: "JBOD PO216503 del 2022-04-13", quantity: 4, delivery_year: 2022, lifetime_years: 5 }
@@ -448,3 +544,451 @@ efd:
 current_year:
   months_elapsed: 3            # as of March 2026
   months_remaining: 9          # rest of FY2026
+
+# ---------------------------------------------------------------------------
+# Early data-preview actuals (reference only; not used in projections)
+# Sources: data-curation `du` measurements and the DP2 paper draft, Jul 2026.
+# ---------------------------------------------------------------------------
+edp2:
+  distributed_tb: 59.15            # EDP2 distributed subset, all dataset types
+  deep_coadd_tb: 28                # largest single component; 925,460 files
+  scarlet_models_tb: 11            # product not yet in the per-visit constants
+  hips_tb: 18                      # single-band HiPS maps
+  hips_files_millions: 36          # small-file heavy; metadata load, not capacity
+
+# ---------------------------------------------------------------------------
+# Purchase history and forecast conventions
+# Cohort refresh: hardware bought in FY_x is replaced in FY_x + lifetime.
+# Counts are from the Mar 2025 JTM purchase-order summary; the final-year
+# Torino count is assumed rather than sourced.
+# ---------------------------------------------------------------------------
+purchase_history:
+  first_fiscal_year: 2021
+  batch_nodes:  [0,  0, 72, 50, 35]
+  qserv_nodes:  [0,  0, 47, 55,  0]
+  k8s_nodes:    [0, 16, 32, 30,  0]
+
+# ---------------------------------------------------------------------------
+# Forecast conventions
+# ---------------------------------------------------------------------------
+forecast:
+  annual_price_change: 0.0         # 0 holds prices flat; negative models price falls
+
+# ---------------------------------------------------------------------------
+# Per-year facility share profile used by the Facility Split tab.
+# First entry is the data-preview year, processed entirely locally.
+# Replace with each partner's own plan when supplied.
+# ---------------------------------------------------------------------------
+facility_share_profile:
+  france: [0.00, 0.40, 0.40, 0.40, 0.40, 0.40, 0.40, 0.40, 0.40, 0.40]
+  uk:     [0.00, 0.40, 0.40, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24]
+
+# ---------------------------------------------------------------------------
+# Worked example in the "Your DF" column of the DF Template tab.
+# Placeholder values a visiting facility overwrites with its own.
+# ---------------------------------------------------------------------------
+df_template_example:
+  share: 0.10
+  cores_per_node: 128
+  window_days: 200
+  provisioned_ch_per_year: 10000000
+  default_loop_year: 2
+  peer_cores_per_node: 120         # cores/node assumed for the partner columns
+
+# ---------------------------------------------------------------------------
+# Qserv cluster description shown on the Qserv tab.
+# Pure documentation — replace wholesale with your own cluster, or delete.
+# ---------------------------------------------------------------------------
+qserv_documentation:
+  as_of: July 2026
+  entries:
+    - [Deployments, "35-node Kubernetes production (serves DP2) + 35-node Kubernetes integration + 6-node Docker integration"]
+    - [CPU per node, "1 x AMD EPYC 7543P, 32 cores / 64 hardware threads (SMT enabled)"]
+    - [RAM per node, "256 GB"]
+    - [Storage per node, "Node-local NVMe, shared-nothing, no network storage in the query path: 12 of 24 slots populated = 32 TB raw; ZFS compression gives ~2x, so ~64 TB effective; filling the remaining slots would double raw capacity"]
+    - [Internal network, "100 GbE"]
+    - [Procurement history, "102 nodes purchased: 15 delivered 2023-01, 32 delivered 2023-07, 55 delivered 2024-10"]
+    - [Relation to K8s fleet, "Most USDF Kubernetes nodes share this hardware configuration"]
+
+# =============================================================================
+# WORKBOOK DEFINITION
+# =============================================================================
+# Everything the reader sees — tab titles, section banners, row labels, units,
+# notes — is declared here. generate_model.py supplies only formulas and
+# layout mechanics.
+#
+# Row numbers are NOT written here. The script derives them from the order
+# below: a section banner, then its rows, then one blank line. Insert or
+# remove a row and every formula referencing it follows automatically.
+#
+# Each row takes its value from exactly one of:
+#   param:    dotted path into the parameter blocks above (no duplication)
+#   value:    a literal, for display-only figures
+#   formula:  true — generate_model.py supplies the formula for this key
+#
+# format: int dec1 dec2 dec3 pct pct2 usd usdm tb8 ratio3
+# style:  link (green, cross-tab) | sub (gray, unit restatement) | bold
+# yellow: true marks an assumption that materially moves the answer
+# =============================================================================
+workbook:
+  output: rubin_usdf_model_2026_condensed_with_pricing.xlsx
+
+  key_numbers:
+    tab: Key Numbers
+    title: Rubin USDF Model 2026 — KEY NUMBERS (reference tab)
+    intro: "All sizing and data-product raw numbers live here; every other tab except Cost Inputs is calculated from this tab. Blue = raw input · Black = formula · Yellow = key assumption · Column D = alternate units or how it is derived."
+    sections:
+      - title: OBSERVING
+        rows:
+          - {key: nights, label: Observing nights per year, param: observing.nights_per_year, unit: nights, format: int, note: "330 scheduled less planned/unplanned outages"}
+          - {key: visits, label: Visits per night, param: observing.visits_per_night, unit: visits, format: int, note: "2.1M visits / 10 yr / 300 nights"}
+          - {key: img_tb, label: Image size (logical), param: imaging.lsstcam_image_size_tb, unit: TB, format: tb8, note: "8.19 GB per exposure"}
+          - {key: raw_comp, label: Raw compression ratio, param: imaging.raw_compression, unit: ratio, format: ratio3, note: "3.8 GB on wire / 8.19 GB logical"}
+          - {key: input_tb, label: Input data per survey year, formula: true, unit: TB, format: int, note: "nights x visits x image size x compression"}
+      - title: DRP COMPUTE
+        rows:
+          - {key: ch_per_tb, label: DRP core-hours per input TB, param: drp.core_hours_per_input_tb, unit: ch/TB, format: int, note: "calibrated: 16.416M core-hrs / 798 TB"}
+          - {key: dr1_ch, label: DR1 compute (measured basis), param: drp.dr1_core_hours, unit: core-hrs, format: int, note: "reference; equals 5,700 node-days at 120 cores/node"}
+          - {key: dp2_nd, label: "DP2 compute (actual, on Milano)", param: drp.dp2_node_days, unit: node-days, format: int, note: "reference; equals 2.79M core-hours at 120 cores/node"}
+          - {key: cores_node, label: Cores per batch node, param: drp.cores_per_node, unit: cores, format: int, note: "Milano and Torino both 120"}
+          - {key: window, label: DRP processing window, param: drp.processing_window_days, unit: days, format: int, note: "assumed campaign length"}
+          - {key: idle, label: Idle / inter-stage multiplier, param: drp.idle_and_inter_stage_multiplier, unit: x, format: dec2, yellow: true, note: "placeholder in suggested 1.3-1.5 range"}
+          - {key: rsp, label: USDF RSP extra load fraction, param: developer_pilot.usdf_rsp_extra_fraction_of_drp_concurrent, unit: fraction, format: pct2, note: "USDF only; partner facilities do not carry this"}
+          - {key: pilot_nd, label: Developer / pilot batch load, param: developer_pilot.additional_node_days_per_year, unit: node-days/yr, format: int, note: "observed ~165 node-days over 3 years"}
+          - {key: safety, label: Safety margin, param: drp.safety_margin, unit: x, format: dec1, note: "applied as a separate line, not inside peak-core demand"}
+      - title: DRP STORAGE  (DR1 basis — see dataset-type breakdown at foot of tab)
+        rows:
+          - {key: dp2_out, label: DP2 total DRP output (actual), param: drp.dp2_storage_total_pb, unit: PB, format: dec2, note: "campaign as run; fitted inside the 30 PB installed"}
+          - {key: dp2_rel, label: DP2 release products (actual), param: drp.dp2_storage_release_pb, unit: PB, format: dec2}
+          - {key: bytes_written, label: DR-era campaign output per survey-yr (BYTES WRITTEN), formula: true, unit: PB, format: dec1, note: "total written over the campaign; equals the dataset-type table total below"}
+          - {key: retained, label: "  of which release products (RETAINED)", param: dr1_storage_basis.retained_release_pb, unit: PB, format: dec1, note: "visit_image compressed + standardized catalogs"}
+          - {key: intermediates, label: "  of which intermediates (TRANSIENT)", formula: true, unit: PB, format: dec1, note: "warps, templates, predetection images, footprints"}
+          - {key: livef, label: Live-intermediate fraction (HIGH WATERMARK), param: dr1_storage_basis.live_intermediate_fraction, unit: fraction, format: pct, yellow: true, note: "UNMEASURED. Fraction of intermediates resident at once; dominates the disk budget"}
+          - {key: retwin, label: Release retention window, param: dr1_storage_basis.release_retention_drs, unit: releases, format: int, yellow: true, note: "how many data releases stay on floor"}
+          - {key: rawcal, label: Raw + calibration per survey year, param: dr1_storage_basis.raw_plus_calib_tb_per_year, unit: TB, format: int, note: "science + calibration + engineering frames, compressed"}
+          - {key: t1, label: Prompt Tier-1 per year, param: dr1_storage_basis.prompt_tier1_tb_per_year, unit: TB, format: int, note: "5.6 TB/night x 300 nights, long-term retention"}
+          - {key: t2, label: Prompt Tier-2 (rolling), param: dr1_storage_basis.prompt_tier2_tb, unit: TB, format: int, note: "6.0 TB/night x 30-day window"}
+          - {key: other, label: Other on-floor allowance, param: dr1_storage_basis.other_onfloor_fraction, unit: fraction, format: pct, yellow: true, note: "user areas, APDB, sims, misc — applied to the on-floor total"}
+      - title: TAPE / ARCHIVE (cumulative — archived data is never deleted)
+        rows:
+          - {key: tape_copies, label: Raw + calibration copies held on USDF tape, param: tape_onfloor.raw_copies_on_tape, unit: copies, format: int, note: "further copies of raw data are held at partner facilities, not costed here"}
+          - {key: tape_rel, label: Release products archived to tape, param: tape_onfloor.release_archive_fraction, unit: fraction of releases, format: dec2, note: "1.0 = every data release is preserved permanently"}
+          - {key: tape_backup, label: On-floor data backed up to tape, param: tape_onfloor.onfloor_backup_fraction, unit: fraction of on-floor, format: pct, yellow: true, note: "0 = no NEW backup modelled; a separate backup system already exists, see the row below"}
+          - {key: tape_pre, label: Archive already on the floor (HPSS), param: tape_onfloor.hpss_archive_in_use_tb, unit: TB, format: int, yellow: true, note: "reported in use Mar 2026; only ~1.65 PB was directly attested — UNVERIFIED"}
+          - {key: tape_tsm, label: TSM backup already on the floor, param: tape_onfloor.tsm_backup_in_use_tb, unit: TB, format: int, note: "reference only: not projected forward"}
+          - {key: tape_owned, label: Tape capacity assumed available to Rubin, param: tape_onfloor.available_capacity_tb, unit: TB, format: int, yellow: true, note: "UNVERIFIED. From a hedged reading of a shared-facility accounting system; the facility is multi-tenant and library slots / drive bandwidth are shared. Set to 0 for the no-headroom case"}
+      - title: ALERT PRODUCTION / PROMPT (USDF only — partner facilities do not run AP)
+        rows:
+          - {key: ap_cores, label: Alert Production cores, param: alert_production.ap_cores, unit: cores, format: int, note: "runs nightly on Kubernetes, not on the batch fleet"}
+          - {key: alerts_visit, label: Alerts per visit, param: alert_production.alerts_per_visit, unit: alerts, format: int, note: "about 7M alerts per night at 700 visits"}
+          - {key: k8s_cores_node, label: Cores per K8s node, param: current_fleet.k8s.cores_per_node, unit: cores, format: int, yellow: true, note: "planner figure; the hardware is 32c/64HT — reconciliation pending"}
+      - title: USER / RSP / DAC COMPUTE (USDF only)
+        rows:
+          - {key: dac_frac, label: DAC / LSP cores as fraction of DRP, param: compute_fractions.dac_drp_fraction, unit: fraction, format: pct, note: "the 10% user-compute allowance carried since DMTN-135"}
+          - {key: staff_frac, label: Staff cores as fraction of DAC, param: compute_fractions.staff_dac_fraction, unit: fraction, format: pct}
+      - title: APDB / CASSANDRA
+        rows:
+          - {key: apdb_ref_tb, label: APDB reference size, param: storage_fractions.apdb_reference_tb, unit: TB, format: dec1, note: "measured at the reference visit count below"}
+          - {key: apdb_ref_visits, label: APDB reference visits, param: storage_fractions.apdb_reference_visits, unit: visits, format: int, note: "APDB scales with cumulative visits"}
+          - {key: cass_nodes, label: Cassandra nodes deployed, param: current_fleet.cassandra.nodes, unit: nodes, format: int}
+          - {key: apdb_backup, label: APDB off-site backup at end of survey, param: apdb.offsite_backup_10yr_tb, unit: TB, format: int, yellow: true, note: "order-of-magnitude projection; about 0.5 TB today"}
+      - title: USDF FLEET (2026)
+        rows:
+          - {key: batch_nodes, label: Batch nodes, formula: true, unit: nodes, format: int, note: "110 Milano + 35 Torino"}
+          - {key: batch_cores, label: Batch cores (raw), formula: true, unit: cores, format: int, note: "raw core count, ignores per-core speed"}
+          - {key: milano, label: Milano nodes, param: current_fleet.batch.milano_nodes, unit: nodes, format: int}
+          - {key: torino, label: Torino nodes, param: current_fleet.batch.torino_nodes, unit: nodes, format: int}
+          - {key: speedup, label: Torino per-core speedup vs Milano, param: drp.torino_per_core_speedup, unit: x, format: dec1, yellow: true, note: "measured across DP2-era tasks; higher clock and memory bandwidth"}
+          - {key: milano_eq, label: "Fleet capacity, Milano-equivalent cores", formula: true, unit: cores, format: int, note: "demand is Milano-calibrated, so capacity is expressed the same way"}
+          - {key: installed_pb, label: Installed storage, param: current_fleet.storage.total_installed_pb, unit: PB, format: int}
+          - {key: k8s_nodes, label: K8s nodes deployed, param: current_fleet.k8s.nodes, unit: nodes, format: int}
+          - {key: int_nodes, label: Interactive nodes, param: current_fleet.interactive.nodes, unit: nodes, format: int, note: "shared bare-metal login / analysis nodes"}
+          - {key: int_cores, label: Cores per interactive node, param: current_fleet.interactive.cores_per_node, unit: cores, format: int}
+      - title: FACILITY SPLIT (DRP COMPUTE)
+        rows:
+          - {key: fr_share, label: France / CC-IN2P3 share, param: international_compute.france_drp_share, unit: "%", format: pct, yellow: true, note: "long-run aggregate"}
+          - {key: uk_share, label: UK / UKDF share (10-yr aggregate), param: international_compute.uk_drp_share, unit: "%", format: pct, yellow: true, note: "front-loaded ~40% of year 1, tapering to this aggregate"}
+          - {key: usdf_share, label: "USDF share (residual, aggregate)", formula: true, unit: "%", format: pct}
+          - {key: uk_cap, label: UK provisioned capacity, param: international_compute.uk_capacity_ch_per_year, unit: ch/yr, format: int, note: "shared infrastructure: ~9k cores for six months"}
+      - title: QSERV (catalog database)
+        rows:
+          - {key: qs_nodes, label: Qserv nodes deployed, param: qserv.current_nodes, unit: nodes, format: int, note: "hardware specification is documented on the Qserv tab"}
+          - {key: qs_rep, label: Qserv replication factor, param: qserv.replication_factor, unit: x, format: int}
+          - {key: qs_retwin, label: Qserv retention window, param: storage_retention.qserv_window_years, unit: releases, format: int, note: "sliding window of releases held in the database"}
+          - {key: obj_row, label: Object row size, param: catalogs.object_row_bytes, unit: bytes, format: int, note: LDM-141}
+          - {key: obj_extra, label: Object extra row size, param: catalogs.object_extra_row_bytes, unit: bytes, format: int, note: LDM-141}
+          - {key: src_row, label: Source row size, param: catalogs.source_row_bytes, unit: bytes, format: int, note: LDM-141}
+          - {key: fsrc_row, label: Forced-source row size, param: catalogs.forced_source_row_bytes, unit: bytes, format: int, note: LDM-141}
+      - title: DP2 / EDP2 REFERENCE (not used in projections)
+        rows:
+          - {key: dp2_visits, label: DP2 visits processed, param: dp2.visits, unit: visits, format: int, note: "one survey-year is ~210,000 visits"}
+          - {key: edp2_total, label: EDP2 distributed subset (total), param: edp2.distributed_tb, unit: TB, format: dec2, note: "EDP2 is an early subset of DP2, not full DP2"}
+          - {key: edp2_coadd, label: EDP2 deep_coadd, param: edp2.deep_coadd_tb, unit: TB, format: int, note: "925,460 files"}
+          - {key: edp2_scarlet, label: EDP2 object_scarlet_models, param: edp2.scarlet_models_tb, unit: TB, format: int, note: "product not yet in the model"}
+          - {key: hips_tb, label: HiPS single-band maps, param: edp2.hips_tb, unit: TB, format: int, note: "small-file heavy; see file count below"}
+          - {key: hips_files, label: HiPS file count, param: edp2.hips_files_millions, unit: millions, format: int, note: "capacity is small but the object count stresses filesystem metadata"}
+      - kind: dataset_table
+        title: DR1 DATASET-TYPE BREAKDOWN — source of BYTES WRITTEN and the file count
+        header: ["Dataset type (DR1, compressed)", PB, files]
+        header_note: "DRP Resource Usage Estimates (RTN-109) DR1 table, top-18 by size"
+        source: dr1_storage_basis.dataset_types_pb
+        other_label: All other dataset types (~395)
+        other_note: "carried as zero: the top-18 already reach the page's stated total"
+        total_key: ds_total
+        total_label: DR1 CAMPAIGN TOTAL
+        total_note: "PB feeds BYTES WRITTEN above; file count feeds the All at USDF projection"
+        note: "Source: DRP Resource Usage Estimates (RTN-109), DR1 section 'Storage by dataset type, using compression' — mean sizes from DM-53697, lsst_cells_v1 skymap, inputs = Y1 of the baseline v5.0 opsim. The page's cumulative-size and cumulative-fraction columns are mutually inconsistent by about 5%: the top-18 sizes already sum to the stated campaign total, so the remaining ~395 dataset types are carried as zero rather than invented. Treat the total as approximate to that tolerance."
+
+  cost_inputs:
+    tab: Cost Inputs
+    title: COST INPUTS (reference tab) — costs only
+    intro: "Sizing and data-product numbers are NOT duplicated here — they live on Key Numbers. Blue = raw input · Yellow = key assumption. Only the Pricing Forecast reads this tab."
+    note_col: 7
+    sections:
+      - title: UNIT COSTS — 2026 HW Initial Capacity Capture
+        rows:
+          - {key: torino, label: Torino batch node (768 GB RAM), param: costs_2026_capture.torino_768_usd, unit: $/node, format: usd, yellow: true, note: "current quote; assumed for all future batch purchases"}
+          - {key: k8snode, label: K8s / Qserv-class node (EPYC 7543P), param: costs_2026_capture.k8s_node_usd, unit: $/node, format: usd, yellow: true, note: "same hardware class serves both roles"}
+          - {key: ceph, label: Ceph usable disk, param: costs_2026_capture.ceph_usable_per_tb, unit: $/TB, format: dec2, note: "JBOD $203,320 / 865 usable TB"}
+          - {key: tape, label: Tape / archive, param: costs_2026_capture.tape_per_tb, unit: $/TB, format: dec2, note: "archive and backup estimate"}
+          - {key: host, label: Hosting per node per year, param: costs.hosting.per_node_per_year, unit: $/node-yr, format: usd, yellow: true, note: "prior agreement — NOT re-quoted in the 2026 capture; verify before external use"}
+          - {key: ovh, label: Overhead on hardware, param: costs.hosting.overhead_pct, unit: "%", format: pct, note: "applied to the hardware subtotal"}
+          - {key: ovhf, label: "Overhead, fixed annual", param: costs.hosting.overhead_fixed_m, scale: 1000000, unit: $/yr, format: usd}
+          - {key: fac, label: Annual price change, param: forecast.annual_price_change, unit: "%/yr", format: pct, yellow: true, note: "0% holds prices flat; set negative for price falls"}
+      - title: LIFECYCLE AND GROWTH
+        rows:
+          - {key: life_c, label: Compute hardware lifetime, param: lifecycle.compute_lifetime_years, unit: years, format: int, yellow: true, note: "a cohort bought in FY_x is replaced in FY_x + lifetime"}
+          - {key: life_s, label: Storage hardware lifetime, param: lifecycle.storage_lifetime_years, unit: years, format: int, yellow: true, note: "disk capacity is re-bought after this many years"}
+          - {key: k8s_g, label: K8s annual growth, param: k8s.growth_rate_per_year, unit: fraction, format: pct, note: "services growth, applied to the deployed K8s base on Key Numbers"}
+      - kind: history_grid
+        title: HISTORIC PURCHASES BY FISCAL YEAR (drives cohort refresh)
+        source: purchase_history
+        rows:
+          - {key: hist_batch, label: Batch nodes purchased, series: batch_nodes, note: "Mar 2025 JTM purchase-order cohorts; the FY25 Torino count is assumed"}
+          - {key: hist_qserv, label: Qserv nodes purchased, series: qserv_nodes, note: "Mar 2025 JTM purchase-order cohorts"}
+          - {key: hist_k8s, label: K8s nodes purchased, series: k8s_nodes, note: "Mar 2025 JTM purchase-order cohorts"}
+      - title: FY2026 ACTUAL REQUESTS — 2026 HW Initial Capacity Capture, Rubin USDF
+        rows:
+          - {key: act_batch, label: Batch nodes requested, param: costs_2026_capture.fy2026_rubin_actuals.batch_nodes, unit: nodes, format: int, note: "zero — the existing fleet covers FY2026"}
+          - {key: act_k8s_n, label: K8s nodes requested, param: costs_2026_capture.fy2026_rubin_actuals.k8s_nodes, unit: nodes, format: int}
+          - {key: act_k8s_c, label: K8s cost, param: costs_2026_capture.fy2026_rubin_actuals.k8s_cost, unit: $, format: usd}
+          - {key: act_disk_tb, label: Disk requested, param: costs_2026_capture.fy2026_rubin_actuals.disk_tb, unit: TB, format: int, note: "usable Ceph"}
+          - {key: act_disk_c, label: Disk cost, param: costs_2026_capture.fy2026_rubin_actuals.disk_cost, unit: $, format: usd}
+          - {key: act_arc_tb, label: Archive requested, param: costs_2026_capture.fy2026_rubin_actuals.archive_tb, unit: TB, format: int}
+          - {key: act_arc_c, label: Archive cost, param: costs_2026_capture.fy2026_rubin_actuals.archive_cost, unit: $, format: usd, note: "deadline 2026-10-01"}
+    notes:
+      - "These are the only cost numbers in the workbook. Everything the forecast needs about data volumes, core-hours, fleet size or facility shares is read from the Key Numbers tab."
+      - "Hosting and overhead are carried over from the earlier sizing agreement and were not re-quoted in the 2026 capture — treat them as the least well-sourced figures here."
+
+  # ── Projection tabs. Row kinds: grid (default, formula from code),
+  #    series (per-year raw input from a param array), scalar (single cell),
+  #    note (italic line). ────────────────────────────────────────────────
+  all_at_usdf:
+    tab: All at USDF
+    title: Scenario A — Everything runs at USDF (100% of DRP). All cells calculated from Key Numbers.
+    tab_color: ED7D31
+    sections:
+      - title: DRP COMPUTE — core-hours / node-days / peak cores (LOY1 = DP2 actuals)
+        rows:
+          - {key: survey_years, label: Survey years of input processed, unit: years, format: dec2}
+          - {key: input_tb, label: Cumulative input data, unit: TB, format: int, style: link}
+          - {key: core_hours, label: DRP work — core-hours, unit: core-hrs, format: int}
+          - {key: node_days, label: DRP work — node-days (at 120 cores/node), unit: node-days, format: int}
+          - {key: peak_cores, label: DRP work — peak concurrent cores (in window), unit: cores, format: int}
+          - {key: ch_safety, label: Core-hours with safety margin, unit: core-hrs, format: int}
+          - {key: nodes_needed, label: Batch nodes needed (peak), unit: nodes, format: int}
+          - {key: fleet_eq, label: "USDF fleet, Milano-equivalent cores", unit: cores, format: int, style: link}
+          - {key: utilization, label: Fleet utilization (peak / Milano-equivalent), unit: "%", format: pct}
+      - title: DRP STORAGE — bytes written vs on-floor need (these are different things)
+        rows:
+          - {key: written_pb, label: Campaign output this FY — BYTES WRITTEN, unit: PB, format: dec1}
+          - {key: written_tb, label: "  same in TB", unit: TB, format: int, style: sub}
+          - {key: rel_pb, label: "  of which release products (retained)", unit: PB, format: dec1}
+          - {key: inter_pb, label: "  of which intermediates (transient)", unit: PB, format: dec1}
+          - {key: live_inter, label: "On floor: live intermediates (peak)", unit: PB, format: dec1}
+          - {key: on_rel, label: "On floor: retained releases (sliding window)", unit: PB, format: dec1}
+          - {key: on_raw, label: "On floor: raw + calibration, cumulative", unit: PB, format: dec1}
+          - {key: on_prompt, label: "On floor: prompt products (Tier-1 cumulative + Tier-2)", unit: PB, format: dec1}
+          - {key: subtotal, label: Subtotal before other allowance, unit: PB, format: dec1}
+          - {key: onfloor_pb, label: ON-FLOOR DISK NEED (drives purchases), unit: PB, format: dec1, style: bold}
+          - {key: onfloor_tb, label: "  same in TB", unit: TB, format: int, style: sub}
+          - {key: installed, label: Installed storage today, unit: PB, format: int, style: link}
+      - title: TAPE / ARCHIVE — cumulative footprint (archived data is never deleted)
+        rows:
+          - {key: tape_raw, label: "Raw + calibration archived, cumulative", unit: PB, format: dec1}
+          - {key: tape_relc, label: "Release products archived, cumulative", unit: PB, format: dec1}
+          - {key: tape_bk, label: Backup of on-floor data, unit: PB, format: dec1}
+          - {key: tape_fp, label: "TAPE FOOTPRINT, cumulative (incl. archive already on floor)", unit: PB, format: dec1, style: bold}
+          - {key: tape_fp_tb, label: "  same in TB", unit: TB, format: int, style: sub}
+          - {key: tape_avail, label: Tape capacity assumed available (UNVERIFIED), unit: TB, format: int, style: link}
+          - {key: tape_buy_cum, label: Cumulative tape capacity to buy, unit: TB, format: int}
+          - {key: tape_buy, label: Tape purchased this FY, unit: TB, format: int}
+      - title: ALERT PRODUCTION AND SERVICES (USDF only — not shared with partner facilities)
+        rows:
+          - {key: ap, label: Alert Production cores, unit: cores, format: int, style: link}
+          - {key: ap_nodes, label: Alert Production K8s nodes, unit: nodes, format: int}
+          - {key: dac, label: DAC / LSP cores (share of DRP peak), unit: cores, format: int}
+          - {key: staff, label: Staff cores, unit: cores, format: int}
+          - {key: interactive, label: Interactive nodes, unit: nodes, format: int, style: link}
+          - {key: svc_util, label: Service cores vs deployed K8s fleet, unit: "%", format: pct}
+      - title: APDB / CASSANDRA (within the other on-floor allowance, not additional)
+        rows:
+          - {key: apdb_tb, label: APDB on floor, unit: TB, format: dec1}
+          - {key: apdb_bk, label: "APDB off-site backup, cumulative", unit: TB, format: int}
+          - {key: cass, label: Cassandra nodes deployed, unit: nodes, format: int, style: link}
+      - title: FILE / OBJECT COUNTS — capacity is not the only constraint
+        rows:
+          - {key: files_written, label: Files written by this campaign, unit: millions, format: int}
+          - {key: files_floor, label: Files resident on floor, unit: millions, format: int}
+    notes:
+      - "BYTES WRITTEN and ON-FLOOR NEED are different quantities. The first is everything the campaign writes over its processing run. The second is what has to be resident on disk at once, and is what gets purchased: most intermediates are created and deleted during the run, so only the Key Numbers live-intermediate fraction is resident simultaneously, plus retained releases, raw data and prompt products, scaled by the other-on-floor allowance."
+      - "The first loop year is the data preview as completed, comfortably inside the installed capacity."
+      - "Tape is cumulative: raw data and every data release are preserved permanently, so the footprint only grows. Purchases start only once the footprint exceeds the tape capacity assumed available on Key Numbers. That capacity figure is UNVERIFIED: it comes from one hedged reading of a shared-facility accounting system, and the facility is multi-tenant, so owning media does not reserve library slots or drive bandwidth. Set it to 0 to see the conservative case, which roughly triples the tape purchase."
+      - "Alert Production, DAC/RSP and interactive capacity are local-only obligations that partner facilities do not share; they run on the Kubernetes and interactive fleets rather than on batch, so they are shown against K8s capacity rather than added to batch purchases."
+      - "User areas, APDB, sims and misc headroom are carried inside the other on-floor allowance on Key Numbers rather than as separate lines. Network/WAN is not modelled pending measured throughput figures. Every cell on this tab is a formula over Key Numbers."
+
+  facility_split:
+    tab: Facility Split
+    title: Scenario B — DRP split across data facilities (storage archived at USDF)
+    tab_color: 70AD47
+    sections:
+      - title: SHARES BY YEAR (blue = edit; UK front-loads then tapers to its aggregate)
+        rows:
+          - {key: sh_local, label: USDF share (residual), unit: "%", format: pct}
+          - {key: sh_fr, label: France / CC-IN2P3 share, unit: "%", format: pct, kind: series, param: facility_share_profile.france}
+          - {key: sh_uk, label: UK / UKDF share, unit: "%", format: pct, kind: series, param: facility_share_profile.uk}
+          - {key: uk_agg, label: UK work-weighted aggregate (target on Key Numbers), kind: scalar, format: pct, note: "LOY1 shares are zero: DP2 was processed entirely at USDF."}
+      - title: DRP WORK BY FACILITY — CORE-HOURS
+        rows:
+          - {key: tot_ch, label: Total DRP core-hours, unit: core-hrs, format: int, style: link}
+          - {key: ch_local, label: USDF, unit: core-hrs, format: int}
+          - {key: ch_fr, label: France / CC-IN2P3, unit: core-hrs, format: int}
+          - {key: ch_uk, label: UK / UKDF, unit: core-hrs, format: int}
+      - title: DRP WORK BY FACILITY — NODE-DAYS (at the USDF 120-core reference node)
+        rows:
+          - {key: nd_local, label: USDF, unit: node-days, format: int}
+          - {key: nd_fr, label: France / CC-IN2P3, unit: node-days, format: int}
+          - {key: nd_uk, label: UK / UKDF, unit: node-days, format: int}
+      - title: DRP WORK BY FACILITY — PEAK CONCURRENT CORES (in window)
+        rows:
+          - {key: pc_local, label: USDF, unit: cores, format: int}
+          - {key: pc_fr, label: France / CC-IN2P3, unit: cores, format: int}
+          - {key: pc_uk, label: UK / UKDF, unit: cores, format: int}
+      - title: CAPACITY CHECKS
+        rows:
+          - {key: chk_local, label: USDF peak cores vs fleet (Milano-equivalent), unit: "%", format: pct}
+          - {key: chk_uk, label: UK required vs UK provisioned capacity, unit: "%", format: pct}
+          - {key: chk_fr_note, kind: note, label: "France provisioned capacity not yet supplied."}
+      - title: STORAGE IMPLICATIONS OF THE SPLIT
+        rows:
+          - {key: st_fr, label: Live intermediates held at France, unit: PB, format: dec1}
+          - {key: st_uk, label: Live intermediates held at UK, unit: PB, format: dec1}
+          - {key: st_arch, label: Retained releases archived at USDF (unchanged by split), unit: PB, format: dec1, style: link}
+    notes:
+      - "Partner facilities hold live intermediates for their share of the processing only; all release products transfer back to USDF for the archive. The per-year profiles are provisional — replace them with each partner's own plan when available."
+
+  qserv:
+    tab: Qserv
+    title: Qserv — cluster specification and node projection
+    tab_color: 7030A0
+    mark_first_actual: false
+    spec_title: CLUSTER SPECIFICATION
+    sections:
+      - title: CATALOG SIZES BY RELEASE — the only raw inputs on this tab
+        rows:
+          - {key: objects, label: Objects, unit: billions, format: dec1, kind: series, param: catalogs.objects_per_year, divisor: 1000000000}
+          - {key: sources, label: Sources, unit: billions, format: int, kind: series, param: catalogs.sources_per_year, divisor: 1000000000}
+          - {key: fsources, label: Forced sources, unit: billions, format: int, kind: series, param: catalogs.forced_sources_base_per_year, divisor: 1000000000}
+      - title: QSERV DATABASE SIZE (replicated)
+        rows:
+          - {key: czar, label: Czar / object index, unit: TB, format: int}
+          - {key: worker, label: "Worker database, this release", unit: TB, format: int}
+          - {key: worker_win, label: "Worker database, retention window", unit: TB, format: int}
+          - {key: worker_pb, label: "  same in PB", unit: PB, format: dec2, style: sub}
+      - title: NODE PROJECTION
+        rows:
+          - {key: per_node, label: Data per node (drive-density ramp), unit: TB/node, format: dec1, kind: series, param: qserv_data_per_node}
+          - {key: nodes_req, label: QSERV NODES NEEDED, unit: nodes, format: int, style: bold}
+          - {key: nodes_have, label: Qserv nodes deployed today, unit: nodes, format: int, style: link}
+          - {key: surplus, label: Surplus / (gap), unit: nodes, format: int}
+    notes:
+      - "Database size = catalog rows x row sizes (Key Numbers) x replication factor, summed over the retention window. Node count divides that by the assumed usable TB per node, which ramps as drives densify. Replication is already included, so these are physical nodes. The catalog-size and per-node rows are the only raw inputs on this tab; everything else references Key Numbers."
+
+  df_template:
+    tab: DF Template
+    title: Per-Facility Calculator — fill in the yellow cells for your facility
+    tab_color: FFC000
+    loop_year_label: Loop year to evaluate (1-10)
+    columns: ["", USDF, France (CC-IN2P3), UK (UKDF), Your DF]
+    inputs:
+      - {key: share, label: DRP share (aggregate; per-year on Facility Split), format: pct}
+      - {key: cores, label: Cores per node, format: int}
+      - {key: window, label: Processing window (days), format: int}
+      - {key: capacity, label: Provisioned capacity (core-hrs/yr), format: int}
+    computed_title: COMPUTED
+    computed:
+      - {key: total_ch, label: Total DRP work for that year — core-hours, format: int}
+      - {key: your_ch, label: Your facility — core-hours, format: int}
+      - {key: your_nd, label: Your facility — node-days, format: int}
+      - {key: your_pc, label: Your facility — peak concurrent cores, format: int}
+      - {key: your_nodes, label: Nodes needed, format: int}
+      - {key: your_util, label: Utilization vs provisioned, format: pct}
+    note: "The 'Your DF' column holds example values (10% share, 128-core nodes, 10M core-hrs/yr) — replace with your facility's numbers. Yellow = edit, green = linked to Key Numbers. USDF provisioned capacity uses Milano-equivalent cores. The USDF-only RSP surcharge is deliberately excluded from this tab."
+
+  pricing_forecast:
+    tab: USDF Pricing Forecast
+    title: USDF PRICING FORECAST — everything at USDF (partner facility prices unknown)
+    tab_color: C00000
+    total_header: 10-yr Total
+    sections:
+      - title: DEMAND — linked from All at USDF and Qserv, never re-derived here
+        rows:
+          - {key: d_years, label: Survey years of input processed, unit: years, format: dec2, style: link}
+          - {key: d_ch, label: DRP core-hours, unit: core-hrs, format: int, style: link}
+          - {key: d_cores, label: Peak concurrent cores (Milano-equivalent), unit: cores, format: int, style: link}
+      - title: BATCH COMPUTE PURCHASES
+        rows:
+          - {key: b_cum, label: Cumulative Torino needed beyond current fleet, unit: nodes, format: int}
+          - {key: b_growth, label: Growth purchases this FY, unit: nodes, format: int, total: true}
+          - {key: b_refresh, label: Cohort refresh due this FY, unit: nodes, format: int, total: true}
+          - {key: b_nodes, label: Batch nodes purchased, unit: nodes, format: int, total: true}
+          - {key: b_cost, label: Batch compute cost, unit: $, format: usd, total: true}
+      - title: DISK AND TAPE PURCHASES
+        rows:
+          - {key: k_need, label: On-floor disk need (from All at USDF), unit: TB, format: int, style: link}
+          - {key: k_todate, label: Disk installed + purchased to date, unit: TB, format: int}
+          - {key: k_buy, label: Disk purchased this FY (new capacity), unit: TB, format: int, total: true}
+          - {key: k_rebuy, label: Disk re-buy (end of storage lifetime), unit: TB, format: int, total: true}
+          - {key: k_cost, label: Disk cost, unit: $, format: usd, total: true}
+          - {key: t_add, label: Tape / archive added (from All at USDF), unit: TB, format: int, style: link, total: true}
+          - {key: t_cost, label: Tape cost, unit: $, format: usd, total: true}
+      - title: K8S AND QSERV PURCHASES
+        rows:
+          - {key: q_k8s, label: K8s nodes purchased (growth + cohort refresh), unit: nodes, format: int, total: true}
+          - {key: q_k8s_cost, label: K8s cost, unit: $, format: usd, total: true}
+          - {key: q_need, label: Qserv nodes needed (from Qserv tab), unit: nodes, format: int, style: link}
+          - {key: q_max, label: Running maximum needed, unit: nodes, format: int}
+          - {key: q_growth, label: Qserv growth purchases, unit: nodes, format: int, total: true}
+          - {key: q_refresh, label: Qserv cohort refresh due this FY, unit: nodes, format: int, total: true}
+          - {key: q_nodes, label: Qserv nodes purchased, unit: nodes, format: int, total: true}
+          - {key: q_cost, label: Qserv cost, unit: $, format: usd, total: true}
+      - title: HOSTING, OVERHEAD AND TOTALS
+        rows:
+          - {key: hw, label: Hardware subtotal, unit: $, format: usd, total: true}
+          - {key: nodes_svc, label: Nodes in service (approximate), unit: nodes, format: int}
+          - {key: hosting, label: Hosting, unit: $, format: usd, total: true}
+          - {key: overhead, label: Overhead, unit: $, format: usd, total: true}
+          - {key: total, label: TOTAL ANNUAL SPEND, unit: $, format: usd, style: bold, total: true}
+          - {key: total_m, label: TOTAL ANNUAL SPEND, unit: $M, format: usdm, style: sub, total: true}
+          - {key: cumulative, label: Cumulative spend, unit: $M, format: usdm}
+    notes:
+      - "HOW THIS TAB WORKS — every row is a formula; the only tabs it reads are Key Numbers (sizing), Cost Inputs (costs), All at USDF (demand and disk need) and Qserv (node counts)."
+      - "Demand rows are linked straight from All at USDF so the two tabs can never disagree."
+      - "Batch need: peak Milano-equivalent cores less the current fleet capacity, divided by the Milano-equivalent cores a new node contributes (cores/node x speedup). Growth takes the year-on-year increase, so a node is bought once and then kept."
+      - "Cohort refresh: a purchase made in FY_x falls due in FY_x + compute lifetime. The first term looks up the historic grid on Cost Inputs; the second re-buys this tab's own earlier purchases. Changing the lifetime moves every replacement automatically."
+      - "Disk: the need comes from All at USDF; purchases cover only the shortfall against what is already installed and previously bought, and capacity is re-bought once the storage lifetime expires."
+      - "Tape: the increment in tape capacity that must be BOUGHT. Tape already on the floor and the capacity assumed available are netted off on All at USDF, so purchases begin only once the cumulative footprint exceeds that capacity."
+      - "Qserv: node counts come from the Qserv tab. Purchases track the running maximum, so the cluster never shrinks, plus cohort refresh on the same rule as batch."
+      - "Hosting scales with nodes in service; overhead is a percentage of the hardware subtotal plus a fixed annual amount."
+      - "The first column uses the actual capture requests from Cost Inputs rather than the model."
+      - "SENSITIVITY: the live-intermediate fraction on Key Numbers is the single biggest driver of this forecast, and it is unmeasured. Change it there and every disk number moves."
