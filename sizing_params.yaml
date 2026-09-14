@@ -147,7 +147,40 @@ qserv:
   effective_tb_per_node: 64      # ~2x via ZFS automatic compression on data filesystems
   max_storage_tb_per_node: 64    # raw, if all 24 slots populated (~128 TB effective w/ ZFS)
   internal_network: "100 GbE"
+  # PLANNING ASSUMPTION, not a measurement. The deployment whose dashboard the
+  # measured figures come from runs at 2, confirmed two ways: the all-replicas
+  # total is exactly 2x the unique-chunk total, and the replica chunk count is
+  # 2x the unique chunk count. Production is intended to run at 3. Sizing uses
+  # the intended production value, because procurement has to cover it.
+  # Every on-disk catalogue figure scales linearly with this. At 2: -33%.
   replication_factor: 3
+  # What the measured deployment actually runs at. Recorded so the measured
+  # anchor below is not misread; not used in any formula.
+  replication_factor_measured: 2
+  # Calibration between the LDM-141 logical row sizes above and what Qserv
+  # actually stores. *** UNANCHORED. ***
+  # The value came from ingest CSVs (19 TB compressed / 60 TB uncompressed),
+  # but Qserv stores 33.4 TB logical for that same catalogue, so that ratio
+  # describes a CSV-to-binary format change, not what Qserv does to a row.
+  # It cannot be derived without per-table row counts for a measured
+  # catalogue. Sensitivity at DR1: 1.0 -> ~1,170 TB/copy, 0.32 -> ~370 TB/copy.
+  ldm_to_stored_factor: 0.3167
+  # Overlap regions are stored as a second table per chunk, holding rows from
+  # neighbouring chunks so near-neighbour joins stay local. They are additional
+  # bytes on top of the chunk tables.
+  # Measured overlap as a fraction of chunk bytes, across the three catalogues
+  # on the deployment: 5.9%, 14.1%, 23.7%. It does NOT track chunk count (the
+  # 86-chunk catalogue sits at 14.1%, the 1,478-chunk one at 5.9%) and the
+  # partitioning geometry is fixed, so it is not geometric either. What varies
+  # is the table mix: only director tables carry overlap, so a catalogue heavy
+  # in dependent tables dilutes the fraction. Defaulted to the data-preview
+  # value as the closest analogue to a data release.
+  overlap_uplift: 0.237
+  # Measured anchor: Data Preview 2 on the production deployment.
+  # "Logical" = the unique-chunks total, i.e. before replication; the model
+  # applies the replication factor itself.
+  dp2_measured_logical_tb: 33.45   # data 30.2 TB + index 3.2 TB
+  dp2_measured_index_tb: 3.24      # index portion of the above
 
 # ---------------------------------------------------------------------------
 # Observing Parameters (from Rubin Key Numbers spreadsheet)
@@ -189,6 +222,11 @@ storage_fractions:
 # ---------------------------------------------------------------------------
 # Catalog Row Sizes (from LDM-141)
 # ---------------------------------------------------------------------------
+# NOTE (Sep 2026): objects_per_year / sources_per_year / forced_sources_base_per_year
+# are DATA-RELEASE scale (entry 0 = DR1 = one full survey-year), NOT loop years.
+# They were previously read into the first loop-year column, which is the data
+# preview — a one-column shift that overstated that column by ~7x. The Qserv tab
+# now offsets them by one column and anchors the preview column on measured data.
 catalogs:
   object_row_bytes: 1896
   object_extra_row_bytes: 21005
@@ -600,14 +638,15 @@ df_template_example:
 # Pure documentation — replace wholesale with your own cluster, or delete.
 # ---------------------------------------------------------------------------
 qserv_documentation:
-  as_of: July 2026
+  as_of: September 2026
   entries:
-    - [Deployments, "35-node Kubernetes production (serves DP2) + 35-node Kubernetes integration + 6-node Docker integration"]
+    - [Deployments, "35-node Kubernetes production (serves DP2) + 35-node Kubernetes integration + 6-node Docker integration. Production and integration are the same size and hardware; their replication settings are not known to match"]
     - [CPU per node, "1 x AMD EPYC 7543P, 32 cores / 64 hardware threads (SMT enabled)"]
     - [RAM per node, "256 GB"]
     - [Storage per node, "Node-local NVMe, shared-nothing, no network storage in the query path: 12 of 24 slots populated = 32 TB raw; ZFS compression gives ~2x, so ~64 TB effective; filling the remaining slots would double raw capacity"]
     - [Internal network, "100 GbE"]
-    - [Procurement history, "102 nodes purchased: 15 delivered 2023-01, 32 delivered 2023-07, 55 delivered 2024-10"]
+    - [Nodes procured, "102 across three procurement rounds, of which the deployments above are in service"]
+    - [Replication, "Three-fold on production. The measured catalogue figures in this model come from a deployment observed running two-fold, so on-disk totals here are provisioning figures at three-fold, not measurements"]
     - [Relation to K8s fleet, "Most USDF Kubernetes nodes share this hardware configuration"]
 
 # =============================================================================
@@ -674,7 +713,7 @@ workbook:
           - {key: tape_copies, label: Raw + calibration copies held on USDF tape, param: tape_onfloor.raw_copies_on_tape, unit: copies, format: int, note: "further copies of raw data are held at partner facilities, not costed here"}
           - {key: tape_rel, label: Release products archived to tape, param: tape_onfloor.release_archive_fraction, unit: fraction of releases, format: dec2, note: "1.0 = every data release is preserved permanently"}
           - {key: tape_backup, label: On-floor data backed up to tape, param: tape_onfloor.onfloor_backup_fraction, unit: fraction of on-floor, format: pct, yellow: true, note: "0 = no NEW backup modelled; a separate backup system already exists, see the row below"}
-          - {key: tape_pre, label: Archive already on the floor (HPSS), param: tape_onfloor.hpss_archive_in_use_tb, unit: TB, format: int, yellow: true, note: "reported in use Mar 2026; only ~1.65 PB was directly attested — UNVERIFIED"}
+          - {key: tape_pre, label: Archive already on the floor (HPSS), param: tape_onfloor.hpss_archive_in_use_tb, unit: TB, format: int, yellow: true, note: "UNVERIFIED: only a fraction of this could be independently attested"}
           - {key: tape_tsm, label: TSM backup already on the floor, param: tape_onfloor.tsm_backup_in_use_tb, unit: TB, format: int, note: "reference only: not projected forward"}
           - {key: tape_owned, label: Tape capacity assumed available to Rubin, param: tape_onfloor.available_capacity_tb, unit: TB, format: int, yellow: true, note: "UNVERIFIED. From a hedged reading of a shared-facility accounting system; the facility is multi-tenant and library slots / drive bandwidth are shared. Set to 0 for the no-headroom case"}
       - title: ALERT PRODUCTION / PROMPT (USDF only — partner facilities do not run AP)
@@ -684,7 +723,7 @@ workbook:
           - {key: k8s_cores_node, label: Cores per K8s node, param: current_fleet.k8s.cores_per_node, unit: cores, format: int, yellow: true, note: "planner figure; the hardware is 32c/64HT — reconciliation pending"}
       - title: USER / RSP / DAC COMPUTE (USDF only)
         rows:
-          - {key: dac_frac, label: DAC / LSP cores as fraction of DRP, param: compute_fractions.dac_drp_fraction, unit: fraction, format: pct, note: "the 10% user-compute allowance carried since DMTN-135"}
+          - {key: dac_frac, label: DAC / LSP cores as fraction of DRP, param: compute_fractions.dac_drp_fraction, unit: fraction, format: pct, note: "the standing user-compute allowance, as a fraction of DRP"}
           - {key: staff_frac, label: Staff cores as fraction of DAC, param: compute_fractions.staff_dac_fraction, unit: fraction, format: pct}
       - title: APDB / CASSANDRA
         rows:
@@ -713,12 +752,16 @@ workbook:
       - title: QSERV (catalog database)
         rows:
           - {key: qs_nodes, label: Qserv nodes deployed, param: qserv.current_nodes, unit: nodes, format: int, note: "hardware specification is documented on the Qserv tab"}
-          - {key: qs_rep, label: Qserv replication factor, param: qserv.replication_factor, unit: x, format: int}
+          - {key: qs_rep, label: Qserv replication factor, param: qserv.replication_factor, unit: x, format: int, yellow: true, note: "planning value. Every on-disk catalogue figure scales linearly with it; at 2 they fall by a third"}
+          - {key: qs_overlap, label: Overlap uplift on chunk bytes, param: qserv.overlap_uplift, unit: fraction, format: pct, yellow: true, note: "overlap regions are extra tables holding neighbouring rows. Applied to the modelled columns only; the measured column already contains its own. Observed range across catalogues 6% to 24%, driven by how much of a catalogue is director tables"}
           - {key: qs_retwin, label: Qserv retention window, param: storage_retention.qserv_window_years, unit: releases, format: int, note: "sliding window of releases held in the database"}
-          - {key: obj_row, label: Object row size, param: catalogs.object_row_bytes, unit: bytes, format: int, note: LDM-141}
-          - {key: obj_extra, label: Object extra row size, param: catalogs.object_extra_row_bytes, unit: bytes, format: int, note: LDM-141}
-          - {key: src_row, label: Source row size, param: catalogs.source_row_bytes, unit: bytes, format: int, note: LDM-141}
-          - {key: fsrc_row, label: Forced-source row size, param: catalogs.forced_source_row_bytes, unit: bytes, format: int, note: LDM-141}
+          - {key: obj_row, label: Object row size, param: catalogs.object_row_bytes, unit: bytes, format: int}
+          - {key: obj_extra, label: Object extra row size, param: catalogs.object_extra_row_bytes, unit: bytes, format: int, note: "uncompressed logical size of the auxiliary per-object tables; the largest single term in the catalogue total"}
+          - {key: src_row, label: Source row size, param: catalogs.source_row_bytes, unit: bytes, format: int}
+          - {key: fsrc_row, label: Forced-source row size, param: catalogs.forced_source_row_bytes, unit: bytes, format: int}
+          - {key: qs_compress, label: LDM row size to stored-bytes factor, param: qserv.ldm_to_stored_factor, unit: ratio, format: ratio3, yellow: true, note: "UNANCHORED. Maps the logical row sizes above onto what Qserv actually stores. Cannot be pinned down without per-table row counts for a measured catalogue. At DR1 a factor of 1.0 gives about 1,170 TB per copy and 0.32 about 370 TB"}
+          - {key: qs_dp2_meas, label: Measured data-preview catalogue (logical), param: qserv.dp2_measured_logical_tb, unit: TB, format: dec2, yellow: true, note: "unique-chunk total, before replication. Anchors the data-preview column on measurement instead of modelling it. The on-disk preview figure is this times the planning replication factor, so it is a provisioning figure, not a measurement"}
+          - {key: qs_dp2_idx, label: Measured data-preview indexes (logical), param: qserv.dp2_measured_index_tb, unit: TB, format: dec2, note: "index portion of the row above; already included in it"}
       - title: DP2 / EDP2 REFERENCE (not used in projections)
         rows:
           - {key: dp2_visits, label: DP2 visits processed, param: dp2.visits, unit: visits, format: int, note: "one survey-year is ~210,000 visits"}
@@ -730,14 +773,14 @@ workbook:
       - kind: dataset_table
         title: DR1 DATASET-TYPE BREAKDOWN — source of BYTES WRITTEN and the file count
         header: ["Dataset type (DR1, compressed)", PB, files]
-        header_note: "DRP Resource Usage Estimates (RTN-109) DR1 table, top-18 by size"
+        header_note: "largest dataset types by size; the remainder are carried in the row below"
         source: dr1_storage_basis.dataset_types_pb
         other_label: All other dataset types (~395)
         other_note: "carried as zero: the top-18 already reach the page's stated total"
         total_key: ds_total
         total_label: DR1 CAMPAIGN TOTAL
         total_note: "PB feeds BYTES WRITTEN above; file count feeds the All at USDF projection"
-        note: "Source: DRP Resource Usage Estimates (RTN-109), DR1 section 'Storage by dataset type, using compression' — mean sizes from DM-53697, lsst_cells_v1 skymap, inputs = Y1 of the baseline v5.0 opsim. The page's cumulative-size and cumulative-fraction columns are mutually inconsistent by about 5%: the top-18 sizes already sum to the stated campaign total, so the remaining ~395 dataset types are carried as zero rather than invented. Treat the total as approximate to that tolerance."
+        note: "CAVEAT: in the source data the cumulative-size and cumulative-fraction columns are mutually inconsistent by about 5%. The listed types already sum to the stated campaign total, so the remaining types are carried as zero rather than invented. Treat the total as approximate to that tolerance."
 
   cost_inputs:
     tab: Cost Inputs
@@ -745,13 +788,13 @@ workbook:
     intro: "Sizing and data-product numbers are NOT duplicated here — they live on Key Numbers. Blue = raw input · Yellow = key assumption. Only the Pricing Forecast reads this tab."
     note_col: 7
     sections:
-      - title: UNIT COSTS — 2026 HW Initial Capacity Capture
+      - title: UNIT COSTS
         rows:
           - {key: torino, label: Torino batch node (768 GB RAM), param: costs_2026_capture.torino_768_usd, unit: $/node, format: usd, yellow: true, note: "current quote; assumed for all future batch purchases"}
           - {key: k8snode, label: K8s / Qserv-class node (EPYC 7543P), param: costs_2026_capture.k8s_node_usd, unit: $/node, format: usd, yellow: true, note: "same hardware class serves both roles"}
-          - {key: ceph, label: Ceph usable disk, param: costs_2026_capture.ceph_usable_per_tb, unit: $/TB, format: dec2, note: "JBOD $203,320 / 865 usable TB"}
+          - {key: ceph, label: Ceph usable disk, param: costs_2026_capture.ceph_usable_per_tb, unit: $/TB, format: dec2, note: "enclosure cost divided by usable TB per enclosure"}
           - {key: tape, label: Tape / archive, param: costs_2026_capture.tape_per_tb, unit: $/TB, format: dec2, note: "archive and backup estimate"}
-          - {key: host, label: Hosting per node per year, param: costs.hosting.per_node_per_year, unit: $/node-yr, format: usd, yellow: true, note: "prior agreement — NOT re-quoted in the 2026 capture; verify before external use"}
+          - {key: host, label: Hosting per node per year, param: costs.hosting.per_node_per_year, unit: $/node-yr, format: usd, yellow: true, note: "carried from an earlier agreement and not re-quoted; the least well-founded figure on this tab"}
           - {key: ovh, label: Overhead on hardware, param: costs.hosting.overhead_pct, unit: "%", format: pct, note: "applied to the hardware subtotal"}
           - {key: ovhf, label: "Overhead, fixed annual", param: costs.hosting.overhead_fixed_m, scale: 1000000, unit: $/yr, format: usd}
           - {key: fac, label: Annual price change, param: forecast.annual_price_change, unit: "%/yr", format: pct, yellow: true, note: "0% holds prices flat; set negative for price falls"}
@@ -764,10 +807,10 @@ workbook:
         title: HISTORIC PURCHASES BY FISCAL YEAR (drives cohort refresh)
         source: purchase_history
         rows:
-          - {key: hist_batch, label: Batch nodes purchased, series: batch_nodes, note: "Mar 2025 JTM purchase-order cohorts; the FY25 Torino count is assumed"}
-          - {key: hist_qserv, label: Qserv nodes purchased, series: qserv_nodes, note: "Mar 2025 JTM purchase-order cohorts"}
-          - {key: hist_k8s, label: K8s nodes purchased, series: k8s_nodes, note: "Mar 2025 JTM purchase-order cohorts"}
-      - title: FY2026 ACTUAL REQUESTS — 2026 HW Initial Capacity Capture, Rubin USDF
+          - {key: hist_batch, label: Batch nodes purchased, series: batch_nodes, note: "the final-year count is assumed rather than recorded"}
+          - {key: hist_qserv, label: Qserv nodes purchased, series: qserv_nodes}
+          - {key: hist_k8s, label: K8s nodes purchased, series: k8s_nodes}
+      - title: CURRENT-YEAR ACTUAL REQUESTS
         rows:
           - {key: act_batch, label: Batch nodes requested, param: costs_2026_capture.fy2026_rubin_actuals.batch_nodes, unit: nodes, format: int, note: "zero — the existing fleet covers FY2026"}
           - {key: act_k8s_n, label: K8s nodes requested, param: costs_2026_capture.fy2026_rubin_actuals.k8s_nodes, unit: nodes, format: int}
@@ -775,10 +818,10 @@ workbook:
           - {key: act_disk_tb, label: Disk requested, param: costs_2026_capture.fy2026_rubin_actuals.disk_tb, unit: TB, format: int, note: "usable Ceph"}
           - {key: act_disk_c, label: Disk cost, param: costs_2026_capture.fy2026_rubin_actuals.disk_cost, unit: $, format: usd}
           - {key: act_arc_tb, label: Archive requested, param: costs_2026_capture.fy2026_rubin_actuals.archive_tb, unit: TB, format: int}
-          - {key: act_arc_c, label: Archive cost, param: costs_2026_capture.fy2026_rubin_actuals.archive_cost, unit: $, format: usd, note: "deadline 2026-10-01"}
+          - {key: act_arc_c, label: Archive cost, param: costs_2026_capture.fy2026_rubin_actuals.archive_cost, unit: $, format: usd}
     notes:
       - "These are the only cost numbers in the workbook. Everything the forecast needs about data volumes, core-hours, fleet size or facility shares is read from the Key Numbers tab."
-      - "Hosting and overhead are carried over from the earlier sizing agreement and were not re-quoted in the 2026 capture — treat them as the least well-sourced figures here."
+      - "Hosting and overhead are carried from an earlier agreement and were not re-quoted; treat them as the least well-founded figures here."
 
   # ── Projection tabs. Row kinds: grid (default, formula from code),
   #    series (per-year raw input from a param array), scalar (single cell),
@@ -894,17 +937,23 @@ workbook:
     mark_first_actual: false
     spec_title: CLUSTER SPECIFICATION
     sections:
-      - title: CATALOG SIZES BY RELEASE — the only raw inputs on this tab
+      - title: CATALOG SIZES BY DATA RELEASE (first column is the data preview, measured not modelled)
         rows:
-          - {key: objects, label: Objects, unit: billions, format: dec1, kind: series, param: catalogs.objects_per_year, divisor: 1000000000}
-          - {key: sources, label: Sources, unit: billions, format: int, kind: series, param: catalogs.sources_per_year, divisor: 1000000000}
-          - {key: fsources, label: Forced sources, unit: billions, format: int, kind: series, param: catalogs.forced_sources_base_per_year, divisor: 1000000000}
-      - title: QSERV DATABASE SIZE (replicated)
+          - {key: objects, label: Objects, unit: billions, format: dec1, kind: series, param: catalogs.objects_per_year, divisor: 1000000000, offset: 1}
+          - {key: sources, label: Sources, unit: billions, format: int, kind: series, param: catalogs.sources_per_year, divisor: 1000000000, offset: 1}
+          - {key: fsources, label: Forced sources, unit: billions, format: int, kind: series, param: catalogs.forced_sources_base_per_year, divisor: 1000000000, offset: 1}
+      - title: QSERV DATABASE SIZE
         rows:
-          - {key: czar, label: Czar / object index, unit: TB, format: int}
-          - {key: worker, label: "Worker database, this release", unit: TB, format: int}
+          - {key: logical, label: "Catalogue, logical uncompressed, one copy", unit: TB, format: int, note: "catalogue rows x row sizes, before compression and replication"}
+          - {key: czar, label: "Object table, replicated and compressed", unit: TB, format: int}
+          - {key: worker, label: "Worker database on disk, this release (replicated, compressed)", unit: TB, format: int}
           - {key: worker_win, label: "Worker database, retention window", unit: TB, format: int}
           - {key: worker_pb, label: "  same in PB", unit: PB, format: dec2, style: sub}
+      - title: CALIBRATION AGAINST MEASURED DATA
+        rows:
+          - {key: per_copy, label: Worker database per copy, unit: TB, format: int}
+          - {key: vs_measured, label: As a multiple of the measured data preview, unit: x, format: dec1}
+          - {key: vs_visits, label: Visits as a multiple of the data preview, unit: x, format: dec1, style: sub}
       - title: NODE PROJECTION
         rows:
           - {key: per_node, label: Data per node (drive-density ramp), unit: TB/node, format: dec1, kind: series, param: qserv_data_per_node}
@@ -912,7 +961,10 @@ workbook:
           - {key: nodes_have, label: Qserv nodes deployed today, unit: nodes, format: int, style: link}
           - {key: surplus, label: Surplus / (gap), unit: nodes, format: int}
     notes:
-      - "Database size = catalog rows x row sizes (Key Numbers) x replication factor, summed over the retention window. Node count divides that by the assumed usable TB per node, which ramps as drives densify. Replication is already included, so these are physical nodes. The catalog-size and per-node rows are the only raw inputs on this tab; everything else references Key Numbers."
+      - "Database size = catalogue rows x row sizes x compression x replication, summed over the retention window. Node count divides that by the assumed usable TB per node, which ramps as drives densify. Replication is already included, so these are physical nodes."
+      - "STRUCTURE: the catalogue series are data-release scale — the first entry is DR1, one full survey-year — so they sit one column to the right of the data-preview column. No modelled catalogue counts exist for the preview, so that column is anchored on a measured figure instead. Both the compression factor and the replication factor are applied on top of the logical row, so the on-disk row is what a purchase has to cover."
+      - "CAVEAT: the calibration rows compare the modelled catalogue against the one measured point available. They are NOT expected to match exactly — the data preview covers a small sky area, so its object count is far below a data release, while sources scale with visits. They are there to keep the modelled figures next to measurement rather than to validate them. The modelled data-release columns rest on logical row sizes that have never been checked against a measured catalogue; until per-table row counts are available, treat them as an upper bound."
+      - "The replication factor and the row-size calibration are the two levers that move every catalogue figure. Both are marked on Key Numbers."
 
   df_template:
     tab: DF Template
@@ -990,5 +1042,5 @@ workbook:
       - "Tape: the increment in tape capacity that must be BOUGHT. Tape already on the floor and the capacity assumed available are netted off on All at USDF, so purchases begin only once the cumulative footprint exceeds that capacity."
       - "Qserv: node counts come from the Qserv tab. Purchases track the running maximum, so the cluster never shrinks, plus cohort refresh on the same rule as batch."
       - "Hosting scales with nodes in service; overhead is a percentage of the hardware subtotal plus a fixed annual amount."
-      - "The first column uses the actual capture requests from Cost Inputs rather than the model."
+      - "The first column uses the recorded actual requests from Cost Inputs rather than the model."
       - "SENSITIVITY: the live-intermediate fraction on Key Numbers is the single biggest driver of this forecast, and it is unmeasured. Change it there and every disk number moves."

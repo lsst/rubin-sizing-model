@@ -332,11 +332,18 @@ def render_projection(ws, spec, params, plan, n_loy, formulas, firsts,
         ws.cell(row=row, column=2, value=r.get("unit")).font = label_font
 
         if row_kind == "series":
+            # offset shifts a series right, for arrays whose first entry does
+            # not belong in the first loop-year column (e.g. data-release-scale
+            # catalogue counts against a leading data-preview column).
             values = dotted(params, r["param"])
             divisor = r.get("divisor", 1)
+            offset = r.get("offset", 0)
             editable = r.get("yellow", r["key"].startswith("sh_"))
             for i in range(n_loy):
-                cell = ws.cell(row=row, column=3 + i, value=values[i] / divisor)
+                j = i - offset
+                if j < 0 or j >= len(values):
+                    continue
+                cell = ws.cell(row=row, column=3 + i, value=values[j] / divisor)
                 cell.number_format = fmt
                 cell.font = BLUE
                 if editable:
@@ -548,21 +555,40 @@ def build_workbook(P: dict, output_path: str | None = None) -> str:
 
     win = P["storage_retention"]["qserv_window_years"]
     qs_formulas = {
+        # Logical, uncompressed, one copy — the LDM-141 row-size basis.
+        "logical": lambda c: (f"=({c}{Q('objects')}*({K('obj_row')}+{K('obj_extra')})"
+                              f"+{c}{Q('sources')}*{K('src_row')}"
+                              f"+{c}{Q('fsources')}*{K('fsrc_row')})"
+                              f"*{PER_BILLION}/{BYTES_PER_TB}"),
         "czar": lambda c: (f"={c}{Q('objects')}*{PER_BILLION}*{K('obj_row')}"
-                           f"*{K('qs_rep')}/{BYTES_PER_TB}"),
-        "worker": lambda c: (f"=({c}{Q('objects')}*({K('obj_row')}+{K('obj_extra')})"
-                             f"+{c}{Q('sources')}*{K('src_row')}"
-                             f"+{c}{Q('fsources')}*{K('fsrc_row')})"
-                             f"*{PER_BILLION}*{K('qs_rep')}/{BYTES_PER_TB}"),
+                           f"*{K('qs_compress')}*{K('qs_rep')}/{BYTES_PER_TB}"),
+        # On disk = logical x compression x replication.
+        # Modelled columns need an overlap allowance; the measured column
+        # already contains its own overlap bytes.
+        "worker": lambda c: (f"={c}{Q('logical')}*{K('qs_compress')}"
+                             f"*(1+{K('qs_overlap')})*{K('qs_rep')}"),
         "worker_win": lambda c: "=" + "+".join(
             f"{col(j)}{Q('worker')}"
             for j in range(max(0, idx(c) - (win - 1)), idx(c) + 1)),
         "worker_pb": lambda c: f"={c}{Q('worker_win')}/{TB_PER_PB}",
+        "per_copy": lambda c: f"={c}{Q('worker')}/{K('qs_rep')}",
+        "vs_measured": lambda c: f"={c}{Q('per_copy')}/{K('qs_dp2_meas')}",
+        "vs_visits": lambda c: (f"={AU}!{c}{A('survey_years')}"
+                                f"/({K('dp2_visits')}/({K('nights')}*{K('visits')}))"),
         "nodes_req": lambda c: f"=ROUNDUP({c}{Q('worker_win')}/{c}{Q('per_node')},0)",
         "nodes_have": lambda c: f"={K('qs_nodes')}",
         "surplus": lambda c: f"={c}{Q('nodes_have')}-{c}{Q('nodes_req')}",
     }
-    render_projection(ws_qs, W["qserv"], P, qs_plan, n_loy, qs_formulas, {})
+    # The data-preview column has no modelled catalogue counts: anchor it on
+    # the measured figure instead.
+    # The measured column is already a stored figure, so the row-size
+    # calibration does not apply to it; only replication does.
+    qs_firsts = {
+        "logical": "",
+        "czar": "",
+        "worker": f"={K('qs_dp2_meas')}*{K('qs_rep')}",
+    }
+    render_projection(ws_qs, W["qserv"], P, qs_plan, n_loy, qs_formulas, qs_firsts)
 
     # ── DF Template ─────────────────────────────────────────────
     render_df_template(wb, W["df_template"], P, K, AU, A, n_loy, fy0, last_col)
