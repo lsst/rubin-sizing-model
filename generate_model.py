@@ -466,7 +466,10 @@ def build_workbook(P: dict, output_path: str | None = None) -> str:
         "on_raw": lambda c: f"={K('rawcal')}*(COLUMN()-2)/{TB_PER_PB}",
         "on_prompt": lambda c: f"=({K('t1')}*(COLUMN()-2)+{K('t2')})/{TB_PER_PB}",
         "subtotal": lambda c: f"=SUM({c}{A('live_inter')}:{c}{A('on_prompt')})",
-        "onfloor_pb": lambda c: f"={c}{A('subtotal')}*(1+{K('other')})",
+        # Shown as its own line rather than folded into the total below, so the
+        # allowance is auditable against the itemised datasets it stands in for.
+        "other_pb": lambda c: f"={c}{A('subtotal')}*{K('other')}",
+        "onfloor_pb": lambda c: f"={c}{A('subtotal')}+{c}{A('other_pb')}",
         "onfloor_tb": lambda c: f"={c}{A('onfloor_pb')}*{TB_PER_PB}",
         "installed": lambda c: f"={K('installed_pb')}",
         "tape_raw": lambda c: (f"={K('rawcal')}*{K('tape_copies')}*(COLUMN()-2)"
@@ -556,8 +559,14 @@ def build_workbook(P: dict, output_path: str | None = None) -> str:
     win = P["storage_retention"]["qserv_window_years"]
     qs_formulas = {
         # Logical, uncompressed, one copy — the LDM-141 row-size basis.
-        "logical": lambda c: (f"=({c}{Q('objects')}*({K('obj_row')}+{K('obj_extra')})"
-                              f"+{c}{Q('sources')}*{K('src_row')}"
+        # Row sizes widen from one release to the next as measured columns are
+        # added, so the object and source terms carry a compounding factor.
+        # Forced sources are excluded: that schema is fixed. The exponent
+        # counts releases since DR1, which is the column at index 1.
+        "row_infl": lambda c: (f"=(1+{K('row_growth')})^(COLUMN()-{ord('D') - ord('A') + 1})"
+                               if idx(c) >= 1 else ""),
+        "logical": lambda c: (f"=(({c}{Q('objects')}*({K('obj_row')}+{K('obj_extra')})"
+                              f"+{c}{Q('sources')}*{K('src_row')})*{c}{Q('row_infl')}"
                               f"+{c}{Q('fsources')}*{K('fsrc_row')})"
                               f"*{PER_BILLION}/{BYTES_PER_TB}"),
         "czar": lambda c: (f"={c}{Q('objects')}*{PER_BILLION}*{K('obj_row')}"
@@ -575,6 +584,12 @@ def build_workbook(P: dict, output_path: str | None = None) -> str:
         "vs_measured": lambda c: f"={c}{Q('per_copy')}/{K('qs_dp2_meas')}",
         "vs_visits": lambda c: (f"={AU}!{c}{A('survey_years')}"
                                 f"/({K('dp2_visits')}/({K('nights')}*{K('visits')}))"),
+        # Calibration against an independently stated DR1 planning range.
+        # Meaningful only in the DR1 column, so blank everywhere else.
+        "plan_mid": lambda c: (f"=({K('qs_dr1_lo')}+{K('qs_dr1_hi')})/2*{TB_PER_PB}"
+                               if idx(c) == 1 else ""),
+        "vs_plan": lambda c: (f"={c}{Q('per_copy')}/{c}{Q('plan_mid')}"
+                              if idx(c) == 1 else ""),
         "nodes_req": lambda c: f"=ROUNDUP({c}{Q('worker_win')}/{c}{Q('per_node')},0)",
         "nodes_have": lambda c: f"={K('qs_nodes')}",
         "surplus": lambda c: f"={c}{Q('nodes_have')}-{c}{Q('nodes_req')}",

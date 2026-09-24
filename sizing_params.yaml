@@ -158,13 +158,24 @@ qserv:
   # anchor below is not misread; not used in any formula.
   replication_factor_measured: 2
   # Calibration between the LDM-141 logical row sizes above and what Qserv
-  # actually stores. *** UNANCHORED. ***
-  # The value came from ingest CSVs (19 TB compressed / 60 TB uncompressed),
-  # but Qserv stores 33.4 TB logical for that same catalogue, so that ratio
-  # describes a CSV-to-binary format change, not what Qserv does to a row.
-  # It cannot be derived without per-table row counts for a measured
-  # catalogue. Sensitivity at DR1: 1.0 -> ~1,170 TB/copy, 0.32 -> ~370 TB/copy.
-  ldm_to_stored_factor: 0.3167
+  # stores, BEFORE filesystem compression.
+  #
+  # Set to 1.0 deliberately. The previous 0.3167 came from ingest CSVs
+  # (19 TB compressed / 60 TB uncompressed), which measures a CSV-to-binary
+  # format change, not what Qserv does to a row. Worse, it double-counted
+  # compression: ZFS already doubles capacity on the hardware side, and that
+  # is carried in qserv_data_per_node below. Compression belongs on the
+  # capacity side or the volume side, not both.
+  #
+  # Still unanchored in the sense that no per-table row counts exist to
+  # confirm Qserv stores LDM-141 row bytes one-for-one. 1.0 is the neutral
+  # assumption, not a measurement. Sensitivity at DR1, per copy:
+  # 1.0 -> ~1,450 TB, 0.32 -> ~460 TB.
+  ldm_to_stored_factor: 1.0
+  # Independent DR1 catalogue estimate, one copy, PB. Used only as a
+  # calibration band on the Qserv tab; drives nothing.
+  dr1_independent_estimate_low_pb: 2
+  dr1_independent_estimate_high_pb: 3
   # Overlap regions are stored as a second table per chunk, holding rows from
   # neighbouring chunks so near-neighbour joins stay local. They are additional
   # bytes on top of the chunk tables.
@@ -213,11 +224,6 @@ imaging:
 storage_fractions:
   apdb_reference_tb: 4.5           # APDB reference total TB (OSS-REQ-0190 baseline)
   apdb_reference_visits: 57000     # visits corresponding to the APDB reference TB
-  # K-T: intermediates can be much larger than 10% today; belongs in total vs release story.
-  # Placeholder until derived from Jim C. release vs intermediate split (DRP doc).
-  scratch_fraction: 0.35
-  misc_overhead_fraction: 0.20     # other/misc = 20% of per-year subtotal
-  sims_output_tb: 5.0              # simulation output (constant per year)
 
 # ---------------------------------------------------------------------------
 # Catalog Row Sizes (from LDM-141)
@@ -232,6 +238,13 @@ catalogs:
   object_extra_row_bytes: 21005
   source_row_bytes: 467
   forced_source_row_bytes: 41
+  # Catalogue schemas widen from one data release to the next as measured
+  # columns are added. Rates implied by DMTN-135's construction-era projection:
+  # Object 3.02%, Object_Extra 3.00%, Source 3.12% per release; ForcedSource
+  # flat, because its schema is fixed. Applied PER RELEASE, not per calendar
+  # year -- the widening happens at a release boundary, so a slower release
+  # cadence does not make rows widen faster.
+  row_size_growth_per_release: 0.03
   loy1_objects: 27500000000        # 27.5 billion
   loy1_sources: 901000000000       # 901 billion
   loy1_forced_sources: 2910000000000  # 2.91 trillion
@@ -420,8 +433,6 @@ lifecycle:
 # Categories: compute → 3 yr default; jbod / nvme → 5 yr (storage_lifetime_years)
 # ---------------------------------------------------------------------------
 hardware_refresh:
-  compute_lifetime_years: 5    # default for batch, qserv, k8s, cassandra (5-yr policy, Aug 2026)
-  storage_lifetime_years: 5    # JBOD enclosures, NVMe servers
   # NOTE: per-cohort lifetime_years below still say 3 from the older policy;
   # left as-is pending explicit re-baselining of the Hardware Refresh tab.
   cohorts:
@@ -758,8 +769,11 @@ workbook:
           - {key: obj_row, label: Object row size, param: catalogs.object_row_bytes, unit: bytes, format: int}
           - {key: obj_extra, label: Object extra row size, param: catalogs.object_extra_row_bytes, unit: bytes, format: int, note: "uncompressed logical size of the auxiliary per-object tables; the largest single term in the catalogue total"}
           - {key: src_row, label: Source row size, param: catalogs.source_row_bytes, unit: bytes, format: int}
-          - {key: fsrc_row, label: Forced-source row size, param: catalogs.forced_source_row_bytes, unit: bytes, format: int}
-          - {key: qs_compress, label: LDM row size to stored-bytes factor, param: qserv.ldm_to_stored_factor, unit: ratio, format: ratio3, yellow: true, note: "UNANCHORED. Maps the logical row sizes above onto what Qserv actually stores. Cannot be pinned down without per-table row counts for a measured catalogue. At DR1 a factor of 1.0 gives about 1,170 TB per copy and 0.32 about 370 TB"}
+          - {key: fsrc_row, label: Forced-source row size, param: catalogs.forced_source_row_bytes, unit: bytes, format: int, note: "held flat: the forced-source schema is fixed, so it is the one row size that does not widen between releases"}
+          - {key: row_growth, label: Row-size growth per release, param: catalogs.row_size_growth_per_release, unit: fraction, format: pct, yellow: true, note: "schemas widen as measured columns are added. Compounds per RELEASE, so it is sensitive to release cadence rather than to elapsed years. Applied to the object and source row sizes above, not to forced sources"}
+          - {key: qs_compress, label: LDM row size to stored-bytes factor, param: qserv.ldm_to_stored_factor, unit: ratio, format: ratio3, yellow: true, note: "UNANCHORED. Maps the logical row sizes above onto what Qserv stores before filesystem compression. Set to 1.0 as the neutral assumption: filesystem compression is already carried in the per-node capacity, so applying it here as well would count it twice. At DR1, 1.0 gives about 1,450 TB per copy and 0.32 about 460 TB"}
+          - {key: qs_dr1_lo, label: "Independent DR1 catalogue estimate, low", param: qserv.dr1_independent_estimate_low_pb, unit: PB, format: dec1, note: "one copy, before replication. Used as a calibration band on the Qserv tab; drives no downstream figure"}
+          - {key: qs_dr1_hi, label: "Independent DR1 catalogue estimate, high", param: qserv.dr1_independent_estimate_high_pb, unit: PB, format: dec1, note: "one copy, before replication"}
           - {key: qs_dp2_meas, label: Measured data-preview catalogue (logical), param: qserv.dp2_measured_logical_tb, unit: TB, format: dec2, yellow: true, note: "unique-chunk total, before replication. Anchors the data-preview column on measurement instead of modelling it. The on-disk preview figure is this times the planning replication factor, so it is a provisioning figure, not a measurement"}
           - {key: qs_dp2_idx, label: Measured data-preview indexes (logical), param: qserv.dp2_measured_index_tb, unit: TB, format: dec2, note: "index portion of the row above; already included in it"}
       - title: DP2 / EDP2 REFERENCE (not used in projections)
@@ -852,7 +866,8 @@ workbook:
           - {key: on_rel, label: "On floor: retained releases (sliding window)", unit: PB, format: dec1}
           - {key: on_raw, label: "On floor: raw + calibration, cumulative", unit: PB, format: dec1}
           - {key: on_prompt, label: "On floor: prompt products (Tier-1 cumulative + Tier-2)", unit: PB, format: dec1}
-          - {key: subtotal, label: Subtotal before other allowance, unit: PB, format: dec1}
+          - {key: subtotal, label: Subtotal of modelled datasets, unit: PB, format: dec1}
+          - {key: other_pb, label: "Other / misc allowance (user areas, APDB, sims)", unit: PB, format: dec1, note: "a percentage of the subtotal above rather than itemised lines, because per-year user and sims arrays would be raw inputs on a calculated tab"}
           - {key: onfloor_pb, label: ON-FLOOR DISK NEED (drives purchases), unit: PB, format: dec1, style: bold}
           - {key: onfloor_tb, label: "  same in TB", unit: TB, format: int, style: sub}
           - {key: installed, label: Installed storage today, unit: PB, format: int, style: link}
@@ -942,6 +957,7 @@ workbook:
           - {key: objects, label: Objects, unit: billions, format: dec1, kind: series, param: catalogs.objects_per_year, divisor: 1000000000, offset: 1}
           - {key: sources, label: Sources, unit: billions, format: int, kind: series, param: catalogs.sources_per_year, divisor: 1000000000, offset: 1}
           - {key: fsources, label: Forced sources, unit: billions, format: int, kind: series, param: catalogs.forced_sources_base_per_year, divisor: 1000000000, offset: 1}
+          - {key: row_infl, label: "  row-size inflation vs DR1", unit: x, format: dec3, style: sub}
       - title: QSERV DATABASE SIZE
         rows:
           - {key: logical, label: "Catalogue, logical uncompressed, one copy", unit: TB, format: int, note: "catalogue rows x row sizes, before compression and replication"}
@@ -954,6 +970,8 @@ workbook:
           - {key: per_copy, label: Worker database per copy, unit: TB, format: int}
           - {key: vs_measured, label: As a multiple of the measured data preview, unit: x, format: dec1}
           - {key: vs_visits, label: Visits as a multiple of the data preview, unit: x, format: dec1, style: sub}
+          - {key: plan_mid, label: "Independent DR1 estimate, per copy (midpoint)", unit: TB, format: int, style: link}
+          - {key: vs_plan, label: Model as a multiple of that estimate, unit: x, format: dec2}
       - title: NODE PROJECTION
         rows:
           - {key: per_node, label: Data per node (drive-density ramp), unit: TB/node, format: dec1, kind: series, param: qserv_data_per_node}
@@ -965,6 +983,9 @@ workbook:
       - "STRUCTURE: the catalogue series are data-release scale — the first entry is DR1, one full survey-year — so they sit one column to the right of the data-preview column. No modelled catalogue counts exist for the preview, so that column is anchored on a measured figure instead. Both the compression factor and the replication factor are applied on top of the logical row, so the on-disk row is what a purchase has to cover."
       - "CAVEAT: the calibration rows compare the modelled catalogue against the one measured point available. They are NOT expected to match exactly — the data preview covers a small sky area, so its object count is far below a data release, while sources scale with visits. They are there to keep the modelled figures next to measurement rather than to validate them. The modelled data-release columns rest on logical row sizes that have never been checked against a measured catalogue; until per-table row counts are available, treat them as an upper bound."
       - "The replication factor and the row-size calibration are the two levers that move every catalogue figure. Both are marked on Key Numbers."
+      - "STRUCTURE: row sizes widen between releases, so the object and source terms carry the compounding inflation factor shown in the catalogue block above. Forced sources are excluded from it because that schema is fixed. The exponent counts releases since DR1, so a change of release cadence changes how far this compounds inside the ten years, not how fast it compounds per release."
+      - "CAVEAT: the last two calibration rows appear only in the DR1 column. They compare the modelled catalogue against an independently stated DR1 planning range, which drives nothing in this workbook. A multiple materially below 1 means the model is sizing under that expectation; treat a gap as unresolved rather than as either figure being confirmed."
+      - "CAVEAT: filesystem compression is applied once, on the capacity side, inside the data-per-node ramp. The row-size factor above must therefore stay on an uncompressed basis. Applying a compression ratio in both places understates the node count by roughly a factor of three."
 
   df_template:
     tab: DF Template
