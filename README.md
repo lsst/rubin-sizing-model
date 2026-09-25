@@ -42,6 +42,27 @@ anything that reads cached values only.
 uv run generate_model.py --params other.yaml --output other.xlsx
 ```
 
+### Stored values and LaTeX export (optional, need LibreOffice)
+
+```bash
+uv run generate_model.py --recalc          # store calculated values in the workbook
+uv run generate_model.py --emit-tex DIR    # also write LaTeX tables + number macros
+```
+
+`--recalc` recalculates the workbook in headless LibreOffice so that tools
+which read cached values (pandas, scripts, some previewers) see numbers. It
+refuses to write the result if any formula is lost or any cell evaluates to an
+error.
+
+`--emit-tex` writes one `longtable` file per table declared in the
+`tex_tables:` block of the YAML, plus a file of `\newcommand` macros so that
+figures quoted in a document's prose come from the same calculation as its
+tables. Each file is stamped with `git describe --dirty`; regenerate from a
+clean, tagged commit before citing the output.
+
+LibreOffice is found via `$SOFFICE`, then `PATH`, then the macOS app bundle
+(`brew install --cask libreoffice`).
+
 ## Repository layout
 
 | Path | Purpose |

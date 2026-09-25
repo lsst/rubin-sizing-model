@@ -2,7 +2,11 @@
 """
 Build the data-facility sizing and pricing workbook.
 
-    uv run generate_model.py
+    uv run generate_model.py                 # workbook of live formulas
+    uv run generate_model.py --recalc        # ... with calculated values stored
+    uv run generate_model.py --emit-tex DIR  # ... plus LaTeX tables and macros
+
+--recalc and --emit-tex need LibreOffice.
 
 Reads every number, label and note from ``sizing_params.yaml`` and writes an
 Excel workbook of live formulas covering the loop years of operations.
@@ -42,7 +46,12 @@ CELL COLOUR CONVENTION
 from __future__ import annotations
 
 import argparse
+import os
+import re
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import openpyxl
@@ -379,7 +388,7 @@ def render_projection(ws, spec, params, plan, n_loy, formulas, firsts,
 
 # ───────────────────────── the model ────────────────────────────
 
-def build_workbook(P: dict, output_path: str | None = None) -> str:
+def build_workbook(P: dict, output_path: str | None = None) -> tuple[str, dict]:
     W = P["workbook"]
     output_path = output_path or W["output"]
     n_loy = P["general"]["num_loy"]
@@ -428,7 +437,16 @@ def build_workbook(P: dict, output_path: str | None = None) -> str:
 
     kn_formulas = {
         "input_tb": lambda: f"={B('nights')}*{B('visits')}*{B('img_tb')}*{B('raw_comp')}",
-        "bytes_written": lambda: f"={B('ds_total')}",
+        # The compute estimate is for its own visit count, not for nights x
+        # visits per night, so the per-TB calibration uses that visit count.
+        "dr1_ch": lambda: f"={B('dr1_nd')}*{B('cores_node')}*{HOURS_PER_DAY}",
+        "ch_per_tb": lambda: (f"={B('dr1_ch')}/({B('dr1_visits')}"
+                              f"*{B('img_tb')}*{B('raw_comp')})"),
+        # One survey year (nights x visits per night) against the visit list the
+        # per-dataset estimate was made for; applied to compute and storage alike.
+        "yr_scale": lambda: f"={B('nights')}*{B('visits')}/{B('dr1_visits')}",
+        "bytes_written": lambda: f"={B('ds_total')}*{B('yr_scale')}",
+        "retained": lambda: f"={B('retained_est')}*{B('yr_scale')}",
         "intermediates": lambda: f"={B('bytes_written')}-{B('retained')}",
         "batch_nodes": lambda: f"={B('milano')}+{B('torino')}",
         "batch_cores": lambda: f"={B('batch_nodes')}*{B('cores_node')}",
@@ -495,7 +513,7 @@ def build_workbook(P: dict, output_path: str | None = None) -> str:
         "apdb_bk": lambda c: f"={K('apdb_backup')}/{n_loy}*(COLUMN()-2)",
         "cass": lambda c: f"={K('cass_nodes')}",
         "files_written": lambda c: (f"={KN}!$C${kn_map['ds_total']}/{PER_MILLION}"
-                                    f"*{c}{A('survey_years')}"),
+                                    f"*{K('yr_scale')}*{c}{A('survey_years')}"),
         "files_floor": lambda c: (f"={c}{A('files_written')}*({K('livef')}"
                                   f"*(1-{K('retained')}/{K('bytes_written')})"
                                   f"+{K('retained')}/{K('bytes_written')})"),
@@ -571,6 +589,9 @@ def build_workbook(P: dict, output_path: str | None = None) -> str:
                               f"*{PER_BILLION}/{BYTES_PER_TB}"),
         "czar": lambda c: (f"={c}{Q('objects')}*{PER_BILLION}*{K('obj_row')}"
                            f"*{K('qs_compress')}*{K('qs_rep')}/{BYTES_PER_TB}"),
+        # Low-latency tier: the APDB plus the replicated Object table. Reuses
+        # the APDB line already computed on the projection tab.
+        "fast_tb": lambda c: f"={AU}!{c}{A('apdb_tb')}+{c}{Q('czar')}",
         # On disk = logical x compression x replication.
         # Modelled columns need an overlap allowance; the measured column
         # already contains its own overlap bytes.
@@ -618,7 +639,9 @@ def build_workbook(P: dict, output_path: str | None = None) -> str:
                    K, C, H, R, A, Q, AU, QS, last_col)
 
     wb.save(output_path)
-    return output_path
+    maps = {"key_numbers": kn_map, "cost_inputs": ci_map, "all_at_usdf": au_map,
+            "facility_split": fs_map, "qserv": qs_map, "pricing_forecast": pf_map}
+    return output_path, maps
 
 
 def render_df_template(wb, spec, P, K, AU, A, n_loy, fy0, last_col):
@@ -805,6 +828,255 @@ def render_pricing(wb, spec, P, plan, n_loy, fy0, milestones,
                       total_col=total_col)
 
 
+# ───────────────────── recalculation (optional) ─────────────────
+#
+# openpyxl writes formulas without cached values. People opening the workbook
+# never notice, because Excel, LibreOffice and Google Sheets recalculate on
+# load; anything that reads it programmatically sees blanks. LibreOffice in
+# headless mode fills the values in.
+
+SOFFICE_CANDIDATES = ("soffice", "libreoffice",
+                      "/Applications/LibreOffice.app/Contents/MacOS/soffice")
+
+
+def find_soffice() -> str:
+    """LibreOffice binary: $SOFFICE, then PATH, then the macOS app bundle."""
+    explicit = os.environ.get("SOFFICE")
+    if explicit:
+        return explicit
+    for candidate in SOFFICE_CANDIDATES:
+        found = shutil.which(candidate)
+        if found:
+            return found
+        if Path(candidate).is_file():
+            return candidate
+    raise SystemExit("LibreOffice not found. Install it (macOS: "
+                     "brew install --cask libreoffice) or set SOFFICE.")
+
+
+def count_formulas(path) -> int:
+    wb = openpyxl.load_workbook(path)
+    return sum(1 for ws in wb for row in ws.iter_rows() for cell in row
+               if isinstance(cell.value, str) and cell.value.startswith("="))
+
+
+def recalculate(path) -> Path:
+    """Return a recalculated copy of ``path``; the original is untouched.
+
+    A throwaway LibreOffice profile is used so the conversion also works while
+    a LibreOffice window is open — otherwise headless mode silently does
+    nothing on macOS.
+    """
+    work = Path(tempfile.mkdtemp(prefix="sizing-recalc-"))
+    profile = (work / "profile").resolve().as_uri()
+    subprocess.run([find_soffice(), f"-env:UserInstallation={profile}",
+                    "--headless", "--calc", "--convert-to", "xlsx",
+                    "--outdir", str(work / "out"), str(path)],
+                   check=True, capture_output=True, timeout=900)
+    out = work / "out" / Path(path).name
+    if not out.exists():
+        raise SystemExit(f"LibreOffice produced no output for {path}")
+
+    before, after = count_formulas(path), count_formulas(out)
+    if before != after:
+        raise SystemExit(f"recalculation changed the formula count "
+                         f"({before} -> {after}); refusing to use it")
+    errors = [f"{ws.title}!{cell.coordinate}={cell.value}"
+              for ws in openpyxl.load_workbook(out, data_only=True)
+              for row in ws.iter_rows() for cell in row
+              if isinstance(cell.value, str) and cell.value.startswith("#")]
+    if errors:
+        raise SystemExit("formula errors after recalculation: "
+                         + ", ".join(errors[:10]))
+    return out
+
+
+# ─────────────────── LaTeX emission (optional) ──────────────────
+#
+# Writes tables in the longtable form the DMTN-135 tech note already uses,
+# plus a file of \newcommand macros so numbers quoted in prose come from the
+# same calculation as the tables. What to emit is declared in the tex_tables
+# block of the YAML; this code only formats.
+
+TEX_ESCAPES = {"\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$",
+               "#": r"\#", "_": r"\_", "{": r"\{", "}": r"\}",
+               "~": r"\textasciitilde{}", "^": r"\textasciicircum{}"}
+DECIMALS = {"dec1": 1, "dec2": 2, "dec3": 3, "ratio3": 3, "tb8": 8}
+
+
+def tex_escape(text) -> str:
+    return "".join(TEX_ESCAPES.get(ch, ch) for ch in str(text))
+
+
+def tex_value(value, fmt: str, scale: float = 1) -> str:
+    """Format one value the way the workbook's number format shows it."""
+    if value is None or value == "":
+        return ""
+    if not isinstance(value, (int, float)):
+        return tex_escape(value)
+    value = value * scale
+    if fmt == "pct":
+        return f"{value * 100:.0f}\\%"
+    if fmt == "pct1":
+        return f"{value * 100:.1f}\\%"
+    if fmt == "pct2":
+        return f"{value * 100:.2f}\\%"
+    if fmt == "usd":
+        return f"\\${value:,.0f}"
+    if fmt == "usdm":
+        return f"\\${value / PER_MILLION:,.2f}M"
+    return f"{value:,.{DECIMALS.get(fmt, 0)}f}"
+
+
+def tex_label(label) -> str:
+    """Workbook sub-rows are indented with spaces; keep that as a quad."""
+    text = str(label or "")
+    stripped = text.lstrip(" ")
+    return (r"\quad " if len(stripped) < len(text) else "") + tex_escape(stripped)
+
+
+def milestone_labels(P: dict, spec: dict) -> list[str]:
+    n_loy = P["general"]["num_loy"]
+    labels = [P["milestones_by_loy"].get(i + 1, "") for i in range(n_loy)]
+    if spec.get("mark_first_actual", True):
+        labels[0] = f"{labels[0]} (actual)" if labels[0] else "(actual)"
+    return labels
+
+
+def git_describe(repo: Path, inputs: list[Path]) -> str:
+    """Tag or commit of the model, marked -dirty only if an INPUT differs.
+
+    The generated workbook is deliberately ignored: rewriting it changes its
+    bytes on every run, which would otherwise mark a clean tag as dirty.
+    """
+    try:
+        ref = subprocess.run(
+            ["git", "-C", str(repo), "describe", "--tags", "--always"],
+            capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "unversioned"
+    changed = subprocess.run(
+        ["git", "-C", str(repo), "diff", "--quiet", "HEAD", "--"]
+        + [str(p.resolve()) for p in inputs]).returncode
+    return f"{ref}-dirty" if changed else ref
+
+
+def rows_by_key(spec: dict) -> dict:
+    return {r["key"]: r for sec in spec["sections"]
+            for r in (sec.get("rows") or []) if isinstance(r, dict) and "key" in r}
+
+
+def emit_tex(P: dict, maps: dict, recalculated: Path, outdir: Path,
+             repo: Path, inputs: list[Path]) -> list[Path]:
+    T, W = P["tex_tables"], P["workbook"]
+    n_loy = P["general"]["num_loy"]
+    fy0 = P["general"]["start_fiscal_year"]
+    wb = openpyxl.load_workbook(recalculated, data_only=True)
+    ref = git_describe(repo, inputs)
+    header = "".join(f"% {line.format(source=T['source'], ref=ref)}\n"
+                     for line in T["header_lines"])
+    outdir.mkdir(parents=True, exist_ok=True)
+    written = []
+
+    def cell(tab_key, key, column):
+        row = maps[tab_key].get(key)
+        if row is None:
+            raise SystemExit(f"tex_tables: no row '{key}' on tab '{tab_key}'")
+        return wb[W[tab_key]["tab"]].cell(row=row, column=column).value
+
+    def column_for(tab_key, at):
+        """None -> reference value column; 'total' -> the totals column;
+        otherwise a milestone name (DR1) or loop year (LOY3)."""
+        if at is None:
+            return 2
+        if at == "total":
+            return 3 + n_loy
+        for loy, name in P["milestones_by_loy"].items():
+            if at in (name, f"LOY{loy}"):
+                return 2 + int(loy)
+        raise SystemExit(f"tex_tables: unknown column '{at}'")
+
+    for t in T["tables"]:
+        tab_key = t["tab"]
+        spec = W[tab_key]
+        rows = rows_by_key(spec)
+        d = {**T["defaults"], **t}
+        lines = [header]
+        reference = tab_key in T["reference_tabs"]
+        # A history table reads a purchase-history grid: one column per fiscal
+        # year, starting at the reference value column.
+        history = bool(t.get("history"))
+        if history:
+            first = rows[t["rows"][0]]
+            source = P[first["_source"]]
+            n_hist = len(source[first["series"]])
+            colspec = f"|p{{{d['label_width']}}}|l|" + "r|" * n_hist
+            head = [d["label_header"], d["unit_header"]] + [
+                f"FY{source['first_fiscal_year'] + i}" for i in range(n_hist)]
+            font = d["reference_font"]
+        elif reference:
+            colspec = f"|p{{{d['label_width']}}}|r|l|"
+            head = [d["label_header"], d["value_header"], d["unit_header"]]
+            font = d["reference_font"]
+        else:
+            total = bool(t.get("total"))
+            ncols = n_loy + (1 if total else 0)
+            colspec = f"|p{{{d['label_width']}}}|l|" + "r|" * ncols
+            names = milestone_labels(P, spec) + ([spec["total_header"]] if total else [])
+            fys = [f"FY{fy0 + i}" for i in range(n_loy)] + ([""] if total else [])
+            head = [d["label_header"], d["unit_header"]] + names
+            font = d["projection_font"]
+        # Caption and label go in the first-page head only. Column headings
+        # repeat on continuation pages; a repeated \\label would be defined
+        # once per page and reported as multiply defined.
+        heading = ["\\hline",
+                   " & ".join(f"\\textbf{{{tex_escape(h)}}}" for h in head) + " \\\\"]
+        if not reference and not history:
+            heading.append(" & ".join(["", ""] + fys) + " \\\\")
+        lines.append(f"{font} \\begin{{longtable}}{{{colspec}}}")
+        lines.append(f"\\caption{{{t['caption']} \\label{{tab:{t['name']}}}}}\\\\")
+        lines += heading + ["\\hline\\endfirsthead"]
+        lines += heading + ["\\hline\\endhead"]
+        for key in t["rows"]:
+            r = rows.get(key)
+            if r is None:
+                raise SystemExit(f"tex_tables: no row '{key}' on '{tab_key}'")
+            fmt = r.get("format", "int")
+            if history:
+                cells = [tex_label(r["label"]), tex_escape(r.get("unit", t.get("unit", "")))]
+                cells += [tex_value(cell(tab_key, key, 2 + i), fmt) for i in range(n_hist)]
+            elif reference:
+                cells = [tex_label(r["label"]),
+                         tex_value(cell(tab_key, key, 2), fmt),
+                         tex_escape(r.get("unit", ""))]
+            else:
+                cells = [tex_label(r["label"]), tex_escape(r.get("unit", ""))]
+                cells += [tex_value(cell(tab_key, key, 3 + i), fmt) for i in range(ncols)]
+            lines.append(" & ".join(cells) + " \\\\ \\hline")
+        lines.append(f"\\end{{longtable}} {d['restore_font']}")
+        path = outdir / f"{t['name']}.tex"
+        path.write_text("\n".join(lines) + "\n")
+        written.append(path)
+
+    # Macros for numbers quoted in prose, plus the source reference so a
+    # document can link to exactly the version its tables came from.
+    lines = [header,
+             f"\\newcommand{{\\{T['macro_prefix']}{T['ref_macro']}}}{{{tex_escape(ref)}}}"]
+    for m in T["numbers"]:
+        name = T["macro_prefix"] + m["name"]
+        if not re.fullmatch(r"[A-Za-z]+", name):
+            raise SystemExit(f"tex_tables: macro '{name}' must be letters only")
+        rows = rows_by_key(W[m["tab"]])
+        fmt = m.get("format", rows[m["key"]].get("format", "int"))
+        value = cell(m["tab"], m["key"], column_for(m["tab"], m.get("at")))
+        lines.append(f"\\newcommand{{\\{name}}}"
+                     f"{{{tex_value(value, fmt, m.get('scale', 1))}}}")
+    path = outdir / T["numbers_file"]
+    path.write_text("\n".join(lines) + "\n")
+    written.append(path)
+    return written
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         description="Build the data-facility sizing and pricing workbook.")
@@ -812,6 +1084,11 @@ def main(argv=None) -> int:
                         help=f"parameter file (default: {DEFAULT_PARAMS})")
     parser.add_argument("-o", "--output", default=None,
                         help="output workbook (default: workbook.output in the YAML)")
+    parser.add_argument("--recalc", action="store_true",
+                        help="store calculated values in the workbook (needs LibreOffice)")
+    parser.add_argument("--emit-tex", nargs="?", const="", default=None, metavar="DIR",
+                        help="also write LaTeX tables and number macros "
+                             "(default DIR: tex_tables.output_dir; needs LibreOffice)")
     args = parser.parse_args(argv)
 
     params_path = Path(args.params)
@@ -820,10 +1097,26 @@ def main(argv=None) -> int:
     with params_path.open() as handle:
         P = yaml.safe_load(handle)
 
-    output = build_workbook(P, args.output)
+    output, maps = build_workbook(P, args.output)
     print(f"Wrote {output}")
-    print("Formulas are written without cached values. Open in Excel or "
-          "LibreOffice once to populate them.")
+
+    if args.recalc or args.emit_tex is not None:
+        recalculated = recalculate(output)
+        if args.recalc:
+            shutil.copyfile(recalculated, output)
+            print(f"Stored calculated values in {output}")
+        if args.emit_tex is not None:
+            outdir = Path(args.emit_tex or P["tex_tables"]["output_dir"])
+            inputs = [params_path, Path(__file__)]
+            repo = params_path.resolve().parent
+            written = emit_tex(P, maps, recalculated, outdir, repo, inputs)
+            print(f"Wrote {len(written)} LaTeX files to {outdir}/")
+            if git_describe(repo, inputs).endswith("-dirty"):
+                print("WARNING: generated from uncommitted changes; commit and "
+                      "regenerate before citing these tables.")
+    if not args.recalc:
+        print("Formulas are written without cached values. Open in Excel or "
+              "LibreOffice once to populate them, or pass --recalc.")
     return 0
 
 
