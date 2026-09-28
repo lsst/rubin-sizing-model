@@ -86,12 +86,14 @@ figure is stated in two places.
 | **Facility Split** | calculated | The same workload split across partner facilities, with per-year shares and capacity checks. |
 | **Qserv** | calculated | Cluster specification, catalogue-driven database size, and node projection. |
 | **DF Template** | calculated | Blank-fill calculator so another facility can size its own share. |
-| **USDF Pricing Forecast** | calculated | Annual purchases and spend, with a ten-year total. |
+| **All at USDF Pricing** | calculated | Annual purchases and spend if every workload is hosted at the USDF, at USDF prices, with a ten-year total. |
+| **Split USDF Pricing** | calculated | The USDF's own purchases and spend when DRP is shared at the Facility Split shares. Partner facilities are not priced. |
 
 Reference tabs may not read another tab. The projection tabs read only the
-reference tabs (and, for the split and the pricing forecast, the tabs that
+reference tabs (and, for the split and the two pricing tabs, the tabs that
 already computed demand and node counts — never re-deriving them, so the tabs
-cannot disagree).
+cannot disagree). The split pricing tab uses the same purchase rules as the
+all-at-USDF one; only its demand links differ.
 
 ### Cell colours
 

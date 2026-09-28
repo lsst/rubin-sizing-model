@@ -33,8 +33,10 @@ TAB ARCHITECTURE (enforced; no tab duplicates another tab's numbers)
     Facility Split   CALCULATED from Key Numbers + the projection tab.
     Qserv            CALCULATED from Key Numbers.
     DF Template      CALCULATED from Key Numbers + the projection tab.
-    Pricing Forecast CALCULATED from Key Numbers + Cost Inputs, reusing demand
-                     from the projection tab and node counts from Qserv.
+    All at USDF      CALCULATED from Key Numbers + Cost Inputs, reusing demand
+      Pricing        from the projection tab and node counts from Qserv.
+    Split USDF       Same rows and purchase rules; demand from Facility Split
+      Pricing        (USDF share). Partner facilities are not priced.
 
 CELL COLOUR CONVENTION
     blue    raw input, safe to edit
@@ -46,6 +48,7 @@ CELL COLOUR CONVENTION
 from __future__ import annotations
 
 import argparse
+import copy
 import os
 import re
 import shutil
@@ -416,6 +419,11 @@ def build_workbook(P: dict, output_path: str | None = None) -> tuple[str, dict]:
     fs_map, fs_plan = lay_out(W["facility_split"], 6, P)
     qs_map, qs_plan = lay_out(W["qserv"], qs_start, P)
     pf_map, pf_plan = lay_out(W["pricing_forecast"], 5, P)
+    # The split pricing tab reuses the all-at-USDF pricing rows; only its
+    # labels, notes and three demand links differ. The merged spec is stored
+    # back so the LaTeX export can read it like any other tab.
+    W["pricing_split"] = derive_spec(W["pricing_forecast"], W["pricing_split"])
+    ps_map, ps_plan = lay_out(W["pricing_split"], 5, P)
 
     def K(key):
         return f"{KN}!$B${kn_map[key]}"
@@ -427,6 +435,7 @@ def build_workbook(P: dict, output_path: str | None = None) -> tuple[str, dict]:
         return f"{CI}!$B${ci_map[key]}:$F${ci_map[key]}"
 
     A, F, Q, R = au_map.__getitem__, fs_map.__getitem__, qs_map.__getitem__, pf_map.__getitem__
+    FS = f"'{W['facility_split']['tab']}'"
 
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
@@ -634,13 +643,28 @@ def build_workbook(P: dict, output_path: str | None = None) -> tuple[str, dict]:
                      ci_map, ci_plan, {}, ncols=7,
                      note_col=W["cost_inputs"]["note_col"])
 
-    # ── Pricing Forecast ────────────────────────────────────────
+    # ── All at USDF Pricing ────────────────────────────────────────
     render_pricing(wb, W["pricing_forecast"], P, pf_plan, n_loy, fy0, milestones,
                    K, C, H, R, A, Q, AU, QS, last_col)
 
+    # ── Split USDF Pricing ──────────────────────────────────────
+    # USDF's own purchases when DRP is shared. Batch follows USDF's share of
+    # peak cores; disk drops only the live intermediates held at partners.
+    # Everything else (tape, Qserv, K8s, services) stays at USDF unchanged.
+    split_demand = {
+        "d_ch": lambda c: f"={FS}!{c}{F('ch_local')}",
+        "d_cores": lambda c: f"={FS}!{c}{F('pc_local')}",
+        "k_need": lambda c: (f"=({AU}!{c}{A('onfloor_pb')}-{FS}!{c}{F('st_fr')}"
+                             f"-{FS}!{c}{F('st_uk')})*{TB_PER_PB}"),
+    }
+    render_pricing(wb, W["pricing_split"], P, ps_plan, n_loy, fy0, milestones,
+                   K, C, H, ps_map.__getitem__, A, Q, AU, QS, last_col,
+                   demand=split_demand)
+
     wb.save(output_path)
     maps = {"key_numbers": kn_map, "cost_inputs": ci_map, "all_at_usdf": au_map,
-            "facility_split": fs_map, "qserv": qs_map, "pricing_forecast": pf_map}
+            "facility_split": fs_map, "qserv": qs_map, "pricing_forecast": pf_map,
+            "pricing_split": ps_map}
     return output_path, maps
 
 
@@ -719,8 +743,30 @@ def render_df_template(wb, spec, P, K, AU, A, n_loy, fy0, last_col):
     ws.cell(row=row + 1, column=1, value=check_note(spec["note"])).font = ITALIC
 
 
+def derive_spec(base: dict, override: dict) -> dict:
+    """A tab spec built from another: same rows, with its own tab name, title,
+    notes, relabelled rows (row_labels: {key: label}) and section titles
+    (section_titles: {index: title})."""
+    spec = copy.deepcopy(base)
+    for field in ("tab", "title", "tab_color", "notes", "total_header"):
+        if field in override:
+            spec[field] = override[field]
+    labels = override.get("row_labels", {})
+    for i, sec in enumerate(spec["sections"]):
+        if i in override.get("section_titles", {}):
+            sec["title"] = override["section_titles"][i]
+        for r in sec.get("rows") or []:
+            if isinstance(r, dict) and r.get("key") in labels:
+                r["label"] = labels[r["key"]]
+    unknown = set(labels) - {r["key"] for sec in spec["sections"]
+                             for r in (sec.get("rows") or []) if isinstance(r, dict)}
+    if unknown:
+        raise SystemExit(f"row_labels for unknown rows: {sorted(unknown)}")
+    return spec
+
+
 def render_pricing(wb, spec, P, plan, n_loy, fy0, milestones,
-                   K, C, H, R, A, Q, AU, QS, last_col):
+                   K, C, H, R, A, Q, AU, QS, last_col, demand=None):
     ws = wb.create_sheet(spec["tab"])
     ws.sheet_properties.tabColor = spec["tab_color"]
     ws.column_dimensions["A"].width = 48
@@ -810,6 +856,7 @@ def render_pricing(wb, spec, P, plan, n_loy, fy0, milestones,
         "total_m": lambda c: f"={c}{R('total')}",
         "cumulative": lambda c: f"={prev(c)}{R('cumulative')}+{c}{R('total_m')}",
     }
+    formulas.update(demand or {})
     firsts = {
         "b_growth": f"={C('act_batch')}",
         "k_todate": f"={K('installed_pb')}*{TB_PER_PB}+C{R('k_buy')}",
@@ -1055,7 +1102,43 @@ def emit_tex(P: dict, maps: dict, recalculated: Path, outdir: Path,
             lines.append(" & ".join(cells) + " \\\\ \\hline")
         lines.append(f"\\end{{longtable}} {d['restore_font']}")
         path = outdir / f"{t['name']}.tex"
-        path.write_text("\n".join(lines) + "\n")
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        written.append(path)
+
+    # Comparison tables: published reference values against this model, by
+    # survey years covered (reference LOYn and model DRn both hold n years).
+    words = {1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five",
+             6: "Six", 7: "Seven", 8: "Eight", 9: "Nine", 10: "Ten"}
+    ratio_macros = []
+    for t in T.get("comparisons", []):
+        d = {**T["defaults"], **t}
+        at = t["at"]
+        head = [d["label_header"], d["unit_header"]]
+        for n in at:
+            head += [f"{t['reference_header']} n={n}", f"2026 n={n}", "ratio"]
+        colspec = f"|p{{{d['label_width']}}}|l|" + "r|r|r|" * len(at)
+        heading = ["\\hline", " & ".join(f"\\textbf{{{tex_escape(h)}}}" for h in head) + " \\\\"]
+        lines = [header, f"{d['projection_font']} \\begin{{longtable}}{{{colspec}}}",
+                 f"\\caption{{{t['caption']} \\label{{tab:{t['name']}}}}}\\\\"]
+        lines += heading + ["\\hline\\endfirsthead"] + heading + ["\\hline\\endhead"]
+        for r in t["rows"]:
+            refs = r["reference"] if isinstance(r["reference"], list) else [r["reference"]]
+            series = [dotted(P, path) for path in refs]
+            shown = r.get("display_scale", 1)
+            cells = [tex_escape(r["label"]), tex_escape(r["unit"])]
+            for n in at:
+                ref_value = sum(s_[n - 1] for s_ in series)
+                model_value = cell(r["tab"], r["key"], 2 + n + 1) * r.get("scale", 1)
+                ratio = model_value / ref_value
+                cells += [tex_value(ref_value * shown, r.get("format", "int")),
+                          tex_value(model_value * shown, r.get("format", "int")),
+                          f"{ratio:.2f}"]
+                if r.get("macro"):
+                    ratio_macros.append((f"{T['macro_prefix']}Cmp{r['macro']}{words[n]}", f"{ratio:.2f}"))
+            lines.append(" & ".join(cells) + " \\\\ \\hline")
+        lines.append(f"\\end{{longtable}} {d['restore_font']}")
+        path = outdir / f"{t['name']}.tex"
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         written.append(path)
 
     # Macros for numbers quoted in prose, plus the source reference so a
@@ -1071,8 +1154,12 @@ def emit_tex(P: dict, maps: dict, recalculated: Path, outdir: Path,
         value = cell(m["tab"], m["key"], column_for(m["tab"], m.get("at")))
         lines.append(f"\\newcommand{{\\{name}}}"
                      f"{{{tex_value(value, fmt, m.get('scale', 1))}}}")
+    for name, value in ratio_macros:
+        if not re.fullmatch(r"[A-Za-z]+", name):
+            raise SystemExit(f"tex_tables: macro '{name}' must be letters only")
+        lines.append(f"\\newcommand{{\\{name}}}{{{value}}}")
     path = outdir / T["numbers_file"]
-    path.write_text("\n".join(lines) + "\n")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     written.append(path)
     return written
 
@@ -1094,7 +1181,7 @@ def main(argv=None) -> int:
     params_path = Path(args.params)
     if not params_path.exists():
         parser.error(f"parameter file not found: {params_path}")
-    with params_path.open() as handle:
+    with params_path.open(encoding="utf-8") as handle:
         P = yaml.safe_load(handle)
 
     output, maps = build_workbook(P, args.output)
