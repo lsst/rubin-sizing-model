@@ -6,7 +6,7 @@ Build the data-facility sizing and pricing workbook.
     uv run generate_model.py --recalc        # ... with calculated values stored
     uv run generate_model.py --emit-tex DIR  # ... plus LaTeX tables and macros
 
---recalc and --emit-tex need LibreOffice.
+--recalc needs LibreOffice; --emit-tex does not.
 
 Reads every number, label and note from ``sizing_params.yaml`` and writes an
 Excel workbook of live formulas covering the loop years of operations.
@@ -49,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+from decimal import ROUND_HALF_UP, Decimal
 import os
 import re
 import shutil
@@ -59,6 +60,8 @@ from pathlib import Path
 
 import openpyxl
 import yaml
+from openpyxl.utils import get_column_letter
+from pycel import ExcelCompiler
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 # ─────────────────────────── styling ────────────────────────────
@@ -795,14 +798,24 @@ def render_pricing(wb, spec, P, plan, n_loy, fy0, milestones,
     def infl(c):
         return f"(1+{C('fac')})^({idx(c)})"
 
+    def rebuy(c, row, lifetime):
+        """Purchases from `row` made `lifetime` years before column c.
+
+        The range stops at the previous column, so a cell never refers to
+        itself or to later years (no circular reference). In the first column
+        there is nothing earlier to re-buy."""
+        if idx(c) == 0:
+            return "0"
+        return (f"IF(COLUMN()-2>{lifetime},"
+                f"INDEX($C${row}:{prev(c)}${row},1,COLUMN()-2-{lifetime}),0)")
+
     def cohort(hist_key, own_row):
         """Historic cohort due this FY, plus re-buy of this tab's own purchases."""
         return (lambda c:
                 f"=IF(AND(COLUMN()+{fy0}-3-{life}>={hist_fy0},"
                 f"COLUMN()+{fy0}-3-{life}<={hist_last}),"
                 f"INDEX({H(hist_key)},1,COLUMN()+{fy0}-3-{life}-{hist_fy0 - 1}),0)"
-                f"+IF(COLUMN()-2>{life},"
-                f"INDEX($C${own_row}:${last_col}${own_row},1,COLUMN()-2-{life}),0)")
+                f"+{rebuy(c, own_row, life)}")
 
     fleet = P["current_fleet"]
     base_nodes = (fleet["batch"]["milano_nodes"] + fleet["batch"]["torino_nodes"]
@@ -822,9 +835,7 @@ def render_pricing(wb, spec, P, plan, n_loy, fy0, milestones,
         "k_need": lambda c: f"={AU}!{c}{A('onfloor_tb')}",
         "k_todate": lambda c: f"={prev(c)}{R('k_todate')}+{c}{R('k_buy')}",
         "k_buy": lambda c: f"=MAX(0,{c}{R('k_need')}-{prev(c)}{R('k_todate')})",
-        "k_rebuy": lambda c: (f"=IF(COLUMN()-2>{C('life_s')},"
-                              f"INDEX($C${R('k_buy')}:${last_col}${R('k_buy')},"
-                              f"1,COLUMN()-2-{C('life_s')}),0)"),
+        "k_rebuy": lambda c: f"={rebuy(c, R('k_buy'), C('life_s'))}",
         "k_cost": lambda c: (f"=({c}{R('k_buy')}+{c}{R('k_rebuy')})"
                              f"*{C('ceph')}*{infl(c)}"),
         "t_add": lambda c: f"={AU}!{c}{A('tape_buy')}",
@@ -834,9 +845,7 @@ def render_pricing(wb, spec, P, plan, n_loy, fy0, milestones,
                             f"COLUMN()+{fy0}-3-{life}<={hist_last}),"
                             f"INDEX({H('hist_k8s')},1,"
                             f"COLUMN()+{fy0}-3-{life}-{hist_fy0 - 1}),0)"
-                            f"+IF(COLUMN()-2>{life},"
-                            f"INDEX($C${R('q_k8s')}:${last_col}${R('q_k8s')},"
-                            f"1,COLUMN()-2-{life}),0)"),
+                            f"+{rebuy(c, R('q_k8s'), life)}"),
         "q_k8s_cost": lambda c: f"={c}{R('q_k8s')}*{C('k8snode')}*{infl(c)}",
         "q_need": lambda c: f"={QS}!{c}{Q('nodes_req')}",
         "q_max": lambda c: f"=MAX({prev(c)}{R('q_max')},{c}{R('q_need')})",
@@ -955,6 +964,14 @@ def tex_escape(text) -> str:
     return "".join(TEX_ESCAPES.get(ch, ch) for ch in str(text))
 
 
+def excel_round(value: float, decimals: int) -> str:
+    """Round as Excel displays: the 15-significant-digit decimal value, half
+    away from zero. Formatting the binary float instead makes a value such as
+    100.35 print as 100.3 or 100.4 depending on the last bit."""
+    exact = Decimal(f"{value:.15g}")
+    return f"{exact.quantize(Decimal(1).scaleb(-decimals), ROUND_HALF_UP):,}"
+
+
 def tex_value(value, fmt: str, scale: float = 1) -> str:
     """Format one value the way the workbook's number format shows it."""
     if value is None or value == "":
@@ -962,17 +979,13 @@ def tex_value(value, fmt: str, scale: float = 1) -> str:
     if not isinstance(value, (int, float)):
         return tex_escape(value)
     value = value * scale
-    if fmt == "pct":
-        return f"{value * 100:.0f}\\%"
-    if fmt == "pct1":
-        return f"{value * 100:.1f}\\%"
-    if fmt == "pct2":
-        return f"{value * 100:.2f}\\%"
+    if fmt in ("pct", "pct1", "pct2"):
+        return f"{excel_round(value * 100, {'pct': 0, 'pct1': 1, 'pct2': 2}[fmt])}\\%"
     if fmt == "usd":
-        return f"\\${value:,.0f}"
+        return f"\\${excel_round(value, 0)}"
     if fmt == "usdm":
-        return f"\\${value / PER_MILLION:,.2f}M"
-    return f"{value:,.{DECIMALS.get(fmt, 0)}f}"
+        return f"\\${excel_round(value / PER_MILLION, 2)}M"
+    return excel_round(value, DECIMALS.get(fmt, 0))
 
 
 def tex_label(label) -> str:
@@ -1013,12 +1026,20 @@ def rows_by_key(spec: dict) -> dict:
             for r in (sec.get("rows") or []) if isinstance(r, dict) and "key" in r}
 
 
-def emit_tex(P: dict, maps: dict, recalculated: Path, outdir: Path,
+def emit_tex(P: dict, maps: dict, workbook: Path, outdir: Path,
              repo: Path, inputs: list[Path]) -> list[Path]:
     T, W = P["tex_tables"], P["workbook"]
     n_loy = P["general"]["num_loy"]
     fy0 = P["general"]["start_fiscal_year"]
-    wb = openpyxl.load_workbook(recalculated, data_only=True)
+    # Evaluate the formulas in Python; identical to LibreOffice on every cell.
+    # Evaluating in sheet order first keeps each dependency chain short;
+    # asking cold for a late cell (e.g. cumulative spend) exceeds recursion depth.
+    evaluator = ExcelCompiler(filename=str(workbook))
+    for ws in openpyxl.load_workbook(workbook):
+        for row in ws.iter_rows():
+            for c in row:
+                if isinstance(c.value, str) and c.value.startswith("="):
+                    evaluator.evaluate(f"'{ws.title}'!{c.coordinate}")
     ref = git_describe(repo, inputs)
     header = "".join(f"% {line.format(source=T['source'], ref=ref)}\n"
                      for line in T["header_lines"])
@@ -1029,7 +1050,8 @@ def emit_tex(P: dict, maps: dict, recalculated: Path, outdir: Path,
         row = maps[tab_key].get(key)
         if row is None:
             raise SystemExit(f"tex_tables: no row '{key}' on tab '{tab_key}'")
-        return wb[W[tab_key]["tab"]].cell(row=row, column=column).value
+        coord = f"{get_column_letter(column)}{row}"
+        return evaluator.evaluate(f"'{W[tab_key]['tab']}'!{coord}")
 
     def column_for(tab_key, at):
         """None -> reference value column; 'total' -> the totals column;
@@ -1175,7 +1197,7 @@ def main(argv=None) -> int:
                         help="store calculated values in the workbook (needs LibreOffice)")
     parser.add_argument("--emit-tex", nargs="?", const="", default=None, metavar="DIR",
                         help="also write LaTeX tables and number macros "
-                             "(default DIR: tex_tables.output_dir; needs LibreOffice)")
+                             "(default DIR: tex_tables.output_dir)")
     args = parser.parse_args(argv)
 
     params_path = Path(args.params)
@@ -1187,23 +1209,17 @@ def main(argv=None) -> int:
     output, maps = build_workbook(P, args.output)
     print(f"Wrote {output}")
 
-    if args.recalc or args.emit_tex is not None:
-        recalculated = recalculate(output)
-        if args.recalc:
-            shutil.copyfile(recalculated, output)
-            print(f"Stored calculated values in {output}")
-        if args.emit_tex is not None:
-            outdir = Path(args.emit_tex or P["tex_tables"]["output_dir"])
-            inputs = [params_path, Path(__file__)]
-            repo = params_path.resolve().parent
-            written = emit_tex(P, maps, recalculated, outdir, repo, inputs)
-            print(f"Wrote {len(written)} LaTeX files to {outdir}/")
-            if git_describe(repo, inputs).endswith("-dirty"):
-                print("WARNING: generated from uncommitted changes; commit and "
-                      "regenerate before citing these tables.")
-    if not args.recalc:
-        print("Formulas are written without cached values. Open in Excel or "
-              "LibreOffice once to populate them, or pass --recalc.")
+    if args.emit_tex is not None:
+        outdir = Path(args.emit_tex or P["tex_tables"]["output_dir"])
+        inputs = [params_path, Path(__file__)]
+        repo = params_path.resolve().parent
+        written = emit_tex(P, maps, Path(output), outdir, repo, inputs)
+        print(f"Wrote {len(written)} LaTeX files to {outdir}/")
+        if git_describe(repo, inputs).endswith("-dirty"):
+            print("WARNING: generated from uncommitted changes.")
+    if args.recalc:
+        shutil.copyfile(recalculate(output), output)
+        print(f"Stored calculated values in {output}")
     return 0
 
 

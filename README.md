@@ -11,7 +11,7 @@ whole workbook follows.
 ## Prerequisites
 
 [uv](https://docs.astral.sh/uv/) is the only requirement; it installs Python
-and the two dependencies for you.
+and the dependencies for you.
 
 ```bash
 # macOS / Linux
@@ -25,7 +25,7 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 Anything from Python 3.10 works. If you would rather not use uv:
-`pip install openpyxl pyyaml` and run `python generate_model.py`.
+`pip install openpyxl pyyaml pycel` and run `python generate_model.py`.
 
 ## Quick start
 
@@ -42,26 +42,22 @@ anything that reads cached values only.
 uv run generate_model.py --params other.yaml --output other.xlsx
 ```
 
-### Stored values and LaTeX export (optional, need LibreOffice)
+### LaTeX export and stored values
 
 ```bash
+uv run generate_model.py --emit-tex DIR    # LaTeX tables + number macros
 uv run generate_model.py --recalc          # store calculated values in the workbook
-uv run generate_model.py --emit-tex DIR    # also write LaTeX tables + number macros
 ```
 
-`--recalc` recalculates the workbook in headless LibreOffice so that tools
-which read cached values (pandas, scripts, some previewers) see numbers. It
-refuses to write the result if any formula is lost or any cell evaluates to an
-error.
+`--emit-tex` evaluates the workbook's formulas in Python (pycel) and writes one
+`longtable` file per table declared under `tex_tables:` in the YAML, plus a
+file of `\newcommand` macros for figures quoted in prose. Each file is
+stamped with the model's git tag, marked `-dirty` if `sizing_params.yaml` or
+`generate_model.py` has uncommitted changes.
 
-`--emit-tex` writes one `longtable` file per table declared in the
-`tex_tables:` block of the YAML, plus a file of `\newcommand` macros so that
-figures quoted in a document's prose come from the same calculation as its
-tables. Each file is stamped with `git describe --dirty`; regenerate from a
-clean, tagged commit before citing the output.
-
-LibreOffice is found via `$SOFFICE`, then `PATH`, then the macOS app bundle
-(`brew install --cask libreoffice`).
+`--recalc` is optional. It stores calculated values in the `.xlsx` for tools
+that read cached values (pandas, scripts). It needs LibreOffice, found via
+`$SOFFICE`, `PATH`, or the macOS app bundle.
 
 ## Repository layout
 
@@ -70,7 +66,7 @@ LibreOffice is found via `$SOFFICE`, then `PATH`, then the macOS app bundle
 | `generate_model.py` | The script. Formulas and layout mechanics only. |
 | `sizing_params.yaml` | Every input number, label, note and source citation. |
 | `rubin_usdf_model_2026_condensed_with_pricing.xlsx` | Generated output, committed so it can be read without running anything. |
-| `pyproject.toml` | Dependencies (`openpyxl`, `pyyaml`). |
+| `pyproject.toml` | Dependencies (`openpyxl`, `pyyaml`, `pycel`). |
 | `dp-drp-derivations/`, `sizing-model-spreadsheet/` | Source documents the parameters were derived from. |
 
 ## What the workbook contains
